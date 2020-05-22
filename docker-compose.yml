@@ -1,0 +1,18 @@
+version: '3'
+services:
+  angular:
+    container_name: angular
+    hostname: angular
+    build: trailscape
+    depends_on:
+      - nodejs
+    ports:
+      - "80:80"
+  nodejs:
+    container_name: nodejs
+    hostname: nodejs
+    build: trailscape-backend
+    volumes:
+      - ./data/ASTGTMV003:/data
+    ports:
+      - "8080:8080"

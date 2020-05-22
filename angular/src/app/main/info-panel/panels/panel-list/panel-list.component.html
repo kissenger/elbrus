@@ -1,0 +1,47 @@
+
+
+<div class='container'  class="p-0 h-100 position-static border border-white">
+
+  <!-- Loop through available data and create a list box item for each-->
+  <div *ngFor="let line of listData; let i = index">
+
+    <!-- conditional formatting for each list item, and click event-->
+    <div id={{line.pathId}}
+      (click)="onLineClick(line.pathId)"
+      class="p-1 border-bottom border-left border-right"
+      [ngClass]="getCssClass(line.pathId, i)">
+
+      <!-- make up a name if one doesnt exist-->
+      <div *ngIf="line.name === '' || !line.name; else else_div" class="name">
+        {{line.category}} {{line.pathType}}
+      </div>
+
+      <ng-template #else_div>
+        <div class="name">{{line.name}}</div>
+      </ng-template>
+
+      <table class="table table-sm m-0 p-0">
+        <tbody>
+          <tr>
+            <td>{{line.stats.distance | units: 'distance': units.distance}}</td>
+            <td *ngIf="line.isElevations"> {{line.stats.elevations.ascent | units: 'elevation': units.elevation}} </td>
+            <td *ngIf="line.isElevations"> {{line.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}} </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+
+  <div *ngIf="numberOfRoutes === 0; else moreThanOneRouteDiv" class="p-0 text-center">
+    No routes to show.
+  </div>
+  <ng-template #moreThanOneRouteDiv >
+    <div class="more p-0 text-center">
+      showing {{numberOfLoadedRoutes}} of {{numberOfRoutes}} routes <br>
+      <span *ngIf="!isEndOfList" class="global-make-text-look-like-link" (click)="onMoreClick()"> Load more </span> <br>
+    </div>
+  </ng-template>
+
+</div>

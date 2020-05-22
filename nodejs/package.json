@@ -1,0 +1,39 @@
+{
+  "name": "trailscape-backend",
+  "description": "Backend for trailscape",
+  "homepage": "https://github.com/kissenger/trailscape-backend",
+  "keywords": [
+    "trailscape",
+    "route",
+    "track"
+  ],
+  "author": "Gordon Taylor",
+  "contributors": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kissenger/trailscape-backend"
+  },
+  "main": "src/app.js",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "test": "mocha",
+    "serve": "nodemon server.mjs"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "chai-as-promised": "*",
+    "mocha": "^7.1.2"
+  },
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "geo-points-and-paths": "^1.4.0",
+    "jael": "^1.0.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.15",
+    "multer": "^1.4.2"
+  }
+}

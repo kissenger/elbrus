@@ -1,0 +1,18 @@
+Operations on active route:<br>
+<span class="global-make-text-look-like-link" (click)="onDeleteClick()"> Delete route </span> <br>
+Edit route<br>
+Export to .fit file<br>
+<span class="global-make-text-look-like-link" (click)="onExportGpxClick()"> Export to .gpx file </span> <br>
+<hr>
+Create a new route:<br>
+<span> Load from .fit file </span> <br>
+<span class="global-make-text-look-like-link" (click)="onLoadFileClick()"> Load from .gpx file </span> <br>
+<span class="global-make-text-look-like-link" (click)="onCreateOnMapClick()"> Create on map </span> <br>
+<!-- <a [routerLink]="['/route/create']">Create on map</a><br> -->
+
+<!-- This is a hidden element activated by the 'Load from file' link above -->
+<div class="file-selector">
+  <form id="file_form">
+    <input type="file" id="file-select-single" (change)="onFilePickedImport($event, false, 'route')" single>
+  </form>
+</div>

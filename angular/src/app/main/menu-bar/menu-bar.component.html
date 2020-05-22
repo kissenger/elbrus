@@ -1,0 +1,21 @@
+
+<!-- invisible container to get d-flex onto child elements -->
+<div class="btn-group-vertical menu-bar position-absolute mt-2">
+
+    <button (click)="onClick({command: 'undo'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Undo</small></button>
+    <button (click)="onClick({command: 'close'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Close Route</small></button>
+    <button (click)="onClick({command: 'clear'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Clear Route</small></button>
+
+    <div class="btn-group-vertical btn-group-toggle" data-toggle="buttons">
+        <label (click)="onClick({option: {snapProfile: 'driving'}})" class="btn btn-light btn-sm active radio-btns text-left">
+            <input type="radio" name="options" id="roads" autocomplete="off" checked> <small>Follow Roads</small>
+        </label>
+        <label (click)="onClick({option: {snapProfile: 'walking'}})" class="btn btn-light btn-sm text-left">
+            <input type="radio" name="options" id="paths" autocomplete="off"> <Small>Follow Paths</Small>
+        </label>
+        <label (click)="onClick({option: {snapProfile: 'none'}})" class="btn btn-light btn-sm text-left">
+            <input type="radio" name="options" id="none" autocomplete="off"> <Small> Don't Follow</Small>
+        </label>
+    </div>
+
+</div>

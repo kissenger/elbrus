@@ -1,0 +1,30 @@
+.input{
+  font-size: 12px;
+  padding: 3px 6px;
+}
+
+.inner {
+  /* border: 1px red dotted; */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.table thead tr th, .table tbody tr td {
+  height: 10px;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  /* margin-top: 0px; */
+ }
+/*
+.table tbody tr {
+  height: 10px;
+} */
+
+/* .outer {
+  border: 1px blue solid;
+}
+
+.buttons {
+  border: 1px green dashed;
+} */

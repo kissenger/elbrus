@@ -1,0 +1,24 @@
+
+
+/* debugging only */
+div { border: 0px red solid;  }
+li  { border: 0px blue solid; }
+nav { border: 0px orange solid; }
+
+/* brand image */
+.image {
+  width: 175px;
+}
+
+/* colour of the link text */
+.navbar-nav li a {
+  color: var(--ts-brown);
+  font-weight: bold;
+  cursor: pointer; 
+}
+
+/* colour of the link text hover*/
+.navbar-nav li a:hover{
+  /* background-color: var(--ts-background); */
+  color: var(--ts-green);
+}

@@ -1,0 +1,145 @@
+<div class="outer d-flex flex-column h-100">
+
+  <!-- Inner container contains scrollabel content -->
+
+  <div  class="inner h-100">
+
+    <div *ngIf="!isData; else weHaveDataToShowDiv" class="p-0 text-center">
+      No details to show.
+    </div>
+
+    <ng-template #weHaveDataToShowDiv>
+
+      <!-- Name and Description Block -->
+
+      <!-- If we are listing data only, then we dont need form inputs-->
+      <div *ngIf="isListPage; else showForm">
+
+        <div *ngIf="!pathName; else makeUpName" class="h5 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">
+            {{pathCategory}} {{pathType}}
+        </div>
+
+        <ng-template #makeUpName>
+          <div class="h5 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{pathName}}</div>
+        </ng-template>
+
+        <!-- <div class="mt-1 mb-2">{{pathDescription}}</div> -->
+        <div *ngIf="pathDescription" class="mt-1 mb-1 pt-1 pb-1 border-bottom">{{pathDescription}}</div>
+
+      </div>
+
+
+      <!-- Form type -->
+      <ng-template #showForm>
+
+        <div class="input-group input-group-sm my-1">
+            <input class='form-control' type='text' placeholder='Give your route a name' [(ngModel)]="pathName" name="first">
+        </div>
+
+        <div class="input-group input-group-sm my-1">
+            <textarea class='form-control' placeholder='Give your route a description' [(ngModel)]="pathDescription"></textarea>
+        </div>
+
+      </ng-template>
+      <!-- End of Name and Description Block -->
+
+      <div class="mt-1 mb-1 pt-1 pb-1 border-bottom">
+        <table class="table table-sm m-0 p-0">
+          <tbody>
+            <tr>
+              <td>Distance</td>
+              <td>{{pathStats.distance | units: 'distance': units.distance}}</td>
+            </tr>
+            <tr>
+              <td>Points</td>
+              <td>{{pathStats.nPoints | number: '1.0-0'}}</td>
+            </tr>
+            <tr>
+              <td>Category</td>
+              <td>{{pathCategory}}</td>
+            </tr>
+            <tr>
+              <td>Direction</td>
+              <td>{{pathDirection}}</td>
+            </tr>
+
+            <!-- Elevations shown only if isElevations is true -->
+
+            <tr *ngIf="isElevations">
+              <!-- <th scope="row"></th> -->
+              <td>Ascent</td>
+              <td>{{pathStats.elevations.ascent | units: 'elevation': units.elevation}}</td>
+            </tr>
+            <tr *ngIf="isElevations">
+              <!-- <th scope="row"></th> -->
+              <td>Descent</td>
+              <td>{{pathStats.elevations.descent | units: 'elevation': units.elevation}}</td>
+            </tr>
+            <tr *ngIf="isElevations">
+              <!-- <th scope="row"></th> -->
+              <td>Max Elev</td>
+              <td>{{pathStats.elevations.maxElev | units: 'elevation': units.elevation}}</td>
+            </tr>
+            <tr *ngIf="isElevations">
+              <!-- <th scope="row"></th> -->
+              <td>Min Elev</td>
+              <td>{{pathStats.elevations.minElev | units: 'elevation': units.elevation}}</td>
+            </tr>
+            <tr *ngIf="isElevations">
+              <!-- <th scope="row"></th> -->
+              <td>Lumpiness</td>
+              <td>{{pathStats.elevations.lumpiness | units: 'elevation': units.elevation: units.distance}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+  </ng-template>
+
+      <!-- Plot elevations -->
+      <div class="w-100 small">
+          <div [hidden]="!isElevations" class="w-100" id="chart_div"></div>
+      </div>
+      <!-- End of plot elevations-->
+
+      <!-- Hills table -->
+      <div *ngIf="isHills" class="pt-2 w-100 mx-auto text-center small border-top">
+
+          <table class='table thead-dark table-bordered table-striped table-sm'>
+              <thead>
+                  <tr>
+                      <th>Height Gain<br>[m]</th>
+                      <th>Grad Ave<br>[%]</th>
+                      <th>Grad Max<br>[%]</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let row of pathStats.hills">
+                      <td>{{row.dHeight | number: '1.0-0'}}</td>
+                      <td>{{row.aveGrad| number: '1.0-1'}}</td>
+                      <td>{{row.maxGrad | number: '1.0-1'}}</td>
+                  </tr>
+              </tbody>
+          </table>
+          <!-- End of hills table -->
+
+      </div>
+      <!-- End of elevations block -->
+
+      <div *ngIf="isLong">
+          <div class="name">Elevation data are not stored for 'long' routes. <br></div>
+          <div class="text-center">Find out why <a href={{wikiLink}}>here.</a></div>
+      </div>
+
+    </div> <!-- close "inner"  div-->
+
+    <!-- buttons stay at the bottom regarldess of amount of content -->
+    <!-- String Type -->
+    <div *ngIf="!isListPage" class="buttons d-flex mb-2 mt-2 justify-content-center" >
+        <button (click)="onSave()" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
+        <button (click)="onCancel()" type="button" class="btn btn-secondary btn-sm ml-1 mt-1" type="cancel">Cancel</button>
+    </div>
+
+
+
+</div>

@@ -1,0 +1,21 @@
+<div class="login-box bg-white border rounded ">
+
+  <button type="button" class="close" (click)="close.next()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  
+  <form class="form-signin m-3" name="login-form"> 
+
+    <h4 class="mb-3 font-weight-normal text-center">Log in</h4>
+
+    <input type="text" name="userName" class="form-control form-control-sm mt-4 d-block" placeholder="Username" required autofocus>
+    <input type="password" name="password" class="form-control form-control-sm mt-1 d-block" placeholder="Password" required>
+
+    <button class="btn btn-sm btn-primary btn-block mt-4 mb-2" type="submit" (click)="onLoginClick()">Login</button>
+
+    <div class="small">
+      Not registered? <span class="global-make-text-look-like-link" (click)="onRegisterClick()"> Register here. </span>
+    </div>
+  </form>
+
+</div>

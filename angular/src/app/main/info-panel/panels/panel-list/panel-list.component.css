@@ -1,0 +1,24 @@
+.name {
+  font-size: normal;
+  font-weight: bold;
+}
+
+.details {
+  font-size: small;
+}
+
+.highlight-div {
+  background-color: whitesmoke;
+}
+
+.more {
+  font-size: small;
+}
+
+.table thead tr th, .table tbody tr td {
+  height: 10px;
+  border: none;
+  padding: 0px;
+  margin: 0px;
+  /* margin-top: 0px; */
+ }

@@ -1,0 +1,31 @@
+
+
+<!-- <div class="alert-box bg-white border">
+  <h5>Something went wrong :-( </h5>
+  &quot; {{_title}} &quot;<br>
+  &quot; {{_message}} &quot;
+
+  <div class="buttons d-flex mb-2 justify-content-center" >
+    <button *ngIf="_cancelBtn" (click)="closed.next()" type="button" class="btn btn-secondary btn-sm ml-1" type="cancel">Cancel</button>
+    <button *ngIf="_okBtn" (click)="closed.next()" type="button" class="btn btn-secondary btn-sm ml-1" type="cancel">OK</button>
+  </div>
+</div> -->
+
+<div class="alert-box-outer border d-flex flex-column align-middle border rounded bg-white">
+
+  <div class="border-bottom rounded-top d-flex justify-content-center bg-light">
+    <h6 class="m-2 modal-title">{{_title}}</h6>
+  </div>
+
+  <div class="m-2 mb-auto bg-white">
+    <small>{{_message}}</small>
+  </div>
+
+  <div class="border-top rounded-bottom bg-light">
+    <div class="d-flex justify-content-end mt-2 mb-2">
+      <button *ngIf="_cancelBtn" (click)="cancel.next()" type="button" class="btn btn-secondary btn-sm mr-2" type="cancel">Cancel</button>
+      <button *ngIf="_okBtn" (click)="ok.next()" type="button" class="btn btn-primary btn-sm mr-2" type="ok">ok</button>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,34 @@
+/* this is needed here to get bootstrap flex layout to work correctly - dont remove */
+html,
+body {
+  height: 100%;
+  margin: 0
+}
+
+/* define colour scheme */
+:root {
+  --ts-brown: #523209;
+  --ts-green: #83964B;
+  --ts-dark-border: #DDD2AD;
+  --ts-light-border: #EEEBDB;
+  --ts-background: #E9E2CB;
+}
+
+.global-make-text-look-like-link{
+  cursor: pointer;
+  color: #007BFF;
+}
+.global-make-text-look-like-link:hover{
+  text-decoration: underline; 
+  color: #0056B3;
+  cursor: pointer;
+}
+
+/* a:link {
+  color: red;
+} */
+
+/* useful for debugging - keep in for future use */
+/* div {
+  border: red 2px solid;
+} */
