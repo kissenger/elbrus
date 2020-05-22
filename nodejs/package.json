@@ -1,24 +1,16 @@
 {
-  "name": "trailscape-backend",
-  "description": "Backend for trailscape",
-  "homepage": "https://github.com/kissenger/trailscape-backend",
-  "keywords": [
-    "trailscape",
-    "route",
-    "track"
-  ],
-  "author": "Gordon Taylor",
+  "name": "elbrus-backend",
   "contributors": [],
   "repository": {
     "type": "git",
-    "url": "https://github.com/kissenger/trailscape-backend"
+    "url": "https://github.com/kissenger/elbrus"
   },
   "main": "src/app.js",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "test": "mocha",
-    "serve": "nodemon server.mjs"
+    "server": "nodemon server.mjs"
   },
   "devDependencies": {
     "chai": "*",

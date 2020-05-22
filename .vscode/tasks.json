@@ -1,0 +1,33 @@
+{
+	"version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Serve front and back",
+      "dependsOn": [
+        "Serve front",
+        "Serve back"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Serve front",
+      "type": "shell",
+      "command": "cd angular && ng serve",
+      "presentation": {
+        "group": "split terminal",
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Serve back",
+      "type": "shell",
+      "command": "cd nodejs && npm run server",
+      "presentation": {
+        "group": "split terminal",
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}

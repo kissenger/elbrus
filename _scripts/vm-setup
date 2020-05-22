@@ -1,0 +1,18 @@
+# aliases
+sudo rm ~/.bash_aliases
+touch ~/.bash_aliases
+echo alias ll=\"ls -al\" >> ~/.bash_aliases
+echo alias fe=\"cd ~/angular\" >> ~/.bash_aliases
+echo alias be=\"cd ~/nodejs\" >> ~/.bash_aliases
+
+# mount the persistent disk - do this after attaching to the disk in the console
+# $ sudo lsblk --> to check persitent disk name ('sdb') 
+sudo mount -o discard,defaults /dev/sdb ./dat
+
+# change permissions
+sudo chmod -r 777 angular
+sudo chmod -r 777 nodejs
+
+# docker
+# sudo docker-compose build
+# sudo docker-compose up -d
