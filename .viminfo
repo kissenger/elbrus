@@ -12,7 +12,7 @@
 ~h
 # Command Line History (newest to oldest):
 :wq
-|2,0,1590246794,,"wq"
+|2,0,1590246981,,"wq"
 :q
 |2,0,1590246765,,"q"
 :u
@@ -74,28 +74,38 @@
 |3,1,36,0,1,0,1590246274,"u"
 
 # File marks:
-'0  1  3  ~/.gitignore
-|4,48,1,3,1590246794,"~/.gitignore"
-'1  1  0  ~/.gitignore
-|4,49,1,0,1590246765,"~/.gitignore"
-'2  18  119  ~/_scripts/readme.txt
-|4,50,18,119,1590246276,"~/_scripts/readme.txt"
-'3  1  0  ~/angular/src/environments/environment.prod.ts
-|4,51,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
-'4  24  36  ~/_scripts/vm-setup
-|4,52,24,36,1590246127,"~/_scripts/vm-setup"
-'5  1  0  ~/angular/src/environments/environment.prod.ts
-|4,53,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
-'6  28  7  ~/_scripts/vm-setup
-|4,54,28,7,1590246106,"~/_scripts/vm-setup"
-'7  28  7  ~/_scripts/vm-setup
-|4,55,28,7,1590246106,"~/_scripts/vm-setup"
-'8  35  0  ~/angular/src/environments/environment.prod.ts
-|4,56,35,0,1590246073,"~/angular/src/environments/environment.prod.ts"
-'9  35  0  ~/angular/src/environments/environment.prod.ts
-|4,57,35,0,1590246073,"~/angular/src/environments/environment.prod.ts"
+'0  3  10  ~/.gitignore
+|4,48,3,10,1590246981,"~/.gitignore"
+'1  2  1  ~/.gitignore
+|4,49,2,1,1590246929,"~/.gitignore"
+'2  2  1  ~/.gitignore
+|4,50,2,1,1590246929,"~/.gitignore"
+'3  1  3  ~/.gitignore
+|4,51,1,3,1590246794,"~/.gitignore"
+'4  1  3  ~/.gitignore
+|4,52,1,3,1590246794,"~/.gitignore"
+'5  1  3  ~/.gitignore
+|4,53,1,3,1590246794,"~/.gitignore"
+'6  1  3  ~/.gitignore
+|4,54,1,3,1590246794,"~/.gitignore"
+'7  1  0  ~/.gitignore
+|4,55,1,0,1590246765,"~/.gitignore"
+'8  1  0  ~/.gitignore
+|4,56,1,0,1590246765,"~/.gitignore"
+'9  1  0  ~/.gitignore
+|4,57,1,0,1590246765,"~/.gitignore"
 
 # Jumplist (newest first):
+-'  3  10  ~/.gitignore
+|4,39,3,10,1590246981,"~/.gitignore"
+-'  2  1  ~/.gitignore
+|4,39,2,1,1590246972,"~/.gitignore"
+-'  2  1  ~/.gitignore
+|4,39,2,1,1590246929,"~/.gitignore"
+-'  1  3  ~/.gitignore
+|4,39,1,3,1590246915,"~/.gitignore"
+-'  1  3  ~/.gitignore
+|4,39,1,3,1590246915,"~/.gitignore"
 -'  1  3  ~/.gitignore
 |4,39,1,3,1590246794,"~/.gitignore"
 -'  1  0  ~/.gitignore
@@ -108,6 +118,54 @@
 |4,39,18,119,1590246276,"~/_scripts/readme.txt"
 -'  18  119  ~/_scripts/readme.txt
 |4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  18  119  ~/_scripts/readme.txt
+|4,39,18,119,1590246276,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
+-'  25  16  ~/_scripts/readme.txt
+|4,39,25,16,1590246155,"~/_scripts/readme.txt"
 -'  25  16  ~/_scripts/readme.txt
 |4,39,25,16,1590246155,"~/_scripts/readme.txt"
 -'  25  16  ~/_scripts/readme.txt
@@ -132,6 +190,54 @@
 |4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
 -'  1  0  ~/angular/src/environments/environment.prod.ts
 |4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
+-'  1  0  ~/angular/src/environments/environment.prod.ts
+|4,39,1,0,1590246141,"~/angular/src/environments/environment.prod.ts"
 -'  24  36  ~/_scripts/vm-setup
 |4,39,24,36,1590246127,"~/_scripts/vm-setup"
 -'  24  36  ~/_scripts/vm-setup
@@ -164,147 +270,43 @@
 |4,39,24,36,1590246127,"~/_scripts/vm-setup"
 -'  24  36  ~/_scripts/vm-setup
 |4,39,24,36,1590246127,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246119,"~/_scripts/vm-setup"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  1  0  ~/angular/src/environments/environment.prod.ts
-|4,39,1,0,1590246117,"~/angular/src/environments/environment.prod.ts"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  28  7  ~/_scripts/vm-setup
-|4,39,28,7,1590246106,"~/_scripts/vm-setup"
--'  29  0  ~/_scripts/vm-setup
-|4,39,29,0,1590246097,"~/_scripts/vm-setup"
--'  29  0  ~/_scripts/vm-setup
-|4,39,29,0,1590246097,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
+-'  24  36  ~/_scripts/vm-setup
+|4,39,24,36,1590246127,"~/_scripts/vm-setup"
 
 # History of marks within files (newest to oldest):
 
 > ~/.gitignore
-	*	1590246793	0
-	"	1	3
-	^	1	4
-	.	1	3
-	+	1	3
+	*	1590246980	0
+	"	3	10
+	^	3	11
+	.	3	10
+	+	1	4
+	+	2	2
+	+	3	10
 
 > ~/_scripts/readme.txt
 	*	1590246274	0
