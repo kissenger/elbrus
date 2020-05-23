@@ -5,6 +5,13 @@ echo alias ll=\"ls -al\" >> ~/.bash_aliases
 echo alias fe=\"cd ~/angular\" >> ~/.bash_aliases
 echo alias be=\"cd ~/nodejs\" >> ~/.bash_aliases
 
+# create backend .env file
+touch ~/nodejs/.env
+echo PORT=3000 >> ~/nodejs/.env
+echo DEBUG=false >> ~/nodejs/.env
+echo GEOTIFF_PATH=/data >> ~/nodejs/.env
+echo "Must set MONGODB_PASSWORD and AUTH_KEY manually in ~/nodejs/.env
+
 # mount the persistent disk - do this after attaching to the disk in the console
 # $ sudo lsblk --> to check persitent disk name ('sdb') 
 sudo mount -o discard,defaults /dev/sdb ./dat
