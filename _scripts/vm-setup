@@ -31,7 +31,10 @@ sudo rm temp
 # mount the persistent disk - do this after attaching to the disk in the console
 # $ sudo lsblk --> to check persitent disk name ('sdb') 
 sudo mkdir ~/data
-sudo mount -o discard,defaults,noload /dev/sdb ~/data
+# mount read-only disk
+sudo mount -o discard,defaults,noload /dev/sdc ~/data
+# mount read/write disk
+# sudo mount -o discard,defaults /dev/sdc ~/data
 
 # change permissions
 sudo chmod -R 777 ~/angular
