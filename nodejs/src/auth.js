@@ -98,40 +98,31 @@ authRoute.post('/register', async (req, res) => {
 
 
 
-authRoute.post('/login', (req, res) => {
+authRoute.post('/login', async (req, res) => {
 
   debugMsg('login user');
 
   // check that user exists and return data in variable user
-  Users
-    .findOne( {userName: req.body.userName}, {} )
-    .then( (user) => {
 
+  try {
+
+    const user = await Users.findOne( {userName: req.body.userName}, {} );
     if (!user) {
       throw 'User name not found.'
+    };
 
-    } else {
-      // user exists
-      bcrypt.compare(req.body.password, user.hash).then( (result) => {
-
-        if (result) {
-          const token = jsonwebtoken.sign({ subject: user._id }, KEY);
-          res.status(200).send({token, user});
-        } else {
-          throw 'Password did not match';
-        }
-
-      }).catch( (err) => {
-        throw err.toString();
-      })
+    const passwordOK = await bcrypt.compare(req.body.password, user.hash);
+    if (!passwordOK) {
+      throw 'Password did not match';
     }
 
-  }).catch( (err) => {
-    debugMsg('ERROR: ' + err);
-    res.status(401).send(err.toString());
-  })
+    const token = jsonwebtoken.sign({ subject: user._id }, KEY);
+    res.status(200).send({token, user});
+
+  } catch (error) {
+    debugMsg('ERROR: ' + error);
+    res.status(401).send(error.toString());
+  }
 
 });
 
-
-// export { authRoute, verifyToken };
