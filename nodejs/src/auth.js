@@ -56,45 +56,47 @@ authRoute.post('/update-user-data', verifyToken, (req, res) => {
 })
 
 
-authRoute.post('/register', (req, res) => {
+authRoute.post('/register', async (req, res) => {
 // take incoming user data in the form {email, password}, hash password,
 // save to db, get json token and return to front end
-console.log('blah');
+
   debugMsg('register user');
 
   const saltRounds = 10;
 
-  // confirm that email address does not exist in db
-  Users
-    .findOne( {email: req.body.email}, {} )
-    .then( (user) => {
+  try {
+      
+    // confirm that email address does not exist in db
+    let user = await Users.findOne( {userName: req.body.userName}, {} );
+    if (user) {
+      throw 'This user name is already registered';
+    }
 
-      if ( user ) {
-        throw 'This email address has already been registered';
+    let email = await Users.findOne( {email: req.body.email}, {} );
+    if ( email ) {
+      throw 'This email address is already registered';
+    }
 
-      } else {
-        // email is new
-        bcrypt.hash(req.body.password, saltRounds).then( (hash) => {
+    // if we got here then there are no duplicates to worry about
+    bcrypt.hash(req.body.password, saltRounds)
+      .then( (hash) => Users.create({...req.body, hash}))
+      .then( (regUser) => {
+        const token = jsonwebtoken.sign( {subject: regUser._id}, KEY);
+        res.status(200).send({token, user: regUser});
+      })
+      .catch( (err) => {
+        throw err.toString();
+      });
 
-          Users.create({...req.body, hash}).then( (regUser) => {
-            const token = jsonwebtoken.sign( {subject: regUser._id}, KEY);
-            res.status(200).send({token, user: regUser});
-          }).catch( (err) => {
-            throw err.toString();
-          });
+  } catch (error) {
+    debugMsg('ERROR: ' + error);
+    res.status(401).send(error);    
 
-        }).catch( (err) => {
-          throw err.toString();
-        })
-      }
-
-    }).catch( (err) => {
-      debugMsg('ERROR: ' + err);
-      res.status(401).send(err);
-    })
-
+  }
 
 });
+
+
 
 authRoute.post('/login', (req, res) => {
 

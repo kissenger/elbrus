@@ -98,7 +98,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   notValidUserName() {
-    return this.userName.length > 2;
+    return this.userName.length < 2;
   }
 
   notValidPassword() {
