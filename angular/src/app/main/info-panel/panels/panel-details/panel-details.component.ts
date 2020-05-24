@@ -21,7 +21,9 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   private chartData: Array<Array<number>>;
   private colourArray: Array<string>;
 
-  public pathName = '';
+  public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
+  public givenPathName: string;     // name given to the path in the details form; overrides the default name
+
   public pathDescription = '';
   public isListPage: boolean;
   public isLong: boolean;
@@ -34,8 +36,7 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   public pathType: string;
   public pathStats: TsPathStats = globals.emptyStats;
   public pathDirection: string;
-  public defaultPathName: string;
-  public givenPathName: string;
+
 
   constructor(
     private dataService: DataService,
@@ -54,15 +55,16 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
 
       this.pathStats = geoJson.properties.stats;
-      this.pathName = geoJson.properties.info.name;
       this.pathDescription = geoJson.properties.info.description;
       this.pathCategory = geoJson.properties.info.category;
       this.pathDirection = geoJson.properties.info.direction;
       this.pathType = geoJson.properties.info.pathType;
 
       // if this is a create-route action, then path will not have a name until one is entered in the form; create a default one
-      if (!this.pathName) {
-        this.defaultPathName = (this.pathCategory === 'None' ? 'Uncategorised' : this.pathCategory) + ' ' + this.pathType;
+      if (!geoJson.properties.info.name) {
+        this.pathName = (this.pathCategory === 'None' ? 'Uncategorised' : this.pathCategory) + ' ' + this.pathType;
+      } else {
+        this.pathName = geoJson.properties.info.name;
       }
 
       this.isData = true;
@@ -106,17 +108,18 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.dataService.getFromStore('activePath', false);
+    const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
 
       // if this is a create-route action then pathName is null, so take givenPathName (input from form) if it exists, otherwise use default
-      this.pathName = !!this.givenPathName ? this.givenPathName : this.defaultPathName;
+
 
       const sendObj = {
         coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
         elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),
-        name: this.pathName,
+        name: pathName,
         description: this.pathDescription
       };
       this.httpService.saveCreatedRoute(sendObj).subscribe( () => {
@@ -125,10 +128,11 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
 
     // imported file, backend only needs to knw the pathType, pathId, name and description, so create theis object and call http
     } else {
+
       const sendObj = {
         pathId: newPath.properties.pathId,
         pathType: newPath.properties.info.pathType,
-        name: this.pathName,
+        name: pathName,
         description: this.pathDescription
       };
       this.httpService.saveImportedPath(sendObj).subscribe( () => {

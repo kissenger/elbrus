@@ -90,7 +90,7 @@ export function gpxRead(data) {
   lineData = data.slice(a,b)
   a = lineData.indexOf("<name>");
   b = lineData.indexOf("</name>");
-  if ( a !== -1 && b !== -1 ) {
+  if ( a > 0 && b > 0 ) {
     nameOfPath = lineData.slice(a + 6, b);
   }
 

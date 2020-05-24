@@ -61,7 +61,7 @@ app.post('/import-route/', verifyToken, upload.single('filename'), (req, res) =>
   debugMsg('import-route');
 
   const pathFromGPX = gpxRead(req.file.buffer.toString());
-  getRouteInstance(pathFromGPX.nameOfPath, null, pathFromGPX.lngLat, pathFromGPX.elev)
+  getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev)
     .then( route => createMongoModel('route', route.asMongoObject(req.userId, false)) )
     .then( doc => res.status(201).json( {hills: new GeoJSON().fromDocument(doc).toGeoHills()} ))
     .catch( (error) => res.status(500).json(error.toString()) );

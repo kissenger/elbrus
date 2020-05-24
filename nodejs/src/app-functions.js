@@ -100,7 +100,7 @@ export function getListData(docs, count) {
  * Abstracts the workflow to instantiate a Route given a data array from an import
  */
 export function getRouteInstance(name, description, lngLat, elevs) {
-
+  
   return new Promise ( (resolve, reject) => {
     Route.preFlight(lngLat, elevs)
       .then( prePath => resolve( new Route(name, description, prePath.lngLat, prePath.elev) ))
