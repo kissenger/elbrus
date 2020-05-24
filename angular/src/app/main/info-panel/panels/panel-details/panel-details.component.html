@@ -15,15 +15,7 @@
       <!-- If we are listing data only, then we dont need form inputs-->
       <div *ngIf="isListPage; else showForm">
 
-        <div *ngIf="!pathName; else makeUpName" class="h5 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">
-            {{pathCategory}} {{pathType}}
-        </div>
-
-        <ng-template #makeUpName>
-          <div class="h5 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{pathName}}</div>
-        </ng-template>
-
-        <!-- <div class="mt-1 mb-2">{{pathDescription}}</div> -->
+        <div class="h6 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{pathName}}</div>
         <div *ngIf="pathDescription" class="mt-1 mb-1 pt-1 pb-1 border-bottom">{{pathDescription}}</div>
 
       </div>
@@ -33,7 +25,7 @@
       <ng-template #showForm>
 
         <div class="input-group input-group-sm my-1">
-            <input class='form-control' type='text' placeholder='Give your route a name' [(ngModel)]="pathName" name="first">
+            <input class='form-control' type='text' placeholder="{{defaultPathName}}" [(ngModel)]="givenPathName" name="first">
         </div>
 
         <div class="input-group input-group-sm my-1">

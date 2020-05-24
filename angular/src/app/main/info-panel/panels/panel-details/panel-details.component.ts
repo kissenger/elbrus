@@ -34,6 +34,8 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   public pathType: string;
   public pathStats: TsPathStats = globals.emptyStats;
   public pathDirection: string;
+  public defaultPathName: string;
+  public givenPathName: string;
 
   constructor(
     private dataService: DataService,
@@ -57,6 +59,11 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
       this.pathCategory = geoJson.properties.info.category;
       this.pathDirection = geoJson.properties.info.direction;
       this.pathType = geoJson.properties.info.pathType;
+
+      // if this is a create-route action, then path will not have a name until one is entered in the form; create a default one
+      if (!this.pathName) {
+        this.defaultPathName = (this.pathCategory === 'None' ? 'Uncategorised' : this.pathCategory) + ' ' + this.pathType;
+      }
 
       this.isData = true;
       this.isLong = geoJson.properties.info.isLong;
@@ -102,6 +109,10 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
+
+      // if this is a create-route action then pathName is null, so take givenPathName (input from form) if it exists, otherwise use default
+      this.pathName = !!this.givenPathName ? this.givenPathName : this.defaultPathName;
+
       const sendObj = {
         coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
         elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),

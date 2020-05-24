@@ -11,14 +11,7 @@
       class="p-1 border-bottom border-left border-right"
       [ngClass]="getCssClass(line.pathId, i)">
 
-      <!-- make up a name if one doesnt exist-->
-      <div *ngIf="line.name === '' || !line.name; else else_div" class="name">
-        {{line.category}} {{line.pathType}}
-      </div>
-
-      <ng-template #else_div>
-        <div class="name">{{line.name}}</div>
-      </ng-template>
+      <div class="name">{{line.name}}</div>
 
       <table class="table table-sm m-0 p-0">
         <tbody>

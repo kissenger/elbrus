@@ -163,7 +163,6 @@ export class MapService {
     // IMPORTANT to wait until the map has stopped moving or this doesnt work
     // TODO Emit when this has heppened so we can error check when someone clicks navigation too soon
     this.tsMap.on('moveend', (ev) => {
-      console.log('mapview')
       this.dataService.saveToStore('mapView', this.getMapView());
     });
 
