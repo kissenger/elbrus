@@ -30,7 +30,7 @@ export class HeaderComponent implements OnInit {
 
   onLoginClick() {
     this.register.removeElement();
-    this.login.showAsElement().subscribe( () => {
+    this.login.showAsElement(false).subscribe( () => {
     });
   }
 

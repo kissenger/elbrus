@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Router } from '@angular/router';
 import { RegisterService } from 'src/app/shared/services/register.service';
@@ -11,6 +11,10 @@ import { AlertService } from 'src/app/shared/services/alert.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit, OnDestroy {
+
+  // public _isAfterValidation: boolean;
+
+  @Input() isAfterValidation: boolean;
 
   @Output()
   close = new EventEmitter();
@@ -26,7 +30,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router
     ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.isAfterValidation);
+  }
 
   onLoginClick() {
 

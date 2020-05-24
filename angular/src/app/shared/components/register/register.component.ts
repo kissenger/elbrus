@@ -77,6 +77,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
         // failure
         this.close.next();
+        console.log(error);
         this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false).subscribe( () => {
         });
 
@@ -88,7 +89,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onLoginClick() {
     this.close.next();
-    this.login.showAsElement().subscribe( (response) => {
+    this.login.showAsElement(false).subscribe( (response) => {
       console.log(response);
     });
   }

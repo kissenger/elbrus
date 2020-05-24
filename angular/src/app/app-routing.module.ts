@@ -14,6 +14,7 @@ const appRoutes: Routes = [
   { path: ':pathType/list', component: RoutesListComponent, canActivate: [AuthGuard]},
   { path: ':pathType/create', component: RoutesCreateComponent, canActivate: [AuthGuard]},
   { path: ':pathType/review', component: RoutesReviewComponent, canActivate: [AuthGuard]},
+  { path: 'verification/:userId/:verificationString', component: WelcomeComponent},
 ];
 
 @NgModule({

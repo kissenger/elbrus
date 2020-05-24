@@ -97,6 +97,11 @@ export class HttpService {
     return this.http.post<any>(`http://${this.backendURL}/login/`, userData);
   }
 
+  verifyAccount(userId: string, verificationString: string) {
+    return this.http.get<any>(`http://${this.backendURL}/verify-account/${userId}/${verificationString}`);
+  }
+
+
   // logoutUser() {
   //   localStorage.removeItem('token');
   // }

@@ -18,11 +18,14 @@ export class LoginService {
     }
   }
 
-  showAsElement() {
+  showAsElement(isAfterVerification: boolean) {
+
+
 
     // Add to the DOM
     this.login = document.createElement('login-box') as any;
     document.body.appendChild(this.login);
+    this.login['isAfterVerification'] = isAfterVerification;
 
     return new Observable( (observer) => {
 
