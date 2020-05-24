@@ -1,17 +1,48 @@
 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 <div class="register-box bg-white border rounded ">
 
   <button type="button" class="close" (click)="close.next()" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 
-  <form class="form-signin m-3" name="register-form"> 
+  <form class="form-signin m-3" name="register-form">
 
-    <h4 class="mb-3 font-weight-normal text-center">Register</h4>
+    <h4 class="mb-3 font-weight-normal text-center">New Account</h4>
 
-    <input type="text" name="userName" class="form-control form-control-sm mt-4 d-block" placeholder="Username" required autofocus autocomplete="false">
-    <input type="email" name="email" class="form-control form-control-sm mt-1 d-block" placeholder="email address" required>
-    <input type="password" name="password" class="form-control form-control-sm mt-1 d-block" placeholder="Password" required>
+    <!-- <input type="text" name="userName" class="form-control form-control-sm mt-4 d-block" placeholder="Username" required autofocus autocomplete="false"> -->
+
+    <div class="input-group input-group-sm">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fa fa-user"></i></span>
+      </div>
+      <input type="text" name="userName" class="form-control" [ngClass]="{'form-control-danger': notValidUserName()}"  [(ngModel)]="userName" placeholder="Username" required>
+    </div>
+
+    <div class="input-group input-group-sm mt-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+      </div>
+      <input type="email" name="email" class="form-control" [ngClass]="{'form-control-danger': notValidEmail()}"  [(ngModel)]="email" placeholder="Email address" required>
+    </div>
+
+
+    <div class="input-group input-group-sm mt-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+      </div>
+      <input type="password" name="password" class="form-control" [ngClass]="{'form-control-danger': notValidPassword()}" placeholder="Password (6 or more characters)" [(ngModel)]="password" required>
+    </div>
+
+    <div class="input-group input-group-sm mt-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+      </div>
+      <input type="password" name="password-confirm" class="form-control" [ngClass]="{'form-control-danger': notValidPasswordConfirm()}" placeholder="Confirm password" [(ngModel)]="passwordConfirm" required>
+    </div>
+
+    <!-- <input type="password" name="password" class="form-control form-control-sm mt-1 d-block" placeholder="Password" required>
+    <input type="password" name="password-confirm" class="form-control form-control-sm mt-1 d-block" placeholder="Confirm password" required> -->
 
     <button class="btn btn-sm btn-primary btn-block mt-4 mb-2" type="submit" (click)="onRegisterClick()">Register</button>
 

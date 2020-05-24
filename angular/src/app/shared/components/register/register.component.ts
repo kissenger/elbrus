@@ -20,6 +20,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
   @Output()
   ok = new EventEmitter();
 
+  public password = '';
+  public passwordConfirm = '';
+  public email = '';
+  public userName = '';
+
   constructor(
     private login: LoginService,
     private http: HttpService,
@@ -28,7 +33,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private router: Router
   ) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+
+  }
 
   onRegisterClick() {
 
@@ -37,9 +44,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
     const email = document.forms['register-form']['email'].value;
     const password = document.forms['register-form']['password'].value;
 
+    // console.log(this.isValidEmail(), this.isValidPassword(), this.isValidPasswordConfirm(), this.isValidUserName());
+
     // basic form validation
     if (userName === '' || email === '' || password === '') {
       this.alert.showAsElement('Incomplete form', 'Make sure all fields are completed', true, false).subscribe( () => {});
+
+    } else if (this.notValidEmail() || this.notValidPassword() || this.notValidPasswordConfirm() || this.notValidUserName() ) {
+      this.alert.showAsElement('Form error', 'Ensure all fields are valid', true, false).subscribe( () => {});
 
     } else {
 
@@ -79,6 +91,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.login.showAsElement().subscribe( (response) => {
       console.log(response);
     });
+  }
+
+  notValidEmail() {
+    return !this.email.match(/[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}/);
+  }
+
+  notValidUserName() {
+    return this.userName.length > 2;
+  }
+
+  notValidPassword() {
+    return this.password.length < 6;
+  }
+
+  notValidPasswordConfirm() {
+    return this.password !== this.passwordConfirm;
   }
 
 
