@@ -3,7 +3,7 @@
 <div class='container'  class="p-0 h-100 position-static border border-white">
 
   <!-- Loop through available data and create a list box item for each-->
-  <div *ngFor="let line of listData; let i = index">
+  <div *ngFor="let line of listData; let i = index" class="list-container">
 
     <!-- conditional formatting for each list item, and click event-->
     <div id={{line.pathId}}
