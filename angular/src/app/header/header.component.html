@@ -12,13 +12,14 @@
     <img class="image" src="../../assets/images/ts_header.svg" alt="">
   </a>
 
+  <!-- TO BE UNCOMMENTED WHEN MORE NEEDS TO BE ADDED TO MENU-->
   <!-- This defines the collapsed hamburger menu -->
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+  <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
-  </button>
+  </button> -->
 
   <!-- Uncollapsed menu -->
-  <div class="collapse navbar-collapse" id="navbarNav">
+  <!-- <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mx-auto">
         <li class="nav-item active">
           <a *ngIf='auth.isLoggedIn()' [routerLink]="['/route/list/']" class="nav-link">Routes<span class="sr-only">(current)</span></a>
@@ -27,7 +28,9 @@
           <a *ngIf='auth.isLoggedIn()' class="nav-link">Blog</a>
         </li>
       </ul>
-  </div>
+  </div> -->
+
+  <div class="collapse navbar-collapse" id="navbarNav"> </div>
 
   <div *ngIf='auth.isLoggedIn()' class="d-flex flex-column small align-items-end">
     <div class="">
