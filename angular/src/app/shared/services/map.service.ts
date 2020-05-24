@@ -45,14 +45,19 @@ export class MapService {
       });
 
       this.tsMap.on('load', () => {
+        this.dataService.saveToStore('mapView', this.getMapView());
         resolve();
       });
 
+
+      // called when the map is moved by user, or when the initial animation is complete
       this.tsMap.on('moveend', (ev) => {
+        this.dataService.saveToStore('mapView', this.getMapView());
         try {
           this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
         } catch {}
       });
+
 
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
@@ -63,8 +68,10 @@ export class MapService {
 
   /**
    * Two methods to determine what is being shown
-   * getMapView - reutrns the centrepoint and zoom level
-   * getMapBounds - returns the bounding box of the current view - called by this class
+   * getMapView - reutrns the centrepoint and zoom level - used by other services to determine what was being shown
+   * before option was selected
+   * getMapBounds - returns the bounding box of the current view - called by this class but who is the listener? (TODO:)
+   * TODO: Do we need both methods?
    */
   getMapView() {
     const centre = this.tsMap.getCenter();
@@ -156,6 +163,7 @@ export class MapService {
     // IMPORTANT to wait until the map has stopped moving or this doesnt work
     // TODO Emit when this has heppened so we can error check when someone clicks navigation too soon
     this.tsMap.on('moveend', (ev) => {
+      console.log('mapview')
       this.dataService.saveToStore('mapView', this.getMapView());
     });
 

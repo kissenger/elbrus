@@ -13,7 +13,7 @@ import { debugMsg } from './debugging.js';
 import { Users } from './schema/user-models.js';
 
 export const authRoute = express.Router();
-const KEY = process.env.AUTH_KEY;
+const KEY = process.env.AUTH_KEY; 
 
 /**
  * middleware to confirm user has an acceptable token. returns userId in req if all is ok

@@ -34,6 +34,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // this.router.navigate(['/route/list']);
     // centre map on the currently loading route if it exists, otherwise take users home location
+    // mapview is set by map.service
     const mapView = this.dataService.getFromStore('mapView', true);
     let startPosition: TsCoordinate;
     let startZoom: number;

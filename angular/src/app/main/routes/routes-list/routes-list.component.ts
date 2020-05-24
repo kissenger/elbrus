@@ -47,26 +47,28 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     // listen for pathID emission from panel-routes-list-list, and get the path from the backend
     this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( (pathId: string) => {
 
+
       if (pathId === '0') {
-        // no path id found so default to users dfault location
+        // no path id found so default to users default location
         this.mapService.initialiseMap();
         document.getElementById('Options').click();
         // this.dataService.activeTabEmitter.emit('options');
-      }
 
-      this.httpService.getPathById('route', pathId).subscribe( (result) => {
 
-        // put on the class to avoid passing to functions
-        this.geoJSON = result.hills;
+      } else {
 
-        // as initialisation will temporarily show default location, only run it if map doesnt currently exist
-        this.initialiseMapIfNeeded().then( () => {
+        this.httpService.getPathById('route', pathId).subscribe( (result) => {
 
-          this.mapService.clearMap();
-          this.mapService.addLayerToMap(this.geoJSON, this.lineStyle, this.plotOptions);
+          // put on the class to avoid passing to functions
+          this.geoJSON = result.hills;
 
+          // as initialisation will temporarily show default location, only run it if map doesnt currently exist
+          this.initialiseMapIfNeeded().then( () => {
+            this.mapService.clearMap();
+            this.mapService.addLayerToMap(this.geoJSON, this.lineStyle, this.plotOptions);
+          });
         });
-      });
+      }
     });
   }
 

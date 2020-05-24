@@ -33,8 +33,10 @@ app.use(authRoute);
 
 
 // mongo as a service
-mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-gplhv.mongodb.net/trailscape?retryWrites=true`,
-  {useUnifiedTopology: true, useNewUrlParser: true });
+console.log(process.env.MONGODB_PASSWORD)
+mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-5h6di.gcp.mongodb.net/test?retryWrites=true&w=majority`,
+// mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-gplhv.mongodb.net/trailscape?retryWrites=true`,
+  {useUnifiedTopology: true, useNewUrlParser: true }); 
 
 mongoose.connection
   .on('error', console.error.bind(console, 'connection error:'))
@@ -58,13 +60,13 @@ app.post('/import-route/', verifyToken, upload.single('filename'), (req, res) =>
 
   debugMsg('import-route');
 
-  const pathFromGPX = readGPX(req.file.buffer.toString());
+  const pathFromGPX = gpxRead(req.file.buffer.toString());
   getRouteInstance(pathFromGPX.nameOfPath, null, pathFromGPX.lngLat, pathFromGPX.elev)
     .then( route => createMongoModel('route', route.asMongoObject(req.userId, false)) )
     .then( doc => res.status(201).json( {hills: new GeoJSON().fromDocument(doc).toGeoHills()} ))
     .catch( (error) => res.status(500).json(error.toString()) );
 
-});
+}); 
 
 
 
@@ -102,7 +104,7 @@ app.post('/save-created-route/', verifyToken, (req, res) => {
   getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev)
     .then( route => mongoModel('route').create( route.asMongoObject(req.userId, true) ))
     .then( doc => res.status(201).json( {pathId: doc._id} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( (error) => res.status(500).json(error));
 
 });
 
@@ -114,7 +116,7 @@ app.post('/save-created-route/', verifyToken, (req, res) => {
  *****************************************************************/
 app.get('/get-path-by-id/:type/:id', verifyToken, (req, res) => {
 
-  debugMsg('get-path-by-id');
+  debugMsg(`get-path-by-id, type=${req.params.type}, id=${req.params.id}` );
 
   getPathDocFromId(req.params.id, req.params.type, req.userId)
     .then( doc => {
@@ -122,7 +124,7 @@ app.get('/get-path-by-id/:type/:id', verifyToken, (req, res) => {
       hills: new GeoJSON().fromDocument(doc).toGeoHills(),
       basic: new GeoJSON().fromDocument(doc).toBasic()
     }) })
-    .catch( (error) => res.status(500).json( error.toString()) );
+    // .catch( (error) => res.status(500).json( error.toString()) );
 })
 
 
@@ -234,7 +236,7 @@ app.post('/get-path-from-points/', verifyToken, (req, res) => {
       hills: new GeoJSON().fromPath(route).toGeoHills(),
       basic: new GeoJSON().fromPath(route).toBasic()
     }))
-    // .catch( (error) => res.status(500).json( error.toString() ));
+    .catch( (error) => res.status(500).json( error.toString() ));
 
 })
 
