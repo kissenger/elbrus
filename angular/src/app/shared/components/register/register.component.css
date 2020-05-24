@@ -11,8 +11,7 @@
   /* background-color: #e06c6c; */
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(224, 108, 108, 0.5);
 }
-/*
-input, textarea{
-  background-color:#666;
-  color: #FFF;
-} */
+
+.input-group-text {
+  width : 32px;
+}
