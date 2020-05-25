@@ -12,9 +12,14 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  // public _isAfterValidation: boolean;
+  public _afterVerification: boolean;
 
-  @Input() isAfterValidation: boolean;
+  // This provisions for calling loginbox after account verification, in which case the title changes to
+  // tell user whats going on.  To apply, use:
+  //       this.login.showAsElement({afterVerification: true}).subscribe( () => {} );
+  @Input()
+  set afterVerification(afterVerification: boolean) { this._afterVerification = afterVerification; }
+  get afterVerification(): boolean { return this._afterVerification; }
 
   @Output()
   close = new EventEmitter();
@@ -30,9 +35,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router
     ) {}
 
-  ngOnInit() {
-    console.log(this.isAfterValidation);
-  }
+  ngOnInit() {}
 
   onLoginClick() {
 

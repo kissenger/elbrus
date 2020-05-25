@@ -97,21 +97,8 @@ export class HttpService {
     return this.http.post<any>(`http://${this.backendURL}/login/`, userData);
   }
 
-  verifyAccount(userId: string, verificationString: string) {
-    return this.http.get<any>(`http://${this.backendURL}/verify-account/${userId}/${verificationString}`);
-  }
-
-
-  // logoutUser() {
-  //   localStorage.removeItem('token');
-  // }
-
-  // loggedIn() {
-  //   return !!localStorage.getItem('token');   // double ! casts result to boolean
-  // }
-
-  // getToken() {
-  //   return localStorage.getItem('token');
+  // verifyAccount(userId: string, verificationString: string) {
+  //   return this.http.get<any>(`http://${this.backendURL}/verify-account/${userId}/${verificationString}`);
   // }
 
   updateUserData(userData: TsUser) {

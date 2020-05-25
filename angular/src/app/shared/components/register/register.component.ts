@@ -89,9 +89,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onLoginClick() {
     this.close.next();
-    this.login.showAsElement(false).subscribe( (response) => {
-      console.log(response);
-    });
+    this.login.showAsElement().subscribe( () => {} );
   }
 
   notValidEmail() {

@@ -33,7 +33,6 @@ app.use(authRoute);
 
 
 // mongo as a service
-console.log(process.env.MONGODB_PASSWORD)
 mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-5h6di.gcp.mongodb.net/test?retryWrites=true&w=majority`,
 // mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-gplhv.mongodb.net/trailscape?retryWrites=true`,
   {useUnifiedTopology: true, useNewUrlParser: true }); 
@@ -64,7 +63,10 @@ app.post('/import-route/', verifyToken, upload.single('filename'), (req, res) =>
   getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev)
     .then( route => createMongoModel('route', route.asMongoObject(req.userId, false)) )
     .then( doc => res.status(201).json( {hills: new GeoJSON().fromDocument(doc).toGeoHills()} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 }); 
 
@@ -88,7 +90,10 @@ app.post('/save-imported-path/', verifyToken, (req, res) => {
   mongoModel(req.body.pathType)
     .updateOne(condition, {$set: filter}, {upsert: true, writeConcern: {j: true}})
     .then( () => res.status(201).json({pathId: req.body.pathId}) )
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 });
 
@@ -104,7 +109,10 @@ app.post('/save-created-route/', verifyToken, (req, res) => {
   getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev)
     .then( route => mongoModel('route').create( route.asMongoObject(req.userId, true) ))
     .then( doc => res.status(201).json( {pathId: doc._id} ))
-    .catch( (error) => res.status(500).json(error));
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 });
 
@@ -123,8 +131,13 @@ app.get('/get-path-by-id/:type/:id', verifyToken, (req, res) => {
       res.status(201).json({
       hills: new GeoJSON().fromDocument(doc).toGeoHills(),
       basic: new GeoJSON().fromDocument(doc).toBasic()
-    }) })
-    // .catch( (error) => res.status(500).json( error.toString()) );
+    }) 
+  })
+  .catch( error => {
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+  });
+
 })
 
 
@@ -157,7 +170,10 @@ app.get('/get-paths-list/:pathType/:offset/:limit', verifyToken, (req, res) => {
       mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset))
         .then( documents => res.status(201).json( getListData(documents, count) ))
       })                          // this 'then' is nested rather than chained so it has access to 'count'
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 })
 
@@ -179,7 +195,10 @@ app.delete('/delete-path/:type/:id', verifyToken, (req, res) => {
   // query database, updating change data and setting isSaved to true
   mongoModel(req.params.type).updateOne(condition, {$set: filter})
     .then( () => res.status(201).json( {'result': 'delete ok'} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 });
 
@@ -200,7 +219,11 @@ app.get('/write-path-to-gpx/:type/:id', verifyToken, (req, res) => {
     .find({_id: req.params.id, userId: req.userId})
     .then( documents => gpxWriteFromDocument(documents[0]))
     .then( fileName => res.status(201).json( {fileName} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
+
 })
 
 // Step 2, download the file to browser
@@ -208,13 +231,16 @@ app.get('/download-file/:fname', verifyToken, (req, res) => {
 
   debugMsg('Download file from server');
 
-  res.download('../' + req.params.fname + '.gpx', (err) => {
-    if (err) {
-      console.log('error: ' + err);
-    } else {
-      console.log('success');
-    }
-  });
+  try {
+    res.download('../' + req.params.fname + '.gpx', (err) => {
+      if (err) {
+        throw new Error(err);
+      }
+    });
+  } catch (error) {
+    debugMsg('ERROR: ' + error);
+    res.status(401).send(error.message);
+  }
 
 })
 
@@ -236,7 +262,10 @@ app.post('/get-path-from-points/', verifyToken, (req, res) => {
       hills: new GeoJSON().fromPath(route).toGeoHills(),
       basic: new GeoJSON().fromPath(route).toBasic()
     }))
-    .catch( (error) => res.status(500).json( error.toString() ));
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 })
 
@@ -252,7 +281,10 @@ app.post('/flush/', verifyToken, (req, res) => {
 
   mongoModel('route').deleteMany( {'userId': userId, 'isSaved': false} )
     .then( () => res.status(201).json( {result: 'db flushed'} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+    .catch( error => {
+      debugMsg('ERROR: ' + error);
+      res.status(500).send(error.message);
+    });
 
 })
 

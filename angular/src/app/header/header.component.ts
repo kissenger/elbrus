@@ -25,12 +25,15 @@ export class HeaderComponent implements OnInit {
 
   onLogoutClick() {
     this.auth.deleteToken();
-    this.router.navigate(['']);
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['']);
+    });
+    // this.router.navigate(['']);
   }
 
   onLoginClick() {
     this.register.removeElement();
-    this.login.showAsElement(false).subscribe( () => {
+    this.login.showAsElement().subscribe( () => {
     });
   }
 

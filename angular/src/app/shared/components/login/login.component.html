@@ -8,24 +8,24 @@
 
   <form class="form-signin m-3" name="login-form">
 
-    <h4 class="mb-3 font-weight-normal text-center">Log in</h4>
 
-    <div class="input-group input-group-sm">
+    <h5 *ngIf='_afterVerification' class="mb-4 font-weight-normal text-center">Account verified, please log in</h5>
+    <h5 *ngIf='!_afterVerification' class="mb-4 font-weight-normal text-center">Log in</h5>
+    <!-- <h4 class="mb-3 font-weight-normal text-center">Log in</h4> -->
+
+    <div class="input-group input-group-sm mt-2">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-user"></i></span>
       </div>
       <input type="text" name="userName" class="form-control" placeholder="Username" required>
     </div>
 
-    <div class="input-group input-group-sm mt-1">
+    <div class="input-group input-group-sm mt-2">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-lock"></i></span>
       </div>
       <input type="password" name="password" class="form-control" placeholder="Password" required>
     </div>
-<!--
-    <input type="text" name="userName" class="form-control form-control-sm mt-4 d-block" placeholder="Username" required autofocus>
-    <input type="password" name="password" class="form-control form-control-sm mt-1 d-block" placeholder="Password" required> -->
 
     <button class="btn btn-sm btn-primary btn-block mt-4 mb-2" type="submit" (click)="onLoginClick()">Login</button>
 

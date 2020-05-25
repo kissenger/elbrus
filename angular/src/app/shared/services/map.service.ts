@@ -49,6 +49,16 @@ export class MapService {
         resolve();
       });
 
+      // this.tsMap.on('mousemove', function(e) {
+      //   document.getElementById('info').innerHTML =
+      //   // e.point is the x, y coordinates of the mousemove event relative
+      //   // to the top-left corner of the map
+      //   JSON.stringify(e.point) +
+      //   '<br />' +
+      //   // e.lngLat is the longitude, latitude geographical position of the event
+      //   JSON.stringify(e.lngLat.wrap());
+      //   });
+
 
       // called when the map is moved by user, or when the initial animation is complete
       this.tsMap.on('moveend', (ev) => {

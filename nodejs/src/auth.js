@@ -83,12 +83,13 @@ authRoute.post('/register', async (req, res) => {
 
   try {
       
-    // confirm that email address does not exist in db
+    // confirm that user name does not exist in db
     const userExists = await Users.findOne( {userName: req.body.userName}, {} );
     if (userExists) {
       throw new AuthenticationError('This user name is already registered');
     }
 
+    // confirm that email address does not exists - cant decide if this should be in or not
     // const emailExists = await Users.findOne( {email: req.body.email}, {} );
     // if ( emailExists ) {
     //   throw new AuthenticationError('This email address is already registered');
@@ -97,15 +98,14 @@ authRoute.post('/register', async (req, res) => {
     // create user in the database
     const hash = await bcrypt.hash(req.body.password, saltRounds);
     const validationString = cryptoRandomString({length: 10, type: 'url-safe'});
-    const user = await Users.create({...req.body, hash, validationString});
+    const newUser = await Users.create({...req.body, hash, validationString});
 
-    console.log(req.body.email)
-    const message = `Click <a href="http://trailscape.cc/validation/${user._id}/${validationString}">here</a> to validate your account`;
-    await sendAnEmail(req.body.email, message);
-    
-    // const token = jsonwebtoken.sign( {subject: registeredUser._id}, KEY);
-    // delete registeredUser.validationString;
-    res.status(201).json( {success: 'success'} );
+    // const message = `Click <a href="http://trailscape.cc/validation/${user._id}/${validationString}">here</a> to validate your account`;
+    // await sendAnEmail(req.body.email, message);
+
+    const token = jsonwebtoken.sign( {subject: newUser._id}, KEY);
+    delete newUser.validationString;
+    res.status(200).send({token, user: newUser});    
 
   } catch (error) {
     debugMsg('ERROR: ' + error);
@@ -145,60 +145,63 @@ authRoute.post('/login', async (req, res) => {
 });
 
 
-authRoute.get('/verify-account/:id/:code', async (req, res) => {
+// authRoute.get('/verify-account/:id/:code', async (req, res) => {
 
-  debugMsg('verify account');
+//   debugMsg('verify account');
 
-  try {
+//   try {
 
-    const user = await Users.findOne( {_id: req.params.id}, {verificationString: 1} );
-    console.log(user);
+//     const user = await Users.findOne( {_id: req.params.id}, {verificationString: 1} );
+//     console.log(user);
 
-    if (req.params.code === user.verificationString) {
-      res.status(200).json({success: true});
-    } else {
-      throw new AuthenticationError('Verification failed');
-    }
+//     if (req.params.code === user.verificationString) {
+//       res.status(200).json({success: true});
+//     } else {
+//       throw new AuthenticationError('Verification failed');
+//     }
 
-  } catch (error) {
-    debugMsg('ERROR: ' + error);
-    res.status(401).send(error.message);
-  }
+//   } catch (error) {
+//     debugMsg('ERROR: ' + error);
+//     res.status(401).send(error.message);
+//   }
 
-});
+// });
 
 
-async function sendAnEmail(toEmail, message) {
+// Code for sending email when we are ready...
 
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
-  let testAccount = await nodemailer.createTestAccount();
+// async function sendAnEmail(toEmail, message) {
 
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
-  });
+//   // Generate test SMTP service account from ethereal.email
+//   // Only needed if you don't have a real mail account for testing
 
-  // send mail with defined transport object
-  let info = await transporter.sendMail({
-    from: '"trailscape user validation" <validation@trailscape.cc>', // sender address
-    to: toEmail, // list of receivers
-    subject: "Please validate your trailscape account", // Subject line
-    // text: "Hello world?", // plain text body
-    html: message, // html body
-  });
+//   let transporter = nodemailer.createTransport({
+//     host: "in-v3.mailjet.com",
+//     port: 587,
+//     secure: false, // upgrade later with STARTTLS
+//     auth: {
+//       user: "c04f36388425ab191a23ea25b36474a0",
+//       pass: "9707c419f4ea1a0907abc03b70216659"
+//     }
+//   });
 
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+//   // verify connection configuration
+//   await transporter.verify(function(error, success) {
+//     if (error) {
+//       console.log(error);
+//     } else {
+//       console.log("Server is ready to take our messages");
+//     }
+//   });
 
-  // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-}
+//   // send mail with defined transport object
+//   let info = await transporter.sendMail({
+//     from: '"trailscape user validation" <ivyterrace@hotmail.co.uk>', // sender address
+//     to: toEmail, // list of receivers
+//     subject: "Please validate your trailscape account", // Subject line
+//     // text: "Hello world?", // plain text body
+//     html: message, // html body
+//   });
+  
+// }
 

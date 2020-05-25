@@ -8,18 +8,18 @@
 
   <form class="form-signin m-3" name="register-form">
 
-    <h4 class="mb-3 font-weight-normal text-center">New Account</h4>
+    <h5 class="mb-4 font-weight-normal text-center">New Account</h5>
 
     <!-- <input type="text" name="userName" class="form-control form-control-sm mt-4 d-block" placeholder="Username" required autofocus autocomplete="false"> -->
 
-    <div class="input-group input-group-sm">
+    <div class="input-group input-group-sm mt-2">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-user"></i></span>
       </div>
       <input type="text" name="userName" class="form-control" [ngClass]="{'form-control-danger': notValidUserName()}"  [(ngModel)]="userName" placeholder="Username" required>
     </div>
 
-    <div class="input-group input-group-sm mt-1">
+    <div class="input-group input-group-sm mt-2">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-envelope"></i></span>
       </div>
@@ -27,14 +27,14 @@
     </div>
 
 
-    <div class="input-group input-group-sm mt-1">
+    <div class="input-group input-group-sm mt-2">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-lock"></i></span>
       </div>
       <input type="password" name="password" class="form-control" [ngClass]="{'form-control-danger': notValidPassword()}" placeholder="Password (6 or more characters)" [(ngModel)]="password" required>
     </div>
 
-    <div class="input-group input-group-sm mt-1">
+    <div class="input-group input-group-sm mt-2">
       <div class="input-group-prepend">
         <span class="input-group-text"><i class="fa fa-lock"></i></span>
       </div>

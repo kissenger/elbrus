@@ -18,14 +18,21 @@ export class LoginService {
     }
   }
 
-  showAsElement(isAfterVerification: boolean) {
+  showAsElement(options?: {afterVerification?: boolean}) {
 
-
+    // prevent multiple instances being active at once
+    if (document.body.contains(this.login)) {
+      document.body.removeChild(this.login);
+    }
 
     // Add to the DOM
     this.login = document.createElement('login-box') as any;
     document.body.appendChild(this.login);
-    this.login['isAfterVerification'] = isAfterVerification;
+    if (options) {
+      if ('afterVerification' in options) {
+        this.login.afterVerification = options.afterVerification;
+      }
+    }
 
     return new Observable( (observer) => {
 
