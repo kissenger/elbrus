@@ -54,6 +54,13 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
 
+      // used by html to say 'nothing to show' if the geojson only has a single point or fewer
+      if (geoJson.features[0].geometry.coordinates.length <= 1) {
+        this.isData = false;
+      } else {
+        this.isData = true;
+      }
+
       this.pathStats = geoJson.properties.stats;
       this.pathDescription = geoJson.properties.info.description;
       this.pathCategory = geoJson.properties.info.category;
@@ -67,7 +74,6 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
         this.pathName = geoJson.properties.info.name;
       }
 
-      this.isData = true;
       this.isLong = geoJson.properties.info.isLong;
       this.isElevations = geoJson.properties.info.isElevations && !this.isLong;
       this.isHills = this.pathStats.hills.length > 0;

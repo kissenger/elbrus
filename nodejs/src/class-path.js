@@ -73,7 +73,15 @@ export class PathWithStats extends Path{
       if (isElevationsProvided) {
         path.addParam('elev', elev);
       };
+      
       path.simplify(2);
+      debugMsg(`PathWithStats:preFlight - ${path.length} points after simplification`);
+
+      // if the path is still long, be a bit more agressive
+      if (path.length > globals.LONG_PATH_THRESHOLD) {
+        path.simplify(10);
+        debugMsg(`PathWithStats:preFlight - ${path.length} points after second simplification`);
+      }
 
       if (path.length < globals.LONG_PATH_THRESHOLD) {
         if (!isElevationsProvided) {
@@ -91,13 +99,14 @@ export class PathWithStats extends Path{
 
 
   get info() {
+    this._category = getCategory.apply(this)
     return {
       pathType: this._pathType,
       name: this._name,
       description: this._description,
       isLong: this._isLong,
       isElevations: this._isElevations,
-      category: getCategory.apply(this),
+      category: this._category,
       direction: getDirection.apply(this)
     }
   }

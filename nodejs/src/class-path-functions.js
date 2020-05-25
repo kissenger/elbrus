@@ -79,59 +79,59 @@ export function getCategory() {
 }
 
 
-
 /**
- * Find the direction that a one-way or circular route is taking
- * Run within the scope of PathWithStats
+ *   Works by calculating the bearing from the successive points on route and determining
+ *   if this bearing is more often increasing (clockwise) or decreasing (anti-clockwise)
+ *  If the range of max to min bearing is small then treat as one-way route and find such as "north to east"
  */
 export function getDirection() {
 
-  debugMsg('PointsList.getDirection()');
+  const RANGE_TOL = 0.25 * Math.PI;     // 90deg
+  const nSkip = Math.ceil(this.length / 25);
+  let cwSum = 0;
+  let lastBearing = geoFunctions.bearing(this.firstPoint, this.getPoint(nSkip));
+  let thisBearing;
+  let maxBearing = - 2 * Math.PI;
+  let minBearing = 2 * Math.PI;
 
-  if ( this._category === 'Circular' ) {
-    return getDirectionOfCircularPath();
-  } else if ( this._category === 'One way' ) {
-    return getDirectionOfOneWayPath(this.firstPoint, this.lastPoint);
+  for ( let i = 2 * nSkip; i < this.length; i += nSkip ) {
+    
+    thisBearing = geoFunctions.bearing(this.firstPoint, this.getPoint(i));
+    thisBearing = correctBearing(thisBearing, lastBearing);
+
+    cwSum = thisBearing - lastBearing < 0 ? cwSum + 1 : cwSum - 1;
+    maxBearing = thisBearing > maxBearing ? thisBearing : maxBearing;
+    minBearing = thisBearing < minBearing ? thisBearing : minBearing;
+    lastBearing = thisBearing;
+
+  }
+
+  if (maxBearing - minBearing < RANGE_TOL) {
+    return getStartToEndDirection(this.firstPoint, this.lastPoint);
   } else {
-    return 'N/A';
+    if ( cwSum > 0 ) return 'Anti-clockwise'
+    else return 'Clockwise'
   }
 
 }
 
 
-/**
- *   Works by calculating the bearing from the successive points on route and determining
- *   if this bearing is more often increasing (clockwise) or decreasing (anti-clockwise)
- */
-function getDirectionOfCircularPath() {
-
-  const isBearingChangeSmall = (thisB, lastB) => Math.abs(thisB - lastB) > Math.PI
-  const nSkip = Math.ceil(path.length / 20);
-  let clockWiseSum = 0;
-  let lastBearing = geoFunctions.bearing(this.firstPoint, this.getPoint(nSkip));
-  let thisBearing;
-
-  for ( let i = 2 * nSkip; i < path.length; i += nSkip ) {
-
-    thisBearing = geoFunctions.bearing(this.getPoint(i - nSkip), this.getPoint(i));
-    if (isBearingChangeSmall(thisBearing, lastBearing)) {       // ignore point if delta is > 180deg (assume moved across 0degs)
-      clockWiseSum += Math.sign(deltaBrg);        // increment if bearing is increasing, decrement if decreasing
-    }
-
-    lastBearing = thisBearing;
+// check for large change in direction - if > 90degs then assume to have moved across 0degs - correct bearing
+function correctBearing (thisB, lastB) {
+  if (thisB - lastB > Math.PI) { 
+    return thisB -= 2 * Math.PI; 
   }
-
-  if ( clockWiseSum > 0 )   { return 'Clockwise'; }
-  if ( clockWiseSum < 0 )   { return 'Anti-Clockwise'; }
-  if ( clockWiseSum === 0 ) { return 'Unknown Direction'; }
-
+  if (thisB - lastB < -Math.PI) { 
+    return thisB +=  2 * Math.PI; 
+  };
+  return thisB;
 }
 
 
 /**
  *  Simply takes the bearing from the first to last point and converts this into a direction
  */
-function getDirectionOfOneWayPath(firstPoint, lastPoint) {
+function getStartToEndDirection(firstPoint, lastPoint) {
   const bearing = geoFunctions.bearing(firstPoint, lastPoint);
   const cardinal = geoFunctions.bearingAsCardinal(bearing);
   return `${cardinal.from} to ${cardinal.to}`
