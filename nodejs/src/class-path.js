@@ -170,7 +170,9 @@ export class PathWithStats extends Path{
   }
 
 
-  asMongoObject(userId, isSaved) {
+  asMongoObject(userId, userName, isSaved) {
+    // console.log(this.info);
+
     return {
       userId: userId,
       isSaved: isSaved,
@@ -180,7 +182,8 @@ export class PathWithStats extends Path{
       },
       params: this.params,
       stats: this.stats,
-      info: this.info
+      info: {...this.info, createdBy: userName},
+      isPublic: false
     }
   }
 

@@ -7,6 +7,7 @@
 
 import { Route } from './class-path.js';
 import { Routes } from './schema/path-models.js';
+// import { PublicRoutes } from './schema/path-models-public.js';
 
 
 /**
@@ -16,6 +17,7 @@ export function mongoModel(pathType) {
   switch(pathType) {
     // case 'challenge': return MongoChallenges.Challenges;
     case 'route': return Routes;
+    // case 'publicroute': return PublicRoutes;
     // case 'track': return Tracks;
     // case 'match': return MongoMatch.Match;
   }
@@ -26,16 +28,16 @@ export function mongoModel(pathType) {
  * get a mongo db entry from a provided path id
  * TODO: use .findById() method.  _id is unique so dont need to search for uid as well
  * https://mongoosejs.com/docs/api.html#model_Model.findById
- */
-export function getPathDocFromId(pid, ptype, uid) {
+//  */
+// export function getPathDocFromId(pid, ptype, uid) {
 
-  return new Promise( (resolve, reject) => {
-    mongoModel(ptype)
-      .find( {_id: pid, userId: uid} )
-      .then( path => resolve(path[0]) )
-      .catch( error => reject(error) )
-  })
-}
+//   return new Promise( (resolve, reject) => {
+//     mongoModel(ptype)
+//       .find( {_id: pid, userId: uid} )
+//       .then( path => resolve(path[0]) )
+//       .catch( error => reject(error) )
+//   })
+// }
 
 
 /**

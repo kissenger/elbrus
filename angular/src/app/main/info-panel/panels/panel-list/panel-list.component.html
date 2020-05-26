@@ -1,36 +1,57 @@
 
 
-<div class='container'  class="p-0 h-100 position-static border border-white">
+<div class="p-0 h-100 position-static h-100 d-flex flex-column border-white">
 
-  <!-- Loop through available data and create a list box item for each-->
-  <div *ngFor="let line of listData; let i = index" class="list-container">
+  <div class="p-0 mt-2 mb-1" [ngClass]="{'flex-grow-1': numberOfRoutes === 0}">
 
-    <!-- conditional formatting for each list item, and click event-->
-    <div id={{line.pathId}}
-      (click)="onLineClick(line.pathId)"
-      class="p-1 border-bottom border-left border-right"
-      [ngClass]="getCssClass(line.pathId, i)">
+    <!-- <div class="d-flex"> -->
+      <select [(ngModel)]="publicOrPrivatePaths" (change)="onSelectMenuChange()" class="custom-select custom-select-sm mt-2 mb-1">
+        <option selected value="private">My routes</option>
+        <option value="public">Public routes</option>
+      </select>
+    <!-- </div> -->
 
-      <div class="name">{{line.name}}</div>
-
-      <table class="table table-sm m-0 p-0">
-        <tbody>
-          <tr>
-            <td>{{line.stats.distance | units: 'distance': units.distance}}</td>
-            <td *ngIf="line.isElevations"> {{line.stats.elevations.ascent | units: 'elevation': units.elevation}} </td>
-            <td *ngIf="line.isElevations"> {{line.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}} </td>
-          </tr>
-        </tbody>
-      </table>
-
+    <div *ngIf="numberOfRoutes === 0" class="m-3 text-center">
+      No routes to show.
     </div>
+
   </div>
 
+  <div *ngIf="numberOfRoutes === 0; else moreThanOneRouteDiv" class="p-0 mt-2 mb-2">
 
-  <div *ngIf="numberOfRoutes === 0; else moreThanOneRouteDiv" class="p-0 text-center">
-    No routes to show.
+      <p class="small text-left m-0">
+        Tip: Click on the 'options' tab to load or create a route, or select 'Public'
+        above to view shared routes in the current field of view.
+      </p>
+
   </div>
+
   <ng-template #moreThanOneRouteDiv >
+
+    <!-- Loop through available data and create a list box item for each-->
+    <div *ngFor="let line of listData; let i = index" class="list-container">
+
+      <!-- conditional formatting for each list item, and click event-->
+      <div id={{line.pathId}}
+        (click)="onLineClick(line.pathId)"
+        class="p-1 border-bottom border-left border-right"
+        [ngClass]="getCssClass(line.pathId, i)">
+
+        <div class="name">{{line.name}}</div>
+
+        <table class="table table-sm m-0 p-0">
+          <tbody>
+            <tr>
+              <td>{{line.stats.distance | units: 'distance': units.distance}}</td>
+              <td *ngIf="line.isElevations"> {{line.stats.elevations.ascent | units: 'elevation': units.elevation}} </td>
+              <td *ngIf="line.isElevations"> {{line.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}} </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
     <div class="more p-0 text-center">
       showing {{numberOfLoadedRoutes}} of {{numberOfRoutes}} routes <br>
       <span *ngIf="!isEndOfList" class="global-make-text-look-like-link" (click)="onMoreClick()"> Load more </span> <br>

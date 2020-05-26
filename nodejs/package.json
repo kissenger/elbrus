@@ -23,7 +23,7 @@
     "crypto-random-string": "^3.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "geo-points-and-paths": "^1.4.0",
+    "geo-points-and-paths": "^2.0.2",
     "jael": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.15",

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   BACKEND_HOST: 'localhost',
-  BACKEND_PORT: 3000,
+  BACKEND_PORT: 3000
 };
 
 /*

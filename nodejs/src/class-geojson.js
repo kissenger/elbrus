@@ -40,7 +40,10 @@ export class GeoJSON {
     this._properties = {
       pathId: doc._id,
       params: doc.params,
-      info: doc.info,
+      info: {
+        ...doc.info,
+        isPublic: doc.isPublic
+      },
       stats: doc.stats
     };
     this._bbox = doc.stats.bbox;

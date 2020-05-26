@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { ChartsService } from 'src/app/shared/services/charts-service';
 import { TsUnits, TsPathStats } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
+import { AlertService } from 'src/app/shared/services/alert.service';
 
 @Component({
   selector: 'app-panel-details',
@@ -27,6 +28,8 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   public pathDescription = '';
   public isListPage: boolean;
   public isLong: boolean;
+  public isPublic: boolean;
+  public createdBy: string;
   public isElevations: boolean;
   public isHills: boolean;
   public isData = false;
@@ -43,7 +46,8 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     private httpService: HttpService,
     private router: Router,
     private chartsService: ChartsService,
-    private auth: AuthService
+    private auth: AuthService,
+    private alert: AlertService
   ) {}
 
   ngOnInit() {
@@ -77,6 +81,8 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
       this.isLong = geoJson.properties.info.isLong;
       this.isElevations = geoJson.properties.info.isElevations && !this.isLong;
       this.isHills = this.pathStats.hills.length > 0;
+      this.isPublic = geoJson.properties.info.isPublic;
+      this.createdBy = geoJson.properties.info.createdBy;
 
       /**
        * TODO: This should be in a subroutine
@@ -128,8 +134,17 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
         name: pathName,
         description: this.pathDescription
       };
+
       this.httpService.saveCreatedRoute(sendObj).subscribe( () => {
+
         this.router.navigate(['/route/list/']);
+
+      }, (error) => {
+
+        this.alert
+          .showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
+          .subscribe( () => {} );
+
       });
 
     // imported file, backend only needs to knw the pathType, pathId, name and description, so create theis object and call http

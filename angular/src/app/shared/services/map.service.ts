@@ -37,6 +37,8 @@ export class MapService {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
     return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
+
+      console.log('tsMap');
       this.tsMap = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g',
@@ -90,6 +92,7 @@ export class MapService {
   }
 
   getMapBounds() {
+    // called by list - used to filter shown routes to those intersecting the current view
     const mapBounds = this.tsMap.getBounds();
     return [mapBounds.getSouthWest().lng, mapBounds.getSouthWest().lat, mapBounds.getNorthEast().lng, mapBounds.getNorthEast().lat];
   }

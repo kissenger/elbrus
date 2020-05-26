@@ -80,28 +80,32 @@ export function getCategory() {
 
 
 /**
- *   Works by calculating the bearing from the successive points on route and determining
- *   if this bearing is more often increasing (clockwise) or decreasing (anti-clockwise)
+ *  Calculates the bearing from the start point to successive points along the route
+ *  Rotation direction dependent on whether this bearing is more often increasing (clockwise) or decreasing (anti-clockwise)
  *  If the range of max to min bearing is small then treat as one-way route and find such as "north to east"
  */
 export function getDirection() {
 
-  const RANGE_TOL = 0.25 * Math.PI;     // 90deg
+  const RANGE_TOL = 135;     // 90deg
   const nSkip = Math.ceil(this.length / 25);
   let cwSum = 0;
   let lastBearing = geoFunctions.bearing(this.firstPoint, this.getPoint(nSkip));
   let thisBearing;
-  let maxBearing = - 2 * Math.PI;
-  let minBearing = 2 * Math.PI;
+  let delta;
+  let maxBearing = -360;
+  let minBearing = 360;
 
   for ( let i = 2 * nSkip; i < this.length; i += nSkip ) {
-    
-    thisBearing = geoFunctions.bearing(this.firstPoint, this.getPoint(i));
-    thisBearing = correctBearing(thisBearing, lastBearing);
 
-    cwSum = thisBearing - lastBearing < 0 ? cwSum + 1 : cwSum - 1;
+    // get thisBearing and correct it if we move across 0degs in either direction
+    thisBearing = geoFunctions.bearing(this.firstPoint, this.getPoint(i));
+    delta = Math.abs(thisBearing-lastBearing) > 180 ? thisBearing - lastBearing - Math.sign(thisBearing - lastBearing) * 360 : thisBearing - lastBearing;
+    thisBearing = lastBearing + delta;
+
     maxBearing = thisBearing > maxBearing ? thisBearing : maxBearing;
     minBearing = thisBearing < minBearing ? thisBearing : minBearing;
+    cwSum = delta < 0 ? cwSum + 1 : cwSum - 1;
+
     lastBearing = thisBearing;
 
   }
@@ -113,18 +117,6 @@ export function getDirection() {
     else return 'Clockwise'
   }
 
-}
-
-
-// check for large change in direction - if > 90degs then assume to have moved across 0degs - correct bearing
-function correctBearing (thisB, lastB) {
-  if (thisB - lastB > Math.PI) { 
-    return thisB -= 2 * Math.PI; 
-  }
-  if (thisB - lastB < -Math.PI) { 
-    return thisB +=  2 * Math.PI; 
-  };
-  return thisB;
 }
 
 

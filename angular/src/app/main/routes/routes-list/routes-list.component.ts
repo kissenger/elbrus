@@ -45,13 +45,15 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     if (this.mapService.isMap()) { this.mapService.killMap(); }
 
     // listen for pathID emission from panel-routes-list-list, and get the path from the backend
-    this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( (pathId: string) => {
+    this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( (obj) => {
 
+      const pathId = obj.id;
+      this.plotOptions.booResizeView = obj.booResizeView;
 
       if (pathId === '0') {
         // no path id found so default to users default location
         this.mapService.initialiseMap();
-        document.getElementById('Options').click();
+        // document.getElementById('Options').click();
         // this.dataService.activeTabEmitter.emit('options');
 
 
@@ -67,6 +69,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
             this.mapService.clearMap();
             this.mapService.addLayerToMap(this.geoJSON, this.lineStyle, this.plotOptions);
           });
+
         });
       }
     });

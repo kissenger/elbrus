@@ -8,7 +8,7 @@
 import express from 'express';
 import jsonwebtoken from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
 import cryptoRandomString from 'crypto-random-string';
 
 import { debugMsg } from './debugging.js';
@@ -41,13 +41,17 @@ export function verifyToken(req, res, next) {
     if ( !payload ) {
       throw new AuthenticationError('Unauthorised request: invalid token');
     }
+console.log(payload);
+    req.userId = payload.userId;
+    req.userName = payload.userName;
 
-    req.userId = payload.subject;
     next();
 
   } catch (error) {
+
     debugMsg('ERROR: ' + error);
     res.status(401).send(error.message);
+
   }
 
 }
@@ -103,7 +107,8 @@ authRoute.post('/register', async (req, res) => {
     // const message = `Click <a href="http://trailscape.cc/validation/${user._id}/${validationString}">here</a> to validate your account`;
     // await sendAnEmail(req.body.email, message);
 
-    const token = jsonwebtoken.sign( {subject: newUser._id}, KEY);
+    const subject = {userId: newUser._id, userName: newUser.userName};
+    const token = jsonwebtoken.sign(subject, KEY);
     delete newUser.validationString;
     res.status(200).send({token, user: newUser});    
 
@@ -134,7 +139,8 @@ authRoute.post('/login', async (req, res) => {
       throw new AuthenticationError('Password did not match');
     }
 
-    const token = jsonwebtoken.sign({ subject: user._id }, KEY);
+    const subject = {userId: user._id, userName: user.userName};
+    const token = jsonwebtoken.sign( subject, KEY );
     res.status(200).send({token, user});
 
   } catch (error) {

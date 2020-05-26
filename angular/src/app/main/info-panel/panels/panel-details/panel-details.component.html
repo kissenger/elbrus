@@ -4,7 +4,7 @@
 
   <div  class="inner h-100">
 
-    <div *ngIf="!isData; else weHaveDataToShowDiv" class="p-0 text-center">
+    <div *ngIf="!isData; else weHaveDataToShowDiv" class="mt-3 text-center">
       No details to show.
     </div>
 
@@ -53,6 +53,14 @@
             <tr>
               <td>Direction</td>
               <td>{{pathDirection}}</td>
+            </tr>
+            <tr>
+              <td>Public</td>
+              <td>{{isPublic}}</td>
+            </tr>
+            <tr *ngIf="isPublic">
+              <td>Created by</td>
+              <td>{{createdBy}}</td>
             </tr>
 
             <!-- Elevations shown only if isElevations is true -->

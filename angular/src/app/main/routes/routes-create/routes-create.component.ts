@@ -65,7 +65,12 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     });
 
     // listen for pathID emission from panel-routes-list-list, and get the path from the backend
-    this.overlaySubscription = this.dataService.pathIdEmitter.subscribe( (pathId: string) => {
+    // TODO: I **think** this can be refactored to remove needing to search through the overlaidPaths,
+    // or even to keep track of them because the subscribed to seervice now sends whether a resizze of the
+    // view is required --> but works for now
+    this.overlaySubscription = this.dataService.pathIdEmitter.subscribe( (obj) => {
+
+      const pathId = obj.id;
 
       // if pathId is not in overlaidPaths then add it
       if (!this.overlaidPaths.includes(pathId)) {

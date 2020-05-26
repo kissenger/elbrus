@@ -6,6 +6,7 @@ import { TsCoordinate, TsPlotPathOptions, TsLineStyle } from 'src/app/shared/int
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared//classes/pathHistory';
+import { AlertService } from './alert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,8 @@ export class MapCreateService extends MapService {
     httpService: HttpService,
     dataService: DataService,
     auth: AuthService,
-    private spinner: SpinnerService
+    private spinner: SpinnerService,
+    private alert: AlertService
   ) {
     super(httpService, dataService, auth);
   }
@@ -112,6 +114,12 @@ export class MapCreateService extends MapService {
           this.removeLayerFromMap('0000');
           this.addLayerToMap(this.history.geoJson(), this.styleOptions, this.plotOptions);
           resolve();
+        }, (error) => {
+
+          this.spinner.removeElement();
+          this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
+            .subscribe( () => {});
+
         });
 
 
