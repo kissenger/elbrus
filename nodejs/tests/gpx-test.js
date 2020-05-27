@@ -12,9 +12,9 @@ var reject = chai.reject;
 chai.use(chaiAsPromised);
 
 import { readFile } from 'fs';
-import { gpxRead } from '../gpx.js';
+import { gpxRead } from '../src/gpx-read-write.js';
 
-const dir = './data/';
+const dir = './tests/data/';
 
 const tests = [
   {
@@ -68,7 +68,7 @@ it('wrapper it to wait for promise.all to complete', function () {
         this.timeout(30000);
         return loadFile(dir+testItem.fileName)
           .then( function(buffer) {
-            gpxResult = readGPX(buffer.toString() );
+            gpxResult = gpxRead(buffer.toString() );
             console.log(gpxResult.lngLat.length, gpxResult)
           })
           .catch( function(error) {

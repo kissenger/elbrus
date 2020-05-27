@@ -41,7 +41,8 @@ export class MapService {
       console.log('tsMap');
       this.tsMap = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g',
+        // style: 'mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g',
+        style: 'mapbox://styles/kissenger/ckapl476e00p61iqeivumz4ey',
         center: location ? location : this.auth.getUser().homeLngLat,
         zoom: zoom ? zoom : 13
       });
@@ -125,7 +126,7 @@ export class MapService {
     this.activeLayers[pathId] = [];
 
     // used for debugging - allows points to be shown
-    // this.addPointsLayer(pathAsGeoJSON);
+    this.addPointsLayer(pathAsGeoJSON);
 
     // add the layer to the map
     this.tsMap.addLayer({
@@ -144,7 +145,7 @@ export class MapService {
     });
 
     // this is for debugging only, but dont delete cos it is useful
-    // this.addPointsLayer(pathAsGeoJSON);
+    this.addPointsLayer(pathAsGeoJSON);
 
     // plot a marker at the start and end of the route, pushing the new markers to activeLayers
     const nFeatures = pathAsGeoJSON.features.length;

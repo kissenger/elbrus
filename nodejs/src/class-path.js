@@ -20,11 +20,10 @@ import geolib from 'geo-points-and-paths';
 import jael from 'jael';
 const {Point, Path, geoFunctions} = geolib;
 jael.setPath(process.env.GEOTIFF_PATH);
-console.log(process.env.GEOTIFF_PATH);
 
 import { debugMsg } from './debugging.js';
-import * as globals from './globals.js';
-import { getCategory, getDirection, getMatchedPoints, analyseElevations } from './class-path-functions.js';
+import { pathAnalysis, getMatchedPoints, analyseElevations } from './class-path-functions.js';
+import { LONG_PATH_THRESHOLD, SIMPLIFICATION_FACTOR_PASS_1, SIMPLIFICATION_FACTOR_PASS_2 } from './globals.js';
 
 /**
  * Extends Path class to provide additional Path analsysis and stats
@@ -48,17 +47,23 @@ export class PathWithStats extends Path{
     // dont reorder, these need bt be on the instance before the .applys are called below
     this._name = name;
     this._description = description;
-    this._isLong = this.length > globals.LONG_PATH_THRESHOLD;
+    this._isLong = this.length > LONG_PATH_THRESHOLD;
     this._distanceData = this.distanceData;
 
     this._elevationData = analyseElevations.apply(this);
     this._matchedPoints = getMatchedPoints.apply(this);
+    const {cw, category, direction} = pathAnalysis.apply(this);
+    this._cw = cw;
+    this._category = category;
+    this._direction = direction;
 
   }
 
 
   // Perform pre-flight checks on provided points and elevations - get elevations from jael if needed
   static preFlight(lngLats, elev) {
+
+    debugMsg('PathWithStats.preflight');
 
     return new Promise( (resolve, reject) => {
 
@@ -74,16 +79,16 @@ export class PathWithStats extends Path{
         path.addParam('elev', elev);
       };
       
-      path.simplify(2);
-      debugMsg(`PathWithStats:preFlight - ${path.length} points after simplification`);
+      path.simplify(SIMPLIFICATION_FACTOR_PASS_1);
+      debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 1`);
 
       // if the path is still long, be a bit more agressive
-      if (path.length > globals.LONG_PATH_THRESHOLD) {
-        path.simplify(10);
-        debugMsg(`PathWithStats:preFlight - ${path.length} points after second simplification`);
+      if (path.length > LONG_PATH_THRESHOLD) {
+        path.simplify(SIMPLIFICATION_FACTOR_PASS_2);
+        debugMsg(`PathWithStats:preFlight --> ${path.length} points after second simplification pass 2`);
       }
 
-      if (path.length < globals.LONG_PATH_THRESHOLD) {
+      if (path.length < LONG_PATH_THRESHOLD) {
         if (!isElevationsProvided) {
           jael.getElevs( {points: path.pointLikes} )
             .then(elev => resolve( {lngLat: path.lngLats, elev: elev.map(e => e.elev)} ))
@@ -99,7 +104,7 @@ export class PathWithStats extends Path{
 
 
   get info() {
-    this._category = getCategory.apply(this)
+    
     return {
       pathType: this._pathType,
       name: this._name,
@@ -107,7 +112,8 @@ export class PathWithStats extends Path{
       isLong: this._isLong,
       isElevations: this._isElevations,
       category: this._category,
-      direction: getDirection.apply(this)
+      direction: this._direction,
+      cw: this._cw
     }
   }
 
@@ -145,7 +151,6 @@ export class PathWithStats extends Path{
 
 
   get distanceData() {
-
     const deltaDistance = this.deltaDistance;
     return{
       distance: this.distance,
@@ -171,8 +176,6 @@ export class PathWithStats extends Path{
 
 
   asMongoObject(userId, userName, isSaved) {
-    // console.log(this.info);
-
     return {
       userId: userId,
       isSaved: isSaved,
