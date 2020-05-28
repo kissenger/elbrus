@@ -21,9 +21,9 @@ import jael from 'jael';
 const {Point, Path, geoFunctions} = geolib;
 jael.setPath(process.env.GEOTIFF_PATH);
 
-import { debugMsg } from './debugging.js';
-import { pathAnalysis, getMatchedPoints, analyseElevations } from './class-path-functions.js';
-import { LONG_PATH_THRESHOLD, SIMPLIFICATION_FACTOR_PASS_1, SIMPLIFICATION_FACTOR_PASS_2 } from './globals.js';
+import { debugMsg } from './debugging.mjs';
+import { pathAnalysis, getMatchedPoints, analyseElevations } from './class-path-functions.mjs';
+import { LONG_PATH_THRESHOLD, SIMPLIFICATION_FACTOR_PASS_1, SIMPLIFICATION_FACTOR_PASS_2 } from './globals.mjs';
 
 /**
  * Extends Path class to provide additional Path analsysis and stats

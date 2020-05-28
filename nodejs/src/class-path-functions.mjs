@@ -7,10 +7,10 @@
 import geolib from 'geo-points-and-paths';
 const {Point, Path, geoFunctions} = geolib;
 
-import { debugMsg } from './debugging.js';
-import {START_AT_END_THRESH, PC_THRESH_UPP, PC_THRESH_LOW, ROTATION_RANGE_TOL, CW_CIRC_THRESHOLD, MATCH_DISTANCE, MATCH_BUFFER} from './globals.js';
-import {ASCENT_THRESH, HILL_THRESH, MOVING_AVERAGE_PERIOD, CW_TOLERANCE, BEARING_SECTIONS} from './globals.js';
-import {OUT_AND_BACK, CIRCULAR, ONE_WAY, NO_DIRECTION, ANTI_CLOCKWISE, CLOCKWISE, NO_CATEGORY, FIGURE_OF_EIGHT} from './globals.js';
+import { debugMsg } from './debugging.mjs';
+import {START_AT_END_THRESH, PC_THRESH_UPP, PC_THRESH_LOW, ROTATION_RANGE_TOL, CW_CIRC_THRESHOLD, MATCH_DISTANCE, MATCH_BUFFER} from './globals.mjs';
+import {ASCENT_THRESH, HILL_THRESH, MOVING_AVERAGE_PERIOD, CW_TOLERANCE, BEARING_SECTIONS} from './globals.mjs';
+import {OUT_AND_BACK, CIRCULAR, ONE_WAY, NO_DIRECTION, ANTI_CLOCKWISE, CLOCKWISE, NO_CATEGORY, FIGURE_OF_EIGHT} from './globals.mjs';
 
 
 /**

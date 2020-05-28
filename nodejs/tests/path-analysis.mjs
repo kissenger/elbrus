@@ -12,11 +12,10 @@ chai.use(chaiAsPromised);
 import 'dotenv/config.js';
 
 import { readFile } from 'fs';
-import { getRouteInstance } from '../src/app-functions.js';
-import { gpxRead } from '../src/gpx-read-write.js';
-import { OUT_AND_BACK, CIRCULAR, ONE_WAY, NO_DIRECTION, ANTI_CLOCKWISE, CLOCKWISE, NO_CATEGORY} from '../src/globals.js';
-import { PC_THRESH_UPP, PC_THRESH_LOW, FIGURE_OF_EIGHT} from '../src/globals.js';
-import { analyseElevations } from '/__FILES/Gordon/PROJECT/Code/elbrus/nodejs/src/class-path-functions.js';
+import { getRouteInstance } from '../src/app-functions.mjs';
+import { gpxRead } from '../src/gpx-read-write.mjs';
+import { OUT_AND_BACK, CIRCULAR, ONE_WAY, NO_DIRECTION, ANTI_CLOCKWISE, CLOCKWISE, NO_CATEGORY} from '../src/globals.mjs';
+import { FIGURE_OF_EIGHT} from '../src/globals.mjs';
 
   const dir = './tests/data/';
   const testList = [
@@ -123,7 +122,7 @@ import { analyseElevations } from '/__FILES/Gordon/PROJECT/Code/elbrus/nodejs/sr
   let paramCheck = [];
   let route;              // not declaring this has caused problems more than once, dont forget it
 
-  after ( function() {
+  after( function() {
     
     console.log(printSummary);
     console.table(paramCheck);
@@ -241,7 +240,7 @@ import { analyseElevations } from '/__FILES/Gordon/PROJECT/Code/elbrus/nodejs/sr
       const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
 
       res(routeInstance);
-      return routeInstance;
+      // return routeInstance;
     
     })
   }

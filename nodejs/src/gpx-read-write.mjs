@@ -26,8 +26,11 @@
  * parameters
  */
 
+ // worker threads test
+// import workerpool from 'workerpool';
+
 import { createWriteStream } from 'fs';
-import { debugMsg } from './debugging.js';
+import { debugMsg } from './debugging.mjs';
 
 /**
 * readGPX(data)
@@ -44,6 +47,9 @@ import { debugMsg } from './debugging.js';
 *   > If at the end of the search only some array values are '', those blank values are set to null
 */
 export function gpxRead(data) {
+
+  // data = data.slice(1,10000);
+  
   debugMsg('gpxRead()');
 
   // declare function variables
@@ -61,7 +67,7 @@ export function gpxRead(data) {
   let typeTag;
   let ptStart, ptEnd, ptData;
 
-
+  
   /**
    * Loop through each line until we find track or route start
    */
@@ -174,6 +180,7 @@ export function gpxRead(data) {
   //   writeFile("../gpx_dump.js", JSON.stringify(returnObject), (err) => {} );
   // };
 
+  console.log('finished')
   return returnObject;
 }
 
@@ -261,3 +268,10 @@ export function gpxWrite(writeObject){
   })
 
 }
+
+
+// workerpool.worker({
+//   gpxRead: gpxRead
+// });
+
+// export {gpxRead};

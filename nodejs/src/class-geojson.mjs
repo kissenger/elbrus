@@ -8,8 +8,8 @@
   *   const newGeoJson = new GeoJson().fromPath(path).toGeoHills();
   */
 
-import * as globals from './globals.js';
-import { PathWithStats } from './class-path.js';
+import * as globals from './globals.mjs';
+import { PathWithStats } from './class-path.mjs';
 
 export class GeoJSON {
 

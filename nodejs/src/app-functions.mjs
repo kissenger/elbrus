@@ -5,8 +5,8 @@
  * Module provides abstractions for the 'app' module
  */
 
-import { Route } from './class-path.js';
-import { Routes } from './schema/path-models.js';
+import { Route } from './class-path.mjs';
+import { Routes } from './schema/path-models.mjs';
 // import { PublicRoutes } from './schema/path-models-public.js';
 
 

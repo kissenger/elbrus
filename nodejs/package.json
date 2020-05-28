@@ -7,7 +7,6 @@
   },
   "main": "src/app.js",
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "test": "mocha",
     "server": "nodemon server.mjs"
@@ -28,6 +27,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.15",
     "multer": "^1.4.2",
-    "nodemailer": "^6.4.6"
+    "nodemailer": "^6.4.6",
+    "threads": "^1.4.1",
+    "workerpool": "^6.0.0"
   }
 }

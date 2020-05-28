@@ -13,12 +13,17 @@ import mongoose from 'mongoose';
 import 'dotenv/config.js';
 const app = express();
 
-import { authRoute, verifyToken } from './auth.js';
-import { GeoJSON } from './class-geojson.js';
-import { gpxRead, gpxWriteFromDocument } from './gpx-read-write.js';
-import { debugMsg } from './debugging.js';
-import { mongoModel, createMongoModel, bbox2Polygon } from './app-functions.js';
-import { getListData, getRouteInstance } from './app-functions.js';
+// worker pool test
+// import workerpool from 'workerpool';
+// const pool = workerpool.pool('./gpx-read-write.js');
+// worker pool test 
+
+import { authRoute, verifyToken } from './auth.mjs';
+import { GeoJSON } from './class-geojson.mjs';
+import { gpxRead, gpxWriteFromDocument } from './gpx-read-write.mjs';
+import { debugMsg } from './debugging.mjs';
+import { mongoModel, createMongoModel, bbox2Polygon } from './app-functions.mjs';
+import { getListData, getRouteInstance } from './app-functions.mjs';
 
 
 // apply middleware - note setheaders must come first
@@ -60,8 +65,9 @@ app.post('/import-route/', verifyToken, upload.single('filename'), async (req, r
 
   try {
 
-    const pathFromGPX = gpxRead(req.file.buffer.toString());
-    const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
+    // const gpxResult = await pool.exec('gpxRead', [req.file.buffer.toString()]);
+    const gpxResult = gpxRead(req.file.buffer.toString());
+    const routeInstance = await getRouteInstance(gpxResult.name, null, gpxResult.lngLat, gpxResult.elev);
     const document = await createMongoModel('route', routeInstance.asMongoObject(req.userId, req.userName, false));
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 

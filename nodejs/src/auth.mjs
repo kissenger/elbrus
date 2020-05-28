@@ -11,8 +11,8 @@ import bcrypt from 'bcrypt';
 // import nodemailer from 'nodemailer';
 import cryptoRandomString from 'crypto-random-string';
 
-import { debugMsg } from './debugging.js';
-import { Users } from './schema/user-models.js';
+import { debugMsg } from './debugging.mjs';
+import { Users } from './schema/user-models.mjs';
 
 export const authRoute = express.Router();
 const KEY = process.env.AUTH_KEY; 
