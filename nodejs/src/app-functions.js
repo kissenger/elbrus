@@ -98,21 +98,20 @@ function getListData(docs, count) {
 /**
  * Abstracts the workflow to instantiate a Route given a data array from an import
  */
-function getRouteInstance(name, description, lngLat, elevs) {
+// function getRouteInstance(name, description, lngLat, elevs) {
   
-  return new Promise ( (resolve, reject) => {
-    Route.preFlight(lngLat, elevs)
-      .then( prePath => resolve( new Route(name, description, prePath.lngLat, prePath.elev) ))
-      .catch( error => reject(error) )
-  });
+//   return new Promise ( (resolve, reject) => {
+//     Route.preFlight(lngLat, elevs)
+//       .then( prePath => resolve( new Route(name, description, prePath.lngLat, prePath.elev) ))
+//       .catch( error => reject(error) )
+//   });
 
-}
+// }
 
 
 module.exports = {
   mongoModel,
   createMongoModel,
   bbox2Polygon,
-  getListData,
-  getRouteInstance
+  getListData
 }

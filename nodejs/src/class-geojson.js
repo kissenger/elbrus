@@ -25,7 +25,7 @@ class GeoJSON {
 
   // populates the class instance with data from supplied Path instance
   fromPath(path) {
-    this._checkIsPath(path);
+    // this._checkIsPath(path);
     this._lngLats = path.lngLats;
     this._properties = path.properties
     this._elevs = this._properties.params.elev;

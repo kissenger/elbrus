@@ -16,16 +16,19 @@
  *
  */
 
-const pathAnalysis = require('./class-path-functions.js').pathAnalysis;
-const getMatchedPoints = require('./class-path-functions.js').getMatchedPoints;
-const analyseElevations = require('./class-path-functions.js').analyseElevations;
+// const analysePath = require('./analyse-path.js').analysePath;
+// const analyseElevations = require('./analyse-elevations.js').analyseElevations;
 const debugMsg = require('./debugging').debugMsg;
-const LONG_PATH_THRESHOLD = require('./globals').LONG_PATH_THRESHOLD;
-const SIMPLIFICATION_FACTOR_PASS_1 = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
-const SIMPLIFICATION_FACTOR_PASS_2 = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
-const {Point, Path, geoFunctions} = require('geo-points-and-paths');
+const Path = require('geo-points-and-paths').Path;
+
+const LONG_PATH_THRESHOLD            = require('./globals').LONG_PATH_THRESHOLD;
+const SIMPLIFICATION_FACTOR_PASS_1   = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
+const SIMPLIFICATION_FACTOR_PASS_2   = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
+
 const jael = require('jael');
 jael.setPath(process.env.GEOTIFF_PATH);
+
+
 
 /**
  * Extends Path class to provide additional Path analsysis and stats
@@ -40,24 +43,51 @@ class PathWithStats extends Path{
     super(lngLat);
 
     if (elev.length > 0) {
-      this.addParam('elev', elev);
+      // this.addParam('elev', elev);
       this._isElevations = true;
     } else {
       this._isElevations = false;
     }
 
-    // dont reorder, these need bt be on the instance before the .applys are called below
-    this._name = name;
-    this._description = description;
-    this._isLong = this.length > LONG_PATH_THRESHOLD;
-    this._distanceData = this.distanceData;
+    this.elev = elev;
 
-    this._elevationData = analyseElevations.apply(this);
-    this._matchedPoints = getMatchedPoints.apply(this);
-    const {cw, category, direction} = pathAnalysis.apply(this);
-    this._cw = cw;
-    this._category = category;
-    this._direction = direction;
+    // dont reorder, these need bt be on the instance before the .applys are called below
+    const deltaDistance = this.deltaDistance;
+
+    this.properties = {
+      pathId: '0000',    // assumes that path is 'created'
+      geometry: {
+        type: 'LineString',
+        coordinates: this.lngLats
+      },
+      info: {
+        pathType: this._pathType,
+        name,
+        description,
+        isLong: this.length > LONG_PATH_THRESHOLD,
+        isElevations: this._isElevations
+      },
+      stats: {
+        dDistance: deltaDistance,
+        distance: this.distance,
+        cumDistance: this.cumulativeDistance,
+        p2p: {
+          max: Math.max(...deltaDistance),
+          ave: deltaDistance.reduce( (a, b) => a+b, 0) / this.length
+        },
+        nPoints: this.length,
+        bbox: this.boundingBox,
+        nPoints: this.length,
+        simplificationRatio: this.simplificationRatio,
+      },
+      params: {
+        cumDistance: this.cumulativeDistance
+      }
+    }
+
+    if (this.properties.info.isElevations) {
+      this.properties.params.elev = this.getParam('elev');
+    }
 
   }
 
@@ -102,96 +132,8 @@ class PathWithStats extends Path{
         resolve( {lngLat: path.lngLats, elev: []});
       }
     })
-  }
-
-
-  get info() {
-    
-    return {
-      pathType: this._pathType,
-      name: this._name,
-      description: this._description,
-      isLong: this._isLong,
-      isElevations: this._isElevations,
-      category: this._category,
-      direction: this._direction,
-      cw: this._cw
-    }
-  }
-
-
-  get stats() {
-
-    const stats = {
-      ...this._distanceData,
-      ...this._elevationData,
-      bbox: this.boundingBox,
-      nPoints: this.length,
-      simplificationRatio: this.simplificationRatio,
-    };
-
-    delete stats.smoothedElev;   // this belongs on the param array
-
-    return stats;
-  }
-
-
-  get params() {
-
-    const params = {
-      matchedPoints: this._matchedPoints,
-      cumDistance: this.cumulativeDistance,
-    };
-
-    if (this._isElevations) {
-      params.smoothedElev = this._elevationData.smoothedElev;
-      params.elev = this.getParam('elev');
-    }
-
-    return params;
-  }
-
-
-  get distanceData() {
-    const deltaDistance = this.deltaDistance;
-    return{
-      distance: this.distance,
-      dDistance: deltaDistance,
-      nPoints: this.length,
-      p2p: {
-        max: Math.max(...deltaDistance),
-        ave: deltaDistance.reduce( (a, b) => a+b, 0) / this.length
-      }
-    }
 
   }
-
-
-  get properties() {
-    return {
-      pathId: '0000',    // assumes that path is 'created'
-      params: this.params,
-      stats: this.stats,
-      info: this.info
-    }
-  }
-
-
-  asMongoObject(userId, userName, isSaved) {
-    return {
-      userId: userId,
-      isSaved: isSaved,
-      geometry: {
-        type: 'LineString',
-        coordinates: this.lngLats
-      },
-      params: this.params,
-      stats: this.stats,
-      info: {...this.info, createdBy: userName},
-      isPublic: false
-    }
-  }
-
 }
 
 

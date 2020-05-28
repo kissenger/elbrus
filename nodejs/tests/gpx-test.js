@@ -5,14 +5,12 @@
  * TODO: tests for gpxWrite
  */
 
-import chai from 'chai';
-import chaiAsPromised from "chai-as-promised";
+const chai = require('chai');
 var expect = chai.expect;
-var reject = chai.reject;
-chai.use(chaiAsPromised);
-
-import { readFile } from 'fs';
-import { gpxRead } from '../src/gpx-read-write.js';
+var reject = chai.reject;;
+require('dotenv').config();
+const readFile = require('fs').readFile;
+const gpxRead = require('../src/gpx-read-write').gpxRead;
 
 const dir = './tests/data/';
 

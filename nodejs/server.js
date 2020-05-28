@@ -1,10 +1,5 @@
-// import app from './src/app.js';
-// import { createServer } from 'http';
 
 const app = require('./src/app.js');
-// const createServer = require('http').createServer;
-// const app = require("./backend/app.js");
-// const debug = require("debug")("node-angular");
 const http = require("http");
 
 

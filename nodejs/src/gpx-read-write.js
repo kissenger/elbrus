@@ -44,7 +44,9 @@ const debugMsg = require('./debugging').debugMsg;
 *   > If at the end of the search only some array values are '', those blank values are set to null
 */
 function gpxRead(data) {
+  // data = data.slice(0,100);
   debugMsg('gpxRead()');
+  // console.log(data);
 
   // declare function variables
   const MAX_LOOPS = 1000000;

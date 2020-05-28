@@ -10,8 +10,14 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-require('dotenv').config()
+require('dotenv').config();
 const app = express();
+
+// const spawn = require('threads').spawn;
+// const Thread = require('threads').Thread;
+const Worker = require('threads').Worker;
+const spawn = require('threads').spawn;
+const Pool = require('threads').Pool;
 
 const auth = require('./auth');
 const GeoJSON = require('./class-geojson').GeoJSON;
@@ -22,7 +28,7 @@ const mongoModel = require('./app-functions.js').mongoModel;
 const createMongoModel = require('./app-functions.js').createMongoModel;
 const bbox2Polygon = require('./app-functions.js').bbox2Polygon;
 const getListData = require('./app-functions.js').getListData;
-const getRouteInstance = require('./app-functions.js').getRouteInstance;
+const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 
 // apply middleware - note setheaders must come first
 app.use( (req, res, next) => {
@@ -53,6 +59,9 @@ const upload = multer({
   }
 });
 
+
+// worker threads
+const pool = Pool(() => spawn(new Worker('workers.js')), 8 /* optional size */);
 
 
 /*****************************************************************
@@ -192,7 +201,6 @@ app.get('/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, 
     const limit = req.params.limit;
     const offset = req.params.offset
     const pathType = req.params.pathType;
-    // console.log(req.params.isPublic, condition);
 
     const count = await mongoModel(pathType).countDocuments(condition);
     const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));

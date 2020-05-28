@@ -13,6 +13,11 @@ const readFile = require('fs').readFile;
 const getRouteInstance = require('../src/path-helpers').getRouteInstance;
 const gpxRead = require('../src/gpx-read-write').gpxRead;
 
+const spawn = require('threads').spawn;
+const Thread = require('threads').Thread;
+const Worker = require('threads').Worker;
+const Pool = require('threads').Pool;
+
 const OUT_AND_BACK =    require('../src/globals').OUT_AND_BACK;
 const CIRCULAR =        require('../src/globals').CIRCULAR;
 const ONE_WAY =         require('../src/globals').ONE_WAY;
@@ -127,73 +132,86 @@ const testList = [
 let printSummary = '';
 let paramCheck = [];
 let route;              // not declaring this has caused problems more than once, dont forget it
+const pool = Pool(() => spawn(new Worker('../src/workers.js')), 8 /* optional size */);
 
-after ( function() {
-  
-  console.log(printSummary);
-  console.table(paramCheck);
-  console.log(`Completed in ${timeDiff(new Date() - startTime)}`) 
-  
+
+
+const promises = [];
+testList.forEach( async (testItem) => {
+  promises.push( new Promise( async (res, rej) => { 
+    console.log("Testing file: " + testItem.fileName);
+    const result = await gpxToRoute(dir+testItem.fileName);
+    const pcShared = Math.round(result.properties.params.matchedPoints.length / result.properties.stats.nPoints * 100);
+    paramCheck.push({fn: testItem.fileName, category: testItem.category, direction: testItem.direction, pcShared, cw: result.properties.info.cw});
+    res();
+  }))
 });
 
-it('wrapper it to wait for promise.all to complete', function () {
-
-  let testWithData = function (testItem) {
-
-    return function () {
-
-      before( function() {
-
-        this.timeout(30000);
-
-        return gpxToRoute(dir+testItem.fileName)
-          .then( function(result) { 
-            printSummary += getPrintSummary(testItem, result);
-            // console.log('result', result);
-            const pcShared = Math.round(result.properties.params.matchedPoints.length / result.properties.stats.nPoints * 100);
-            paramCheck.push({fn: testItem.fileName, category: testItem.category, direction: testItem.direction, pcShared, cw: result.properties.info.cw});
-            route = result;
-          })
-          .catch( function(error) { console.log(error) })
-
-      });
+Promise.all(promises).then( () => {
+  console.table(paramCheck);
+  console.log(`Completed in ${timeDiff(new Date() - startTime)}`) 
+})
 
 
-      it('should have category ' + testItem.category, function() {
-        return expect(route.properties.info.category).to.equal(testItem.category)
-      });
+  
+// it('wrapper it to wait for promise.all to complete', function () {
 
-      it('should have direction ' + testItem.direction, function() {
-        return expect(route.properties.info.direction).to.equal(testItem.direction)
-      });
+//   let testWithData = function (testItem) {
 
-      if (testItem.stravaDistanceMiles>0) {
-        it('should have distance within 2% of ' + testItem.stravaDistanceMiles, function() {
-          const distance = route.properties.stats.distance / 1000 * 0.62137;
-          return expect(distance).to.satisfy(function(d) { return (d < 1.02*testItem.stravaDistanceMiles) && (d > 0.98*testItem.stravaDistanceMiles)});
-        });
-      }
+//     return function () {
+
+//       before( function() {
+
+//         this.timeout(30000);
+
+//         return gpxToRoute(dir+testItem.fileName)
+//           .then( function(result) { 
+//             printSummary += getPrintSummary(testItem, result);
+//             // console.log('result', result);
+//             const pcShared = Math.round(result.properties.params.matchedPoints.length / result.properties.stats.nPoints * 100);
+//             paramCheck.push({fn: testItem.fileName, category: testItem.category, direction: testItem.direction, pcShared, cw: result.properties.info.cw});
+//             route = result;
+//           })
+//           .catch( function(error) { console.log(error) })
+
+//       });
+
+
+//       it('should have category ' + testItem.category, function() {
+//         return expect(route.properties.info.category).to.equal(testItem.category)
+//       });
+
+//       it('should have direction ' + testItem.direction, function() {
+//         return expect(route.properties.info.direction).to.equal(testItem.direction)
+//       });
+
+//       if (testItem.stravaDistanceMiles>0) {
+//         it('should have distance within 2% of ' + testItem.stravaDistanceMiles, function() {
+//           const distance = route.properties.stats.distance / 1000 * 0.62137;
+//           return expect(distance).to.satisfy(function(d) { return (d < 1.02*testItem.stravaDistanceMiles) && (d > 0.98*testItem.stravaDistanceMiles)});
+//         });
+//       }
       
-      // dont bother testing elevations
-      // if (testItem.stravaAscentFt>0) {
-      //   it('should have ascent within 20% ' + testItem.stravaAscentFt, function() {
-      //     const ascent = route.stats.elevations.ascent * 3.28084;
-      //     console.log(`expected ${testItem.stravaAscentFt}, got ${ascent}`)
-      //     return expect(ascent).to.satisfy(function(a) { return (a < 1.2*testItem.stravaAscentFt) && (a > 1/1.2*testItem.stravaAscentFt)});
-      //   });
-      // }
+//       // dont bother testing elevations
+//       // if (testItem.stravaAscentFt>0) {
+//       //   it('should have ascent within 20% ' + testItem.stravaAscentFt, function() {
+//       //     const ascent = route.stats.elevations.ascent * 3.28084;
+//       //     console.log(`expected ${testItem.stravaAscentFt}, got ${ascent}`)
+//       //     return expect(ascent).to.satisfy(function(a) { return (a < 1.2*testItem.stravaAscentFt) && (a > 1/1.2*testItem.stravaAscentFt)});
+//       //   });
+//       // }
 
-    };
-  }; // testWithData
-
-
-  //  loops through all the provided test cases, using the closure as an argument
-  testList.forEach( function(testInfo) {
-    describe("Testing file: " + testInfo.fileName , testWithData(testInfo));
-  });
+//     };
+//   }; // testWithData
 
 
-}); // it (hack)
+//   //  loops through all the provided test cases, using the closure as an argument
+//   testList.forEach( function(testInfo) {
+//     describe("Testing file: " + testInfo.fileName , testWithData(testInfo));
+//   });
+
+
+// }); // it (hack)
 
 
 function getPrintSummary(testItem, route) {
@@ -242,16 +260,47 @@ function gpxToRoute(fn) {
     //   .then( function(pathFromGPX) { return getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev) })
     //   .then( function(routeInstance) { res(routeInstance.asMongoObject('testId', 'testUserName', false)) })
     //   .catch( function(error) {console.log(error)} )
-
+    
     const buffer = await loadFile(fn);
-    const pathFromGPX = gpxRead(buffer.toString());
-    const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
+    const buffString = buffer.toString();
+
+    console.log(fn, 'start task 1');
+    const gpxPath = await addTaskToQueue('gpxRead', buffString);
+    console.log(fn, 'task 1 complete, start task 2');
+    const routeInstance = await addTaskToQueue('getPath', gpxPath);
+    console.log(fn, 'task 2 complete');
+
+
+    // const buffer = await loadFile(fn);
+    // const pathFromGPX = gpxRead(buffer.toString());
+    // const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
 
     res(routeInstance);
     return routeInstance;
   
   })
 }
+
+function addTaskToQueue(functionName, argument) {
+
+  return new Promise((resolve, reject) => {
+
+  pool.queue(async workerFunctions => {
+
+    try {
+
+      const result = await workerFunctions[functionName](argument);
+      resolve(result);
+
+    } catch (error) {
+
+      reject(error)
+
+    }
+
+  })
+
+})}
 
 
 /**
