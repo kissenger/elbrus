@@ -16,20 +16,22 @@
  *
  */
 
-import geolib from 'geo-points-and-paths';
-import jael from 'jael';
-const {Point, Path, geoFunctions} = geolib;
+const pathAnalysis = require('./class-path-functions.js').pathAnalysis;
+const getMatchedPoints = require('./class-path-functions.js').getMatchedPoints;
+const analyseElevations = require('./class-path-functions.js').analyseElevations;
+const debugMsg = require('./debugging').debugMsg;
+const LONG_PATH_THRESHOLD = require('./globals').LONG_PATH_THRESHOLD;
+const SIMPLIFICATION_FACTOR_PASS_1 = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
+const SIMPLIFICATION_FACTOR_PASS_2 = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
+const {Point, Path, geoFunctions} = require('geo-points-and-paths');
+const jael = require('jael');
 jael.setPath(process.env.GEOTIFF_PATH);
-
-import { debugMsg } from './debugging.js';
-import { pathAnalysis, getMatchedPoints, analyseElevations } from './class-path-functions.js';
-import { LONG_PATH_THRESHOLD, SIMPLIFICATION_FACTOR_PASS_1, SIMPLIFICATION_FACTOR_PASS_2 } from './globals.js';
 
 /**
  * Extends Path class to provide additional Path analsysis and stats
  */
 
-export class PathWithStats extends Path{
+class PathWithStats extends Path{
 
   constructor(name, description, lngLat, elev) {
 
@@ -193,13 +195,18 @@ export class PathWithStats extends Path{
 }
 
 
-export class Route extends PathWithStats {
+class Route extends PathWithStats {
 
   constructor(name, description, lngLat, elev){
     super(name, description, lngLat, elev);
     this._pathType = 'route';
   }
 
+}
+
+module.exports = {
+  PathWithStats,
+  Route
 }
 
 

@@ -4,14 +4,29 @@
  * Functions directly supporting the PathWithStats class
  */
 
-import geolib from 'geo-points-and-paths';
-const {Point, Path, geoFunctions} = geolib;
+const {Point, Path, geoFunctions} = require('geo-points-and-paths');
+const debugMsg = require('./debugging').debugMsg;
 
-import { debugMsg } from './debugging.js';
-import {START_AT_END_THRESH, PC_THRESH_UPP, PC_THRESH_LOW, ROTATION_RANGE_TOL, CW_CIRC_THRESHOLD, MATCH_DISTANCE, MATCH_BUFFER} from './globals.js';
-import {ASCENT_THRESH, HILL_THRESH, MOVING_AVERAGE_PERIOD, CW_TOLERANCE, BEARING_SECTIONS} from './globals.js';
-import {OUT_AND_BACK, CIRCULAR, ONE_WAY, NO_DIRECTION, ANTI_CLOCKWISE, CLOCKWISE, NO_CATEGORY, FIGURE_OF_EIGHT} from './globals.js';
-
+const START_AT_END_THRESH = require('./globals').START_AT_END_THRESH;
+const PC_THRESH_UPP = require('./globals').PC_THRESH_UPP;
+const PC_THRESH_LOW = require('./globals').PC_THRESH_LOW;
+const ROTATION_RANGE_TOL = require('./globals').ROTATION_RANGE_TOL;
+const CW_CIRC_THRESHOLD = require('./globals').CW_CIRC_THRESHOLD;
+const MATCH_DISTANCE = require('./globals').MATCH_DISTANCE;
+const MATCH_BUFFER = require('./globals').MATCH_BUFFER;
+const ASCENT_THRESH = require('./globals').ASCENT_THRESH;
+const HILL_THRESH = require('./globals').HILL_THRESH;
+const MOVING_AVERAGE_PERIOD = require('./globals').MOVING_AVERAGE_PERIOD;
+const CW_TOLERANCE = require('./globals').CW_TOLERANCE;
+const BEARING_SECTIONS = require('./globals').BEARING_SECTIONS;
+const OUT_AND_BACK = require('./globals').OUT_AND_BACK;
+const CIRCULAR = require('./globals').CIRCULAR;
+const ONE_WAY = require('./globals').ONE_WAY;
+const NO_DIRECTION = require('./globals').NO_DIRECTION;
+const ANTI_CLOCKWISE = require('./globals').ANTI_CLOCKWISE;
+const CLOCKWISE = require('./globals').CLOCKWISE;
+const NO_CATEGORY = require('./globals').NO_CATEGORY;
+const FIGURE_OF_EIGHT = require('./globals').FIGURE_OF_EIGHT;
 
 /**
  * TODO: THIS IS AN EXPENSIVE ALGORTHM AND ALTERNATIVE METHODS NEED TO BE FOUND
@@ -28,7 +43,7 @@ import {OUT_AND_BACK, CIRCULAR, ONE_WAY, NO_DIRECTION, ANTI_CLOCKWISE, CLOCKWISE
  * to matched points being missed
  * 
  */
-export function getMatchedPoints() {
+function getMatchedPoints() {
 
   debugMsg('PointsList.getMatchedPoints()');
 
@@ -80,7 +95,7 @@ export function getMatchedPoints() {
  * 
 
  */
-export function pathAnalysis() {
+function pathAnalysis() {
   
   debugMsg('PointsList.getCategory()');
   
@@ -159,7 +174,7 @@ export function pathAnalysis() {
  *  Rotation direction dependent on whether this bearing is more often increasing (clockwise) or decreasing (anti-clockwise)
  *  If the range of max to min bearing is small then treat as one-way route and find such as "north to east"
  */
-export function bearingAnalysis(origin) {
+function bearingAnalysis(origin) {
 
   const nSkip = Math.ceil(this.length / BEARING_SECTIONS);
   let cwSum = 0;
@@ -216,7 +231,7 @@ function getLinearDirection(firstPoint, lastPoint) {
   * that takes the required class data and calls lower level functions, which can then be tested without needing to
   * instantiate the class.
   */
-export function analyseElevations() {
+function analyseElevations() {
 
   if (!this.isParamExistsOnAnyPoint('elev')) {
     return {};
@@ -343,6 +358,12 @@ function movingAverage(array, period) {
 
   return movingAverage;
 
+}
+
+module.exports = {
+  getMatchedPoints,
+  pathAnalysis,
+  analyseElevations
 }
 
 

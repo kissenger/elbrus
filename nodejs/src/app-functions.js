@@ -4,16 +4,13 @@
 /**
  * Module provides abstractions for the 'app' module
  */
-
-import { Route } from './class-path.js';
-import { Routes } from './schema/path-models.js';
-// import { PublicRoutes } from './schema/path-models-public.js';
-
+const Routes = require('./schema/path-models').Routes;
+const Route = require('./class-path').Route;
 
 /**
 * returns the desired mongo model object
 */
-export function mongoModel(pathType) {
+function mongoModel(pathType) {
   switch(pathType) {
     // case 'challenge': return MongoChallenges.Challenges;
     case 'route': return Routes;
@@ -43,7 +40,7 @@ export function mongoModel(pathType) {
 /**
 * Abstract model creation
 */
-export function createMongoModel(pathType, model) {
+function createMongoModel(pathType, model) {
   return new Promise( (resolve, reject) => {
     mongoModel(pathType).create(model)
       .then( doc => resolve(doc) )
@@ -57,7 +54,7 @@ export function createMongoModel(pathType, model) {
  * Converts standard bounding box to polygon for mongo geometry query
  * bbox bounding box as [minlng, minlat, maxlng, maxlat]
  */
-export function bbox2Polygon(bbox) {
+function bbox2Polygon(bbox) {
   return [[
     [ bbox[0], bbox[1] ],
     [ bbox[2], bbox[1] ],
@@ -76,7 +73,7 @@ export function bbox2Polygon(bbox) {
   * Returns an object expected by the front end when a list query is made
   * Called by get-paths-list()
   */
-export function getListData(docs, count) {
+function getListData(docs, count) {
 
   return docs.map( d => ({
     name: d.info.name,
@@ -101,7 +98,7 @@ export function getListData(docs, count) {
 /**
  * Abstracts the workflow to instantiate a Route given a data array from an import
  */
-export function getRouteInstance(name, description, lngLat, elevs) {
+function getRouteInstance(name, description, lngLat, elevs) {
   
   return new Promise ( (resolve, reject) => {
     Route.preFlight(lngLat, elevs)
@@ -109,4 +106,13 @@ export function getRouteInstance(name, description, lngLat, elevs) {
       .catch( error => reject(error) )
   });
 
+}
+
+
+module.exports = {
+  mongoModel,
+  createMongoModel,
+  bbox2Polygon,
+  getListData,
+  getRouteInstance
 }

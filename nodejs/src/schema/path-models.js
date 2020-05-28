@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
 
+const mongoose = require('mongoose');
 const pathSchema = mongoose.Schema({
 
   userId: {type: String, required: true},
@@ -87,11 +87,8 @@ const pathSchema = mongoose.Schema({
 pathSchema.index({ userId: 1, creationDate: 1});
 pathSchema.index({ userId: 1, startTime: 1});
 
-//const Challenges = mongoose.model('challenges', pathSchema);
-// export const Tracks = mongoose.model('tracks', pathSchema);
-export const Routes = mongoose.model('routes', pathSchema);
-// export const PublicRoutes = mongoose.model('routes-public', pathSchema);
+const Routes = mongoose.model('routes', pathSchema);
 
-
-// export const Tracks = Tracks;
-// export const Routes = Routes;
+module.exports = {
+  Routes
+}

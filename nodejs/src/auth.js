@@ -5,24 +5,24 @@
  * Module provides the necessary functions for user authentication
  */
 
-import express from 'express';
-import jsonwebtoken from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-// import nodemailer from 'nodemailer';
-import cryptoRandomString from 'crypto-random-string';
+const express = require('express');
+const authRoute = express.Router();
+const jsonwebtoken = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const KEY = process.env.AUTH_KEY;
 
-import { debugMsg } from './debugging.js';
-import { Users } from './schema/user-models.js';
-
-export const authRoute = express.Router();
-const KEY = process.env.AUTH_KEY; 
-
+const debugMsg = require('./debugging').debugMsg;
+const Users = require('./schema/user-models').Users;
 class AuthenticationError extends Error{};
+
+// needed for validate by email
+// const cryptoRandomString = require('crypto-random-string');
+
 
 /**
  * middleware to confirm user has an acceptable token. returns userId in req if all is ok
  */
-export function verifyToken(req, res, next) {
+function verifyToken(req, res, next) {
 
   debugMsg('verifyToken');
 
@@ -41,7 +41,7 @@ export function verifyToken(req, res, next) {
     if ( !payload ) {
       throw new AuthenticationError('Unauthorised request: invalid token');
     }
-console.log(payload);
+    
     req.userId = payload.userId;
     req.userName = payload.userName;
 
@@ -123,7 +123,7 @@ authRoute.post('/register', async (req, res) => {
 
 authRoute.post('/login', async (req, res) => {
 
-  debugMsg('login user');
+  debugMsg(`login user, userName: ${req.body.userName}`);
 
   // check that user exists and return data in variable user
 
@@ -144,8 +144,10 @@ authRoute.post('/login', async (req, res) => {
     res.status(200).send({token, user});
 
   } catch (error) {
+
     debugMsg('ERROR: ' + error);
     res.status(401).send(error.message);
+
   }
 
 });
@@ -211,3 +213,7 @@ authRoute.post('/login', async (req, res) => {
   
 // }
 
+module.exports = {
+  authRoute,
+  verifyToken
+}

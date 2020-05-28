@@ -7,10 +7,9 @@
   },
   "main": "src/app.js",
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "test": "mocha",
-    "server": "nodemon server.mjs"
+    "server": "nodemon server.js"
   },
   "devDependencies": {
     "chai": "*",
