@@ -8,7 +8,7 @@
   *   const newGeoJson = new GeoJson().fromPath(path).toGeoHills();
   */
  
-const PathWithStats = require('./class-path').PathWithStats;
+const PathWithStats = require('./path-class').PathWithStats;
 
 const FLAT_COLOUR = require('./globals').FLAT_COLOUR;
 const ROUTE_COLOUR = require('./globals').ROUTE_COLOUR;

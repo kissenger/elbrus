@@ -5,7 +5,7 @@
  * Functions directly supporting the PathWithStats class
  */
 
-const debugMsg = require('./debugging').debugMsg;
+const debugMsg = require('./debug').debugMsg;
 
 const ASCENT_THRESH =            require('./globals').ASCENT_THRESH;
 const HILL_THRESH =              require('./globals').HILL_THRESH;
@@ -26,6 +26,8 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   * instantiate the class.
   */
  function analyseElevations(path) {
+
+  debugMsg(`analyseElevations, ${path.properties.info.name}`);
 
   // distance data needed to caculate gradients
   const dDistance = path.properties.stats.dDistance;

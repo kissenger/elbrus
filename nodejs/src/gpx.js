@@ -27,7 +27,9 @@
  */
 
 const createWriteStream = require('fs').createWriteStream;
-const debugMsg = require('./debugging').debugMsg;
+const debugMsg = require('./debug').debugMsg;
+
+const addTaskToQueue = require('./thread-tasks').addTaskToQueue;
 
 /**
 * readGPX(data)
@@ -43,6 +45,14 @@ const debugMsg = require('./debugging').debugMsg;
 *   > If at the end of the search all array values are '', the paramater is set to null
 *   > If at the end of the search only some array values are '', those blank values are set to null
 */
+
+async function gpxReadUseThreads(data) {
+  return new Promise( async (resolve, reject) => {
+    const gpxData = await addTaskToQueue('gpxRead', bufferString);  // intensive task so run in threads
+    resolve(gpxData);
+  })
+}
+
 function gpxRead(data) {
   // data = data.slice(0,100);
   debugMsg('gpxRead()');
@@ -266,5 +276,6 @@ function gpxWrite(writeObject){
 
 module.exports = {
   gpxRead,
-  gpxWriteFromDocument
+  gpxWriteFromDocument,
+  gpxReadUseThreads
 }

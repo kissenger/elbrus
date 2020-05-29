@@ -5,10 +5,11 @@
  * Module provides abstractions for the 'app' module
  */
 const Routes = require('./schema/path-models').Routes;
-const Route = require('./class-path').Route;
+// const Route = require('./path-class').Route;
 
 /**
 * returns the desired mongo model object
+* useful to programmatically select mongo model from pathType
 */
 function mongoModel(pathType) {
   switch(pathType) {
@@ -18,34 +19,6 @@ function mongoModel(pathType) {
     // case 'track': return Tracks;
     // case 'match': return MongoMatch.Match;
   }
-}
-
-
-/**
- * get a mongo db entry from a provided path id
- * TODO: use .findById() method.  _id is unique so dont need to search for uid as well
- * https://mongoosejs.com/docs/api.html#model_Model.findById
-//  */
-// export function getPathDocFromId(pid, ptype, uid) {
-
-//   return new Promise( (resolve, reject) => {
-//     mongoModel(ptype)
-//       .find( {_id: pid, userId: uid} )
-//       .then( path => resolve(path[0]) )
-//       .catch( error => reject(error) )
-//   })
-// }
-
-
-/**
-* Abstract model creation
-*/
-function createMongoModel(pathType, model) {
-  return new Promise( (resolve, reject) => {
-    mongoModel(pathType).create(model)
-      .then( doc => resolve(doc) )
-      .catch( error => reject(error))
-  });
 }
 
 
@@ -93,20 +66,6 @@ function getListData(docs, count) {
 }
 
 
-
-
-/**
- * Abstracts the workflow to instantiate a Route given a data array from an import
- */
-// function getRouteInstance(name, description, lngLat, elevs) {
-  
-//   return new Promise ( (resolve, reject) => {
-//     Route.preFlight(lngLat, elevs)
-//       .then( prePath => resolve( new Route(name, description, prePath.lngLat, prePath.elev) ))
-//       .catch( error => reject(error) )
-//   });
-
-// }
 
 
 module.exports = {

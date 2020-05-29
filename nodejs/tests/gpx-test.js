@@ -10,7 +10,7 @@ var expect = chai.expect;
 var reject = chai.reject;;
 require('dotenv').config();
 const readFile = require('fs').readFile;
-const gpxRead = require('../src/gpx-read-write').gpxRead;
+const gpxRead = require('../src/gpx').gpxRead;
 
 const dir = './tests/data/';
 

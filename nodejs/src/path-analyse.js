@@ -5,7 +5,7 @@
  */
 
 const geoFunctions = require('geo-points-and-paths').geoFunctions;
-const debugMsg = require('./debugging').debugMsg;
+const debugMsg = require('./debug').debugMsg;
 
 const START_AT_END_THRESH =      require('./globals').START_AT_END_THRESH;
 const PC_THRESH_UPP =            require('./globals').PC_THRESH_UPP;
@@ -52,22 +52,25 @@ const FIGURE_OF_EIGHT =          require('./globals').FIGURE_OF_EIGHT;
  */
 function analysePath(path) {
   
-  debugMsg('PointsList.getCategory()');
-  
+  debugMsg(`analysePath, ${path.properties.info.name}`);
+
+  const pathLength = path.properties.stats.nPoints;
+  // const lngLats = path.points;
+
   const matchedPoints = getMatchedPoints(path);
-  const pcShared = matchedPoints.length / path.length * 100; 
-  const isStartAtEnd = geoFunctions.p2p(path.firstPoint, path.lastPoint) < (START_AT_END_THRESH);
+  const pcShared = matchedPoints.length / pathLength * 100; 
+  const isStartAtEnd = geoFunctions.p2p(path.points[0], path.points[pathLength-1]) < (START_AT_END_THRESH);
   let category = NO_CATEGORY;
   let direction = NO_DIRECTION;
 
   
   // const boundingBox = this.boundingBox;
   const origin = {
-    lat: (path.boundingBox.maxLat + path.boundingBox.minLat)/2,
-    lng: (path.boundingBox.maxLng + path.boundingBox.minLng)/2
+    lat: (path.properties.stats.bbox.maxLat + path.properties.stats.bbox.minLat)/2,
+    lng: (path.properties.stats.bbox.maxLng + path.properties.stats.bbox.minLng)/2
   }
-  const {cw, _brngRange} = bearingAnalysis.apply(path, [origin]);            // best signal for cw by taking origin at the cog of the route
-  const {_cw, brngRange} = bearingAnalysis.apply(path, [path.firstPoint]);   // best signal for brngRange byt taking origin as the start point
+  const {cw, _brngRange} = bearingAnalysis(path.points, origin);         // best signal for cw by taking origin at the cog of the route
+  const {_cw, brngRange} = bearingAnalysis(path.points, path.points[0]);   // best signal for brngRange byt taking origin as the start point
 
   /**
   *                         CATEGORISATION LOGIC
@@ -107,8 +110,7 @@ function analysePath(path) {
   */
   if ( category === ONE_WAY && brngRange < ROTATION_RANGE_TOL ) {
   // if ( category === ONE_WAY && cw <= CW_CIRC_THRESHOLD ) {  <-- tried this, it didnt work
-
-    direction = getLinearDirection(path.firstPoint, path.lastPoint);
+    direction = getLinearDirection(path.points[0], path.points[pathLength-1]);
 
   } else if ( category === CIRCULAR || ( category === ONE_WAY && cw > CW_CIRC_THRESHOLD ) ) {
 
@@ -142,10 +144,10 @@ function getMatchedPoints(path) {
   debugMsg('PointsList.getMatchedPoints()');
 
   const mp = [];
-  for ( let i = 0; i < path.length; i++ ) {  // look at each point
-    for ( let j = i + MATCH_BUFFER; j < path.length; j++ ) {  // look at each point ahead of it
+  for ( let i = 0; i < path.properties.stats.nPoints; i++ ) {  // look at each point
+    for ( let j = i + MATCH_BUFFER; j < path.properties.stats.nPoints; j++ ) {  // look at each point ahead of it
 
-      const dist = geoFunctions.p2p(path.getPoint(i), path.getPoint(j));
+      const dist = geoFunctions.p2p(path.points[i], path.points[j]);
       if ( dist < MATCH_DISTANCE ) {
         mp.push([i, j]);
         break;
@@ -171,18 +173,18 @@ function getMatchedPoints(path) {
  *  Rotation direction dependent on whether this bearing is more often increasing (clockwise) or decreasing (anti-clockwise)
  *  If the range of max to min bearing is small then treat as one-way route and find such as "north to east"
  */
-function bearingAnalysis(origin) {
+function bearingAnalysis(points, origin) {
 
-  const nSkip = Math.ceil(this.length / BEARING_SECTIONS);
+  const nSkip = Math.ceil(points.length / BEARING_SECTIONS);
   let cwSum = 0;
   let thisBrng;
   let lastBrng;
   let delta;
   let range = {max:-360, min: 360};
 
-  for ( let i = nSkip; i < this.length; i += nSkip ) {
+  for ( let i = nSkip; i < points.length; i += nSkip ) {
 
-    thisBrng = geoFunctions.bearing(origin, this.getPoint(i));
+    thisBrng = geoFunctions.bearing(origin, points[i]);
     if (i > nSkip) {
       
       delta = Math.abs(thisBrng - lastBrng) > 180 ? thisBrng - lastBrng - Math.sign(thisBrng - lastBrng) * 360 : thisBrng - lastBrng;

@@ -20,15 +20,16 @@ const spawn = require('threads').spawn;
 const Pool = require('threads').Pool;
 
 const auth = require('./auth');
-const GeoJSON = require('./class-geojson').GeoJSON;
-const gpxRead = require('./gpx-read-write').gpxRead;
-const gpxWriteFromDocument = require('./gpx-read-write').gpxWriteFromDocument;
-const debugMsg = require('./debugging').debugMsg;
-const mongoModel = require('./app-functions.js').mongoModel;
-const createMongoModel = require('./app-functions.js').createMongoModel;
-const bbox2Polygon = require('./app-functions.js').bbox2Polygon;
-const getListData = require('./app-functions.js').getListData;
+const GeoJSON = require('./geojson').GeoJSON;
+const gpxRead = require('./gpx').gpxRead;
+// const gpxReadUseThreads = require('./gpx').gpxReadUseThreads;
+const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
+const debugMsg = require('./debug').debugMsg;
+const mongoModel = require('./app-helpers.js').mongoModel;
+const bbox2Polygon = require('./app-helpers.js').bbox2Polygon;
+const getListData = require('./app-helpers.js').getListData;
 const getRouteInstance = require('./path-helpers.js').getRouteInstance;
+const initThreadPool = require('./thread-tasks').initThreadPool;
 
 // apply middleware - note setheaders must come first
 app.use( (req, res, next) => {
@@ -61,7 +62,9 @@ const upload = multer({
 
 
 // worker threads
-const pool = Pool(() => spawn(new Worker('workers.js')), 8 /* optional size */);
+console.log('blah');
+threadPool = initThreadPool();
+// const pool = Pool(() => spawn(new Worker('workers.js')), 8 /* optional size */);
 
 
 /*****************************************************************
@@ -73,9 +76,12 @@ app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (r
 
   try {
 
-    const pathFromGPX = gpxRead(req.file.buffer.toString());
-    const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
-    const document = await createMongoModel('route', routeInstance.asMongoObject(req.userId, req.userName, false));
+    const bufferString = req.file.buffer.toString();
+    // const gpxData = await gpxReadUseThreads(bufferString);   // use threads
+    // const gpxData = gpxRead(bufferString);          // dont use threads
+    const gpxData = await addTaskToQueue('gpxRead', bufferString);
+    const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);
+    const document = await mongoModel(pathType).create( routeInstance.asMongoObject(req.userId, req.userName, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 
   } catch (error) {
@@ -86,7 +92,6 @@ app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (r
   }
 
 }); 
-
 
 
 /*****************************************************************

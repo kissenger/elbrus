@@ -1,24 +1,22 @@
 "use strict"
 
 /**
- * Module provides the classes:
- *
- * PathWithStats
- * Extends geo-points-and-paths Path class to provide application specific data
- * handling and processing, particularly the assembly of all the stats and info
- * needed by the front-end.  Accessed through its child classes, its effectively a
- * private class.
- * Includes the static method 'preFlight', which should be called first in order
- * to perform the preProcessing of path such as getting elevations if needed.
- *
- * Route
- * Extends PathWithStats and is the 'public' interface
- *
+ * Extends the base Path class and assembles the properties that it knows about.  
+ * 
+ * A NOTE ON WORKER THREADS
+ * When a task is send to a worker, it loses the methods on the class, so its important
+ * that all the methods are called early and populate as many of the desired properties
+ * as possible.
+ * 
+ * Expected calling order:
+ * prePath = PathWithStats.Preflight --> check for elevations, simplify
+ * path = new Route(prePath)         --> instatiate the class, call any class methods
+ * analysePath(path)                 --> matched points, category and direction
+ * analyseElevations(path)           --> elevation analysis
+ * 
  */
 
-// const analysePath = require('./analyse-path.js').analysePath;
-// const analyseElevations = require('./analyse-elevations.js').analyseElevations;
-const debugMsg = require('./debugging').debugMsg;
+const debugMsg = require('./debug').debugMsg;
 const Path = require('geo-points-and-paths').Path;
 
 const LONG_PATH_THRESHOLD            = require('./globals').LONG_PATH_THRESHOLD;
@@ -27,7 +25,6 @@ const SIMPLIFICATION_FACTOR_PASS_2   = require('./globals').SIMPLIFICATION_FACTO
 
 const jael = require('jael');
 jael.setPath(process.env.GEOTIFF_PATH);
-
 
 
 /**
@@ -53,6 +50,8 @@ class PathWithStats extends Path{
 
     // dont reorder, these need bt be on the instance before the .applys are called below
     const deltaDistance = this.deltaDistance;
+
+    this.points = this.pointLikes;
 
     this.properties = {
       pathId: '0000',    // assumes that path is 'created'

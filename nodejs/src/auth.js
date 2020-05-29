@@ -11,9 +11,10 @@ const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const KEY = process.env.AUTH_KEY;
 
-const debugMsg = require('./debugging').debugMsg;
+const debugMsg = require('./debug').debugMsg;
 const Users = require('./schema/user-models').Users;
 class AuthenticationError extends Error{};
+
 
 // needed for validate by email
 // const cryptoRandomString = require('crypto-random-string');

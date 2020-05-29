@@ -5,18 +5,21 @@
  * path properties against our expectations
  */
 
-const chai = require('chai');
-var expect = chai.expect;
-var reject = chai.reject;;
+// const chai = require('chai');
+// var expect = chai.expect;
+// var reject = chai.reject;;
 require('dotenv').config();
 const readFile = require('fs').readFile;
 const getRouteInstance = require('../src/path-helpers').getRouteInstance;
-const gpxRead = require('../src/gpx-read-write').gpxRead;
+// const gpxReadUseThreads = require('../src/gpx').gpxRead;
 
-const spawn = require('threads').spawn;
-const Thread = require('threads').Thread;
-const Worker = require('threads').Worker;
-const Pool = require('threads').Pool;
+const ThreadPool = require('../src/thread-tasks').ThreadPool;
+// const initThreadPool = require('./thread-tasks').initThreadPool;
+// const threadPool = initThreadPool();
+// const spawn = require('threads').spawn;
+// const Thread = require('threads').Thread;
+// const Worker = require('threads').Worker;
+// const Pool = require('threads').Pool;
 
 const OUT_AND_BACK =    require('../src/globals').OUT_AND_BACK;
 const CIRCULAR =        require('../src/globals').CIRCULAR;
@@ -132,7 +135,7 @@ const testList = [
 let printSummary = '';
 let paramCheck = [];
 let route;              // not declaring this has caused problems more than once, dont forget it
-const pool = Pool(() => spawn(new Worker('../src/workers.js')), 8 /* optional size */);
+// const pool = Pool(() => spawn(new Worker('../src/workers.js')), 8 /* optional size */);
 
 
 
@@ -153,154 +156,67 @@ Promise.all(promises).then( () => {
 })
 
 
-  
-// it('wrapper it to wait for promise.all to complete', function () {
-
-//   let testWithData = function (testItem) {
-
-//     return function () {
-
-//       before( function() {
-
-//         this.timeout(30000);
-
-//         return gpxToRoute(dir+testItem.fileName)
-//           .then( function(result) { 
-//             printSummary += getPrintSummary(testItem, result);
-//             // console.log('result', result);
-//             const pcShared = Math.round(result.properties.params.matchedPoints.length / result.properties.stats.nPoints * 100);
-//             paramCheck.push({fn: testItem.fileName, category: testItem.category, direction: testItem.direction, pcShared, cw: result.properties.info.cw});
-//             route = result;
-//           })
-//           .catch( function(error) { console.log(error) })
-
-//       });
-
-
-//       it('should have category ' + testItem.category, function() {
-//         return expect(route.properties.info.category).to.equal(testItem.category)
-//       });
-
-//       it('should have direction ' + testItem.direction, function() {
-//         return expect(route.properties.info.direction).to.equal(testItem.direction)
-//       });
-
-//       if (testItem.stravaDistanceMiles>0) {
-//         it('should have distance within 2% of ' + testItem.stravaDistanceMiles, function() {
-//           const distance = route.properties.stats.distance / 1000 * 0.62137;
-//           return expect(distance).to.satisfy(function(d) { return (d < 1.02*testItem.stravaDistanceMiles) && (d > 0.98*testItem.stravaDistanceMiles)});
-//         });
-//       }
-      
-//       // dont bother testing elevations
-//       // if (testItem.stravaAscentFt>0) {
-//       //   it('should have ascent within 20% ' + testItem.stravaAscentFt, function() {
-//       //     const ascent = route.stats.elevations.ascent * 3.28084;
-//       //     console.log(`expected ${testItem.stravaAscentFt}, got ${ascent}`)
-//       //     return expect(ascent).to.satisfy(function(a) { return (a < 1.2*testItem.stravaAscentFt) && (a > 1/1.2*testItem.stravaAscentFt)});
-//       //   });
-//       // }
-
-//     };
-//   }; // testWithData
-
-
-//   //  loops through all the provided test cases, using the closure as an argument
-//   testList.forEach( function(testInfo) {
-//     describe("Testing file: " + testInfo.fileName , testWithData(testInfo));
-//   });
-
-
-// }); // it (hack)
-
-
-function getPrintSummary(testItem, route) {
-
-
-  const expectedDistance = testItem.stravaDistanceMiles;
-  const actualDistance = route.properties.stats.distance/1000*0.62137;
-  const expectedElevation = testItem.stravaAscentFt;
-  const actualElevation = route.properties.stats.elevations.ascent * 3.28084;
-  // console.log(route);
-  return `
-  *************************************************************************
-  * File: ${testItem.fileName}
-  * -----------------------------------------------------------------------
-  * Number of Points = ${route.properties.stats.nPoints}
-  * Matched Points = ${route.properties.params.matchedPoints.length}
-  * pcShared = ${Math.round(route.properties.params.matchedPoints.length / route.properties.stats.nPoints * 100)}
-  * Rotation score 'cw' = ${route.properties.info.cw}
-  * -----------------------------------------------------------------------
-  * EXPECTED
-  * Category =  ${testItem.category}
-  * Direction = ${testItem.direction}
-  * Distance = ${expectedDistance} miles 
-  * Elevation = ${expectedElevation} ft 
-  * ----------------------------------------------------------------------- 
-  * ACTUAL
-  * Category =  ${route.properties.info.category}
-  * Direction = ${route.properties.info.direction}
-  * Distance = ${actualDistance.toFixed(2)} miles (deviation ${(((actualDistance - expectedDistance)/expectedDistance) * 100).toFixed(2)}%)
-  * Elevation = ${actualElevation.toFixed(2)} ft (deviation ${(((actualElevation - expectedElevation)/expectedElevation) * 100).toFixed(2)}%))
-  * Lumpiness = ${route.properties.stats.elevations.lumpiness.toFixed(2)} m/km
-  ************************************************************************* 
-  `
-}
-
-
-
 function gpxToRoute(fn) {
 
   return new Promise( async (res, rej) => { 
 
-    // both thenning and awaiting seem to work, left both in for future reference
 
     // loadFile(fn)
-    //   .then( function(buffer) { return gpxRead(buffer.toString()) })
+    //   .then( function(buffer) { return gpxReadUseThreads(buffer.toString()) })
     //   .then( function(pathFromGPX) { return getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev) })
     //   .then( function(routeInstance) { res(routeInstance.asMongoObject('testId', 'testUserName', false)) })
     //   .catch( function(error) {console.log(error)} )
     
-    const buffer = await loadFile(fn);
-    const buffString = buffer.toString();
-
-    console.log(fn, 'start task 1');
-    const gpxPath = await addTaskToQueue('gpxRead', buffString);
-    console.log(fn, 'task 1 complete, start task 2');
-    const routeInstance = await addTaskToQueue('getPath', gpxPath);
-    console.log(fn, 'task 2 complete');
-
-
     // const buffer = await loadFile(fn);
-    // const pathFromGPX = gpxRead(buffer.toString());
-    // const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
+    // const buffString = buffer.toString();
 
-    res(routeInstance);
-    return routeInstance;
+    // console.log(fn, 'start task 1');
+    // const gpxPath = await addTaskToQueue('gpxRead', buffString);
+    // console.log(fn, 'task 1 complete, start task 2');
+    // const routeInstance = await addTaskToQueue('getPath', gpxPath);
+    // console.log(fn, 'task 2 complete');
+
+
+    try {
+      
+
+      const pool = new ThreadPool();
+
+      const buffer = await loadFile(fn);
+      const bufferString = buffer.toString();
+      
+      const gpxData = await pool.addTaskToQueue('gpxRead', bufferString);
+// console.log(gpxData)
+      // const gpxData = await gpxReadUseThreads(bufferString);
+      // const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);
+      const routeInstance = await pool.addTaskToQueue('getRouteInstance', gpxData);
+      res(routeInstance);
+    } catch (error) {
+      rej(error);
+      console.log(error);
+    }
   
   })
 }
 
-function addTaskToQueue(functionName, argument) {
+// function addTaskToQueue(functionName, argument) {
 
-  return new Promise((resolve, reject) => {
+//   return new Promise((resolve, reject) => {
 
-  pool.queue(async workerFunctions => {
+//   pool.queue(async workerFunctions => {
 
-    try {
+//     try {
+//       const result = await workerFunctions[functionName](argument);
+//       resolve(result);
 
-      const result = await workerFunctions[functionName](argument);
-      resolve(result);
+//     } catch (error) {
+//       reject(error)
 
-    } catch (error) {
+//     }
 
-      reject(error)
+//   })
 
-    }
-
-  })
-
-})}
+// })}
 
 
 /**
@@ -334,3 +250,4 @@ function timeDiff(ms) {
          String(ms).padStart(3,'0');
 }
 
+// module.exports = { tsThreadPool: tsThreadPool }
