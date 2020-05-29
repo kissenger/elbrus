@@ -6,8 +6,10 @@
 const analysePath = require('./path-analyse').analysePath;
 const analyseElevations = require('./path-elevations').analyseElevations;
 const Route = require('./path-class').Route;
-// const tsThreadPool = require('../tests/path-analysis-threads').tsThreadPool;
-
+// const pool = require('../tests/path-analysis-threads').pool;
+// const addTaskToQueue = require('../tests/path-analysis-threads').addTaskToQueue;
+// const myPool = require('../src/thumbs').myPool;
+// const addTaskToQueue = require('../src/thumbs').addTaskToQueue;
 
 /**
  * Returns an object from the Path Class that can be delivered to Mongo
@@ -38,7 +40,7 @@ function getRouteInstance(name, description, lngLat, elevs) {
       const path = new Route(name, description, prePath.lngLat, prePath.elev);
 
       const {cw, category, direction, matchedPoints} = analysePath(path);
-      // const {cw, category, direction, matchedPoints} = await tsThreadPool.addTaskToQueue('analysePath', path);
+      // const {cw, category, direction, matchedPoints} = await addTaskToQueue('analysePath', path);
       path.properties.info.cw = cw;
       path.properties.info.category = category;
       path.properties.info.direction = direction;
@@ -47,7 +49,7 @@ function getRouteInstance(name, description, lngLat, elevs) {
       if (path.properties.info.isElevations) {
         path.properties.stats = {
           ...path.properties.stats,
-          // ...await tsThreadPool.addTaskToQueue('analyseElevations', path),
+          // ...await addTaskToQueue('analyseElevations', path),
           ...analyseElevations(path)
         };
         

@@ -25,6 +25,7 @@ const CLOCKWISE =                require('./globals').CLOCKWISE;
 const NO_CATEGORY =              require('./globals').NO_CATEGORY;
 const FIGURE_OF_EIGHT =          require('./globals').FIGURE_OF_EIGHT;
 
+console.log('bottoms')
 
 
 /**

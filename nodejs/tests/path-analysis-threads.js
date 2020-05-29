@@ -9,17 +9,44 @@
 // var expect = chai.expect;
 // var reject = chai.reject;;
 require('dotenv').config();
-const readFile = require('fs').readFile;
-const getRouteInstance = require('../src/path-helpers').getRouteInstance;
-// const gpxReadUseThreads = require('../src/gpx').gpxRead;
 
-const ThreadPool = require('../src/thread-tasks').ThreadPool;
-// const initThreadPool = require('./thread-tasks').initThreadPool;
-// const threadPool = initThreadPool();
+// const createThreadPool = require
+// const getRouteInstance = require('../src/path-helpers').getRouteInstance;
+// const gpxRead = require('../src/gpx').gpxRead;
+// const getRouteInstance = require('../src/path-helpers').getRouteInstance;
+const gpxToRoute = require('./path-analysis-threads-helper').gpxToRoute;
+console.log('legs')
+
+// const createThreadPool = require('../src/thread-tasks').createThreadPool;
+// const addTaskToQueue = require('../src/thread-tasks').addTaskToQueue;
+// const pool = createThreadPool();
 // const spawn = require('threads').spawn;
 // const Thread = require('threads').Thread;
 // const Worker = require('threads').Worker;
 // const Pool = require('threads').Pool;
+// const pool = Pool(() => spawn(new Worker('../src/thread-workers.js')), 8);
+
+// async function addTaskToQueue(functionName, argument) {
+
+//   return new Promise((resolve, reject) => {
+//     pool.queue(async workerFunctions => {
+//       try {
+
+//         const result = await workerFunctions[functionName](argument);
+//         resolve(result);
+
+//       } catch (error) {
+
+//         reject(error)
+
+//       }
+//     })
+//   })
+// }
+// Object.freeze(pool);
+// const initThreadPool = require('./thread-tasks').initThreadPool;
+// const threadPool = initThreadPool();
+
 
 const OUT_AND_BACK =    require('../src/globals').OUT_AND_BACK;
 const CIRCULAR =        require('../src/globals').CIRCULAR;
@@ -156,48 +183,49 @@ Promise.all(promises).then( () => {
 })
 
 
-function gpxToRoute(fn) {
+// function gpxToRoute(fn) {
 
-  return new Promise( async (res, rej) => { 
+//   return new Promise( async (res, rej) => { 
 
 
-    // loadFile(fn)
-    //   .then( function(buffer) { return gpxReadUseThreads(buffer.toString()) })
-    //   .then( function(pathFromGPX) { return getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev) })
-    //   .then( function(routeInstance) { res(routeInstance.asMongoObject('testId', 'testUserName', false)) })
-    //   .catch( function(error) {console.log(error)} )
+//     // loadFile(fn)
+//     //   .then( function(buffer) { return gpxReadUseThreads(buffer.toString()) })
+//     //   .then( function(pathFromGPX) { return getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev) })
+//     //   .then( function(routeInstance) { res(routeInstance.asMongoObject('testId', 'testUserName', false)) })
+//     //   .catch( function(error) {console.log(error)} )
     
-    // const buffer = await loadFile(fn);
-    // const buffString = buffer.toString();
+//     // const buffer = await loadFile(fn);
+//     // const buffString = buffer.toString();
 
-    // console.log(fn, 'start task 1');
-    // const gpxPath = await addTaskToQueue('gpxRead', buffString);
-    // console.log(fn, 'task 1 complete, start task 2');
-    // const routeInstance = await addTaskToQueue('getPath', gpxPath);
-    // console.log(fn, 'task 2 complete');
+//     // console.log(fn, 'start task 1');
+//     // const gpxPath = await addTaskToQueue('gpxRead', buffString);
+//     // console.log(fn, 'task 1 complete, start task 2');
+//     // const routeInstance = await addTaskToQueue('getPath', gpxPath);
+//     // console.log(fn, 'task 2 complete');
 
 
-    try {
+//     try {
       
 
-      const pool = new ThreadPool();
-
-      const buffer = await loadFile(fn);
-      const bufferString = buffer.toString();
       
-      const gpxData = await pool.addTaskToQueue('gpxRead', bufferString);
-// console.log(gpxData)
-      // const gpxData = await gpxReadUseThreads(bufferString);
-      // const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);
-      const routeInstance = await pool.addTaskToQueue('getRouteInstance', gpxData);
-      res(routeInstance);
-    } catch (error) {
-      rej(error);
-      console.log(error);
-    }
+
+//       const buffer = await loadFile(fn);
+//       const bufferString = buffer.toString();
+      
+//       const gpxData = gpxRead(bufferString);
+//       // const gpxData = await addTaskToQueue('gpxRead', bufferString);
+// // console.log(gpxData)
+//       // const gpxData = await gpxReadUseThreads(bufferString);
+//       const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);
+//       // const routeInstance = await pool.addTaskToQueue('getRouteInstance', gpxData);
+//       res(routeInstance);
+//     } catch (error) {
+//       rej(error);
+//       console.log(error);
+//     }
   
-  })
-}
+//   })
+// }
 
 // function addTaskToQueue(functionName, argument) {
 
@@ -222,17 +250,17 @@ function gpxToRoute(fn) {
 /**
  * Load the data from the requested file into a buffer and give back a promise
  */
-function loadFile(fn) {
-  return new Promise ( (res, rej) => {
-    readFile(fn, (err, data) => {
-      if (err) {
-        rej(err);
-      };
-      res(data);
-    })
+// function loadFile(fn) {
+//   return new Promise ( (res, rej) => {
+//     readFile(fn, (err, data) => {
+//       if (err) {
+//         rej(err);
+//       };
+//       res(data);
+//     })
 
-  })
-}
+//   })
+// }
 
 function timeDiff(ms) {
 
@@ -250,4 +278,4 @@ function timeDiff(ms) {
          String(ms).padStart(3,'0');
 }
 
-// module.exports = { tsThreadPool: tsThreadPool }
+// module.exports = { pool, addTaskToQueue }
