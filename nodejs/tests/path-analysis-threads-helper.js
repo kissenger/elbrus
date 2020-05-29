@@ -3,8 +3,8 @@ const readFile = require('fs').readFile;
 const gpxRead = require('../src/gpx').gpxRead;
 const getRouteInstance = require('../src/path-helpers').getRouteInstance;
 // const pool = require('../src/thread-tasks').pool;
-const myPool = require('../src/thumbs').myPool;
-const addTaskToQueue = require('../src/thumbs').addTaskToQueue;
+const myPool = require('../src/worker-pool').myPool; 
+const addTaskToQueue = require('../src/worker-pool').addTaskToQueue;
 
 console.log('elbows')
 

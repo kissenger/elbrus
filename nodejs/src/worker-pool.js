@@ -4,7 +4,7 @@ const spawn = require('threads').spawn;
 const Thread = require('threads').Thread;
 const Worker = require('threads').Worker;
 const Pool = require('threads').Pool;
-const myPool = Pool(() => spawn(new Worker('./thread-workers.js')), 8);
+const myPool = Pool(() => spawn(new Worker('./worker-tasks.js')), 8);
 // console.log('breasts');
 // // console.log(pool);
 
@@ -39,6 +39,5 @@ function addTaskToQueue(functionName, argument) {
 }
 
 module.exports = {
-  myPool,
   addTaskToQueue
 }
