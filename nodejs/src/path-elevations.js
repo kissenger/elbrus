@@ -32,12 +32,12 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   // distance data needed to caculate gradients
   const dDistance = path.properties.stats.dDistance;
   const distance = path.properties.stats.distance;
-  const cumDistance = path.properties.stats.cumDistance;
+  const cumDistance = path.properties.params.cumDistance;
 
   // const elevations = this.getParamFromPoints('elev');
-  const smoothedElevations = getSmoothedElevations(path.elev);
-  // console.log(smoothedElevations, dDistna);
+  const smoothedElevations = getSmoothedElevations(path.properties.params.elev);
   const grads = smoothedElevations.map( (e, i, eArr) => i === 0 ? 0 : (e - eArr[i-1]) / dDistance[i] * 100 );
+  
 
   // initilise loop variables
   let de = 0;                 // cumulative change in elevation
@@ -91,7 +91,7 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   if (Math.abs(hillSum) > HILL_THRESH) {
     hillsArr.push([p0 - 1, path.properties.stats.nPoints - 1]);
   }
-
+  
   // get stats for each hill in the list
   const hills = hillsArr.map( hill => ({
       dHeight: smoothedElevations[hill[1]] - smoothedElevations[hill[0]],
@@ -140,7 +140,7 @@ function getSmoothedElevations(elev) {
 function movingAverage(array, period) {
 
   if (period % 2 === 0) throw Error('Moving average period should be odd');
-
+  
   const shift = (period - 1) / 2;
   const movingAverage = array.map( (p, i, arr) => {
     const low = Math.max(i - shift, 0);

@@ -112,4 +112,9 @@ export class HttpService {
     return this.http.post<any>(`http://${this.backendURL}/copy-public-path/`, {pathType, pathId});
   }
 
+  reverseRoute(pathType: string, pathId: string) {
+    return this.http.get<any>(`http://${this.backendURL}/reverse-route/${pathType}/${pathId}`);
+  }
+
+
 }

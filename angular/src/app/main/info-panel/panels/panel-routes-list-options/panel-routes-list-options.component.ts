@@ -129,7 +129,14 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
     });
   }
 
-
+  onReverseClick() {
+    this.subscription = this.httpService.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
+      const pathAsGeoJSON = result.hills;
+      this.dataService.saveToStore('activePath', {source: 'created', pathAsGeoJSON});
+      this.spinner.removeElement();
+      this.router.navigate(['route/review/']);
+    });
+  }
 
 
   onCreateOnMapClick() {

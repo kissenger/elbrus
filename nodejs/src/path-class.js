@@ -33,7 +33,8 @@ jael.setPath(process.env.GEOTIFF_PATH);
 
 class PathWithStats extends Path{
 
-  constructor(name, description, lngLat, elev) {
+  constructor(name, description, lngLat, elev, pathType) {
+
 
     debugMsg('PathWithStats');
 
@@ -46,13 +47,9 @@ class PathWithStats extends Path{
       this._isElevations = false;
     }
 
-    this.elev = elev;
-
-    // dont reorder, these need bt be on the instance before the .applys are called below
     const deltaDistance = this.deltaDistance;
-
     this.points = this.pointLikes;
-
+    
     this.properties = {
       pathId: '0000',    // assumes that path is 'created'
       geometry: {
@@ -60,7 +57,7 @@ class PathWithStats extends Path{
         coordinates: this.lngLats
       },
       info: {
-        pathType: this._pathType,
+        pathType,
         name,
         description,
         isLong: this.length > LONG_PATH_THRESHOLD,
@@ -69,7 +66,7 @@ class PathWithStats extends Path{
       stats: {
         dDistance: deltaDistance,
         distance: this.distance,
-        cumDistance: this.cumulativeDistance,
+        // cumDistance: this.cumulativeDistance,
         p2p: {
           max: Math.max(...deltaDistance),
           ave: deltaDistance.reduce( (a, b) => a+b, 0) / this.length
@@ -80,12 +77,9 @@ class PathWithStats extends Path{
         simplificationRatio: this.simplificationRatio,
       },
       params: {
+        elev,
         cumDistance: this.cumulativeDistance
       }
-    }
-
-    if (this.properties.info.isElevations) {
-      this.properties.params.elev = this.getParam('elev');
     }
 
   }
@@ -139,8 +133,7 @@ class PathWithStats extends Path{
 class Route extends PathWithStats {
 
   constructor(name, description, lngLat, elev){
-    super(name, description, lngLat, elev);
-    this._pathType = 'route';
+    super(name, description, lngLat, elev, 'route');
   }
 
 }

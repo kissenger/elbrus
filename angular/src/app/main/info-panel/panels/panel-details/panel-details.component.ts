@@ -126,8 +126,6 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
 
       // if this is a create-route action then pathName is null, so take givenPathName (input from form) if it exists, otherwise use default
-
-
       const sendObj = {
         coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
         elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),

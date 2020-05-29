@@ -15,9 +15,9 @@ const app = express();
 
 // const spawn = require('threads').spawn;
 // const Thread = require('threads').Thread;
-const Worker = require('threads').Worker;
-const spawn = require('threads').spawn;
-const Pool = require('threads').Pool;
+// const Worker = require('threads').Worker;
+// const spawn = require('threads').spawn;
+// const Pool = require('threads').Pool;
 
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
@@ -29,7 +29,11 @@ const mongoModel = require('./app-helpers.js').mongoModel;
 const bbox2Polygon = require('./app-helpers.js').bbox2Polygon;
 const getListData = require('./app-helpers.js').getListData;
 const getRouteInstance = require('./path-helpers.js').getRouteInstance;
-const initThreadPool = require('./thread-tasks').initThreadPool;
+const getMongoObject = require('./path-helpers.js').getMongoObject;
+const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
+
+// const initThreadPool = require('./thread-tasks').initThreadPool;
+
 
 // apply middleware - note setheaders must come first
 app.use( (req, res, next) => {
@@ -63,7 +67,7 @@ const upload = multer({
 
 // worker threads
 console.log('blah');
-threadPool = initThreadPool();
+// threadPool = initThreadPool();
 // const pool = Pool(() => spawn(new Worker('workers.js')), 8 /* optional size */);
 
 
@@ -78,10 +82,10 @@ app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (r
 
     const bufferString = req.file.buffer.toString();
     // const gpxData = await gpxReadUseThreads(bufferString);   // use threads
-    // const gpxData = gpxRead(bufferString);          // dont use threads
-    const gpxData = await addTaskToQueue('gpxRead', bufferString);
+    const gpxData = gpxRead(bufferString);          // dont use threads
+    // const gpxData = await addTaskToQueue('gpxRead', bufferString);
     const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);
-    const document = await mongoModel(pathType).create( routeInstance.asMongoObject(req.userId, req.userName, false) );
+    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 
   } catch (error) {
@@ -128,13 +132,13 @@ app.post('/save-imported-path/', auth.verifyToken, async (req, res) => {
 app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
 
 
-  debugMsg(`save-created-route, type=${req.body.pathType}, id=${req.body.pathId}`);
+  debugMsg(`save-created-route`);
 
   try {
 
     const routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);
-    const document = await mongoModel(req.body.pathType).create( route.asMongoObject(req.userId, req.userName, true) );
-    res.status(201).json( {pathId: doc._id} )
+    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
+    res.status(201).json( {pathId: document._id} )
 
   } catch (error) {
 
@@ -381,6 +385,47 @@ app.post('/copy-public-path/', auth.verifyToken, async (req, res) => {
   }
 
 })
+
+
+
+/*****************************************************************
+ * Reverse a route
+ *****************************************************************/
+
+app.get('/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
+
+  debugMsg(`reverse-route, pathId=${req.params.pathId}`)
+
+  try {
+
+    const sourceDoc = await mongoModel(req.params.pathType).findOne({_id: req.params.pathId});
+    console.log(sourceDoc)
+    const {lngLats, elevs} = getReverseOfRoute(sourceDoc.geometry.coordinates, sourceDoc.params.elev);
+    const routeInstance = await getRouteInstance(null, null, lngLats, elevs);
+    const newDoc = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
+    res.status(201).json( {hills: new GeoJSON().fromDocument(newDoc).toGeoHills()} );
+
+
+
+    // const newDate = new Date(Date.now());
+    // document.userId = req.userId;
+    // document.creationDate = newDate,
+    // document.lastEditDate = newDate,
+    // document.isPublic = false;
+    // document.info.createdBy = req.userName;
+    
+    // await mongoModel(req.body.pathType).create(document);
+    // res.status(201).json({success: 'success'});
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
+})
+
 
 
 

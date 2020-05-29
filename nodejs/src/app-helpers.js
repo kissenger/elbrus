@@ -70,7 +70,6 @@ function getListData(docs, count) {
 
 module.exports = {
   mongoModel,
-  createMongoModel,
   bbox2Polygon,
   getListData
 }
