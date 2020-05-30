@@ -17,12 +17,12 @@ module.exports = {
 
   // Route analysis
   ROTATION_RANGE_TOL: 135,       // a one-way route with a bearing range > this will be considered as rotational and return CW or ACW direction
-  CW_CIRC_THRESHOLD: 0.15,        // threshold below which a route is 'weakly rotational', used to help identify circular routes
+  CW_CIRC_THRESHOLD: 0.15,       // threshold below which a route is 'weakly rotational', used to help identify circular routes
   PC_THRESH_UPP: 40,             // if % shared points > PC_THRESH_UPP then consider as 'out and back' route
   PC_THRESH_LOW: 10,             // if % shared points < PC_THRESH_LOW the consider as 'one way' or 'circular' depending on whether start is returned toKs
   MATCH_DISTANCE: 100,           // metres, if distance between two points is less than this they will be treated as matching
-  CW_TOLERANCE: 1,        // tolernace below which change in bearing is neglected (eliminate noise)
-  BEARING_SECTIONS: 100,   // number of sections to divide path into for bearing analysis
+  CW_TOLERANCE: 1,               // tolernace below which change in bearing is neglected (eliminate noise)
+  BEARING_SECTIONS: 100,         // number of sections to divide path into for bearing analysis
   SIMPLIFICATION_FACTOR_PASS_1: 2,
   SIMPLIFICATION_FACTOR_PASS_2: 10,
 

@@ -29,8 +29,6 @@
 const createWriteStream = require('fs').createWriteStream;
 const debugMsg = require('./debug').debugMsg;
 
-// const addTaskToQueue = require('./bottoms').addTaskToQueue;
-
 /**
 * readGPX(data)
 * @param {*} data input data from multer file read
@@ -46,12 +44,6 @@ const debugMsg = require('./debug').debugMsg;
 *   > If at the end of the search only some array values are '', those blank values are set to null
 */
 
-// async function gpxReadUseThreads(data) {
-//   return new Promise( async (resolve, reject) => {
-//     const gpxData = await addTaskToQueue('gpxRead', bufferString);  // intensive task so run in threads
-//     resolve(gpxData);
-//   })
-// }
 
 function gpxRead(data) {
   // data = data.slice(0,100);

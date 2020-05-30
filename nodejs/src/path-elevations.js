@@ -2,15 +2,13 @@
 "use strict"
 
 /**
- * Functions directly supporting the PathWithStats class
+ * Functions supporting the analysis (not getting, which is done in preflight) of elevations
  */
 
 const debugMsg = require('./debug').debugMsg;
-
 const ASCENT_THRESH =            require('./globals').ASCENT_THRESH;
 const HILL_THRESH =              require('./globals').HILL_THRESH;
 const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
-
 
  /**
   * Return stats relevant to elevations

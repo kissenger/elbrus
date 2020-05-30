@@ -1,7 +1,7 @@
 "use strict"
 
 /**
- * Functions directly supporting the PathWithStats class
+ * Functions supporting the analysis of a path (category, direction etc)
  */
 
 const geoFunctions = require('geo-points-and-paths').geoFunctions;
@@ -24,8 +24,6 @@ const ANTI_CLOCKWISE =           require('./globals').ANTI_CLOCKWISE;
 const CLOCKWISE =                require('./globals').CLOCKWISE;
 const NO_CATEGORY =              require('./globals').NO_CATEGORY;
 const FIGURE_OF_EIGHT =          require('./globals').FIGURE_OF_EIGHT;
-
-console.log('bottoms')
 
 
 /**

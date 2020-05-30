@@ -3,15 +3,27 @@
 /**
  * This test imports test route, creates a Path object and compares the calculated
  * path properties against our expectations
+ * 
+ * Use of threads does not seem to impact speed for mocha tests although I havent spent the
+ * time to fugure out why. Speed tests for threads is done in seperate file.
  */
 
 const chai = require('chai');
 var expect = chai.expect;
-var reject = chai.reject;;
+var reject = chai.reject;
 require('dotenv').config();
+
 const readFile = require('fs').readFile;
 const getRouteInstance = require('../src/path-helpers').getRouteInstance;
-const gpxRead = require('../src/gpx-read-write').gpxRead;
+const gpxRead = require('../src/gpx').gpxRead;
+
+const USE_THREADS = true;
+let threadPool;
+
+if (USE_THREADS) {
+  threadPool = require('../src/worker-pool').threadPool;
+  threadPool.create();
+}
 
 const OUT_AND_BACK =    require('../src/globals').OUT_AND_BACK;
 const CIRCULAR =        require('../src/globals').CIRCULAR;
@@ -234,21 +246,21 @@ function getPrintSummary(testItem, route) {
 function gpxToRoute(fn) {
 
   return new Promise( async (res, rej) => { 
-
-    // both thenning and awaiting seem to work, left both in for future reference
-
-    // loadFile(fn)
-    //   .then( function(buffer) { return gpxRead(buffer.toString()) })
-    //   .then( function(pathFromGPX) { return getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev) })
-    //   .then( function(routeInstance) { res(routeInstance.asMongoObject('testId', 'testUserName', false)) })
-    //   .catch( function(error) {console.log(error)} )
-
+    
     const buffer = await loadFile(fn);
-    const pathFromGPX = gpxRead(buffer.toString());
-    const routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
+    const bufferString = buffer.toString();
+    let gpxData;
+    let routeInstance;
+
+    if (USE_THREADS) {
+      gpxData = await threadPool.addTaskToQueue('gpxRead', bufferString);  // use threads
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData.name, null, gpxData.lngLat, gpxData.elev);  // use threads
+    } else {
+      pathFromGPX = gpxRead(bufferString);
+      routeInstance = await getRouteInstance(pathFromGPX.name, null, pathFromGPX.lngLat, pathFromGPX.elev);
+    }
 
     res(routeInstance);
-    return routeInstance;
   
   })
 }

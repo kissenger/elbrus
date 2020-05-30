@@ -2,29 +2,20 @@
 
 /**
  * Extends the base Path class and assembles the properties that it knows about.  
- * 
- * A NOTE ON WORKER THREADS
- * When a task is send to a worker, it loses the methods on the class, so its important
- * that all the methods are called early and populate as many of the desired properties
- * as possible.
- * 
- * Expected calling order:
- * prePath = PathWithStats.Preflight --> check for elevations, simplify
- * path = new Route(prePath)         --> instatiate the class, call any class methods
- * analysePath(path)                 --> matched points, category and direction
- * analyseElevations(path)           --> elevation analysis
- * 
+ * Note refactor to support threads, which requires that no class method sare called
+ * after the instantiation - they are not available on the class after being sent
+ * to the thread pool as the objects are serialised. https://github.com/andywer/threads.js/issues/141
  */
 
 const debugMsg = require('./debug').debugMsg;
 const Path = require('geo-points-and-paths').Path;
+const jael = require('jael');
+jael.setPath(process.env.GEOTIFF_PATH);
 
 const LONG_PATH_THRESHOLD            = require('./globals').LONG_PATH_THRESHOLD;
 const SIMPLIFICATION_FACTOR_PASS_1   = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
 const SIMPLIFICATION_FACTOR_PASS_2   = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
 
-const jael = require('jael');
-jael.setPath(process.env.GEOTIFF_PATH);
 
 
 /**

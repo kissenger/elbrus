@@ -1,15 +1,10 @@
 
 "use strict"
 
-
-// const addTaskToQueue = require('./thread-tasks').addTaskToQueue;
 const analysePath = require('./path-analyse').analysePath;
 const analyseElevations = require('./path-elevations').analyseElevations;
 const Route = require('./path-class').Route;
-// const pool = require('../tests/path-analysis-threads').pool;
-// const addTaskToQueue = require('../tests/path-analysis-threads').addTaskToQueue;
-// const myPool = require('../src/thumbs').myPool;
-// const addTaskToQueue = require('../src/thumbs').addTaskToQueue;
+
 
 /**
  * Returns an object from the Path Class that can be delivered to Mongo

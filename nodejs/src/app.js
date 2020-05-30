@@ -15,14 +15,13 @@ const app = express();
 
 // const spawn = require('threads').spawn;
 // const Thread = require('threads').Thread;
-// const Worker = require('threads').Worker;
-// const spawn = require('threads').spawn;
-// const Pool = require('threads').Pool;
+const Worker = require('threads').Worker;
+const spawn = require('threads').spawn;
+const Pool = require('threads').Pool;
 
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
-const gpxRead = require('./gpx').gpxRead;
-// const gpxReadUseThreads = require('./gpx').gpxReadUseThreads;
+// const gpxRead = require('./gpx').gpxRead;   // uncomment if dont want to use threads
 const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
 const debugMsg = require('./debug').debugMsg;
 const mongoModel = require('./app-helpers.js').mongoModel;
@@ -32,7 +31,9 @@ const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 const getMongoObject = require('./path-helpers.js').getMongoObject;
 const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
 
-// const initThreadPool = require('./thread-tasks').initThreadPool;
+const threadPool = require('./worker-pool').threadPool;
+threadPool.create();
+
 
 
 // apply middleware - note setheaders must come first
@@ -65,12 +66,6 @@ const upload = multer({
 });
 
 
-// worker threads
-console.log('blah');
-// threadPool = initThreadPool();
-// const pool = Pool(() => spawn(new Worker('workers.js')), 8 /* optional size */);
-
-
 /*****************************************************************
  * import a route from a gpx file
  ******************************************************************/
@@ -81,10 +76,10 @@ app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (r
   try {
 
     const bufferString = req.file.buffer.toString();
-    // const gpxData = await gpxReadUseThreads(bufferString);   // use threads
-    const gpxData = gpxRead(bufferString);          // dont use threads
-    // const gpxData = await addTaskToQueue('gpxRead', bufferString);
-    const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);
+    // const gpxData = gpxRead(bufferString);          // dont use threads
+    const gpxData = await threadPool.addTaskToQueue('gpxRead', bufferString);  // use threads
+    // const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);  // dont use threads
+    const routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData.name, null, gpxData.lngLat, gpxData.elev);  // use threads
     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 
@@ -389,7 +384,7 @@ app.post('/copy-public-path/', auth.verifyToken, async (req, res) => {
 
 
 /*****************************************************************
- * Reverse a route
+ * Return the reverse of a route
  *****************************************************************/
 
 app.get('/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
@@ -399,23 +394,10 @@ app.get('/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) =
   try {
 
     const sourceDoc = await mongoModel(req.params.pathType).findOne({_id: req.params.pathId});
-    console.log(sourceDoc)
     const {lngLats, elevs} = getReverseOfRoute(sourceDoc.geometry.coordinates, sourceDoc.params.elev);
     const routeInstance = await getRouteInstance(null, null, lngLats, elevs);
     const newDoc = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(newDoc).toGeoHills()} );
-
-
-
-    // const newDate = new Date(Date.now());
-    // document.userId = req.userId;
-    // document.creationDate = newDate,
-    // document.lastEditDate = newDate,
-    // document.isPublic = false;
-    // document.info.createdBy = req.userName;
-    
-    // await mongoModel(req.body.pathType).create(document);
-    // res.status(201).json({success: 'success'});
 
   } catch (error) {
 
