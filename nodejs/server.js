@@ -1,5 +1,7 @@
-import app from './src/app.js';
-import { createServer } from 'http';
+
+const app = require('./src/app.js');
+const http = require("http");
+
 
 const normalizePort = val => {
   const port = parseInt(val, 10);
@@ -33,7 +35,7 @@ const onListening = () => {
 };
 
 const port = normalizePort(process.env.PORT || '3000');
-const server = createServer(app);
+const server = http.createServer(app);
 server
   .on('error', onError)
   .on('listening', onListening);

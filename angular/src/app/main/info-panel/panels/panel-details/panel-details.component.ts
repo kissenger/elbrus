@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { ChartsService } from 'src/app/shared/services/charts-service';
 import { TsUnits, TsPathStats } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
+import { AlertService } from 'src/app/shared/services/alert.service';
 
 @Component({
   selector: 'app-panel-details',
@@ -21,10 +22,14 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   private chartData: Array<Array<number>>;
   private colourArray: Array<string>;
 
-  public pathName = '';
+  public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
+  public givenPathName: string;     // name given to the path in the details form; overrides the default name
+
   public pathDescription = '';
   public isListPage: boolean;
   public isLong: boolean;
+  public isPublic: boolean;
+  public createdBy: string;
   public isElevations: boolean;
   public isHills: boolean;
   public isData = false;
@@ -35,12 +40,14 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   public pathStats: TsPathStats = globals.emptyStats;
   public pathDirection: string;
 
+
   constructor(
     private dataService: DataService,
     private httpService: HttpService,
     private router: Router,
     private chartsService: ChartsService,
-    private auth: AuthService
+    private auth: AuthService,
+    private alert: AlertService
   ) {}
 
   ngOnInit() {
@@ -51,17 +58,31 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
 
+      // used by html to say 'nothing to show' if the geojson only has a single point or fewer
+      if (geoJson.features[0].geometry.coordinates.length <= 1) {
+        this.isData = false;
+      } else {
+        this.isData = true;
+      }
+
       this.pathStats = geoJson.properties.stats;
-      this.pathName = geoJson.properties.info.name;
       this.pathDescription = geoJson.properties.info.description;
       this.pathCategory = geoJson.properties.info.category;
       this.pathDirection = geoJson.properties.info.direction;
       this.pathType = geoJson.properties.info.pathType;
 
-      this.isData = true;
+      // if this is a create-route action, then path will not have a name until one is entered in the form; create a default one
+      if (!geoJson.properties.info.name) {
+        this.pathName = (this.pathCategory === 'None' ? 'Uncategorised' : this.pathCategory) + ' ' + this.pathType;
+      } else {
+        this.pathName = geoJson.properties.info.name;
+      }
+
       this.isLong = geoJson.properties.info.isLong;
       this.isElevations = geoJson.properties.info.isElevations && !this.isLong;
       this.isHills = this.pathStats.hills.length > 0;
+      this.isPublic = geoJson.properties.info.isPublic;
+      this.createdBy = geoJson.properties.info.createdBy;
 
       /**
        * TODO: This should be in a subroutine
@@ -99,25 +120,38 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.dataService.getFromStore('activePath', false);
+    const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
+
+      // if this is a create-route action then pathName is null, so take givenPathName (input from form) if it exists, otherwise use default
       const sendObj = {
         coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
         elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),
-        name: this.pathName,
+        name: pathName,
         description: this.pathDescription
       };
+
       this.httpService.saveCreatedRoute(sendObj).subscribe( () => {
+
         this.router.navigate(['/route/list/']);
+
+      }, (error) => {
+
+        this.alert
+          .showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
+          .subscribe( () => {} );
+
       });
 
     // imported file, backend only needs to knw the pathType, pathId, name and description, so create theis object and call http
     } else {
+
       const sendObj = {
         pathId: newPath.properties.pathId,
         pathType: newPath.properties.info.pathType,
-        name: this.pathName,
+        name: pathName,
         description: this.pathDescription
       };
       this.httpService.saveImportedPath(sendObj).subscribe( () => {

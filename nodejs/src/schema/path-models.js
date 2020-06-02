@@ -1,11 +1,14 @@
-import mongoose from 'mongoose';
 
+const mongoose = require('mongoose');
 const pathSchema = mongoose.Schema({
 
   userId: {type: String, required: true},
+  // userName: {type: String, required: true},
+  // privatePathId: {type: String},                    // only used to reference original path in a public db
   creationDate: {type: Date, default: Date.now},
   lastEditDate: {type: Date, default: Date.now},
   isSaved: {type: Boolean, default: false},
+  isPublic: {type: Boolean, default: false},
 
   // geometric information defining the path, in geoJSON format to aid searching
   geometry: {
@@ -24,6 +27,7 @@ const pathSchema = mongoose.Schema({
 
   // user entered information to describe/tag route
   info: {
+    createdBy: {type: String},
     direction: {type: String},
     category: {type: String},
     name: {type: String},
@@ -83,10 +87,8 @@ const pathSchema = mongoose.Schema({
 pathSchema.index({ userId: 1, creationDate: 1});
 pathSchema.index({ userId: 1, startTime: 1});
 
-//const Challenges = mongoose.model('challenges', pathSchema);
-export const Tracks = mongoose.model('tracks', pathSchema);
-export const Routes = mongoose.model('routes', pathSchema);
+const Routes = mongoose.model('routes', pathSchema);
 
-
-// export const Tracks = Tracks;
-// export const Routes = Routes;
+module.exports = {
+  Routes
+}

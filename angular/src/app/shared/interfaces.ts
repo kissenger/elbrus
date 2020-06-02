@@ -59,6 +59,8 @@ interface TsTab {
   active: boolean;
   name: string;
   component: any;
+  title?: string;
+  href?: string;
 }
 
 export type TsTabsArray = TsTab[];

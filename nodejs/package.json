@@ -1,16 +1,15 @@
 {
-  "name": "elbrus-backend",
+  "name": "elbrus-nodejs",
+  "version": "0.0.1",
   "contributors": [],
   "repository": {
     "type": "git",
     "url": "https://github.com/kissenger/elbrus"
   },
   "main": "src/app.js",
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "test": "mocha",
-    "server": "nodemon server.mjs"
+    "server": "nodemon server.js"
   },
   "devDependencies": {
     "chai": "*",
@@ -22,7 +21,7 @@
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "geo-points-and-paths": "^1.4.0",
+    "geo-points-and-paths": "^2.0.2",
     "jael": "^1.0.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.15",

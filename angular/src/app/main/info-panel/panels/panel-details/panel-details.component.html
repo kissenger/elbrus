@@ -1,10 +1,10 @@
-<div class="outer d-flex flex-column h-100">
+<div class="d-flex flex-column h-100">
 
   <!-- Inner container contains scrollabel content -->
 
   <div  class="inner h-100">
 
-    <div *ngIf="!isData; else weHaveDataToShowDiv" class="p-0 text-center">
+    <div *ngIf="!isData; else weHaveDataToShowDiv" class="mt-3 text-center">
       No details to show.
     </div>
 
@@ -15,15 +15,7 @@
       <!-- If we are listing data only, then we dont need form inputs-->
       <div *ngIf="isListPage; else showForm">
 
-        <div *ngIf="!pathName; else makeUpName" class="h5 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">
-            {{pathCategory}} {{pathType}}
-        </div>
-
-        <ng-template #makeUpName>
-          <div class="h5 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{pathName}}</div>
-        </ng-template>
-
-        <!-- <div class="mt-1 mb-2">{{pathDescription}}</div> -->
+        <div class="h6 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{pathName}}</div>
         <div *ngIf="pathDescription" class="mt-1 mb-1 pt-1 pb-1 border-bottom">{{pathDescription}}</div>
 
       </div>
@@ -33,7 +25,7 @@
       <ng-template #showForm>
 
         <div class="input-group input-group-sm my-1">
-            <input class='form-control' type='text' placeholder='Give your route a name' [(ngModel)]="pathName" name="first">
+            <input class='form-control' type='text' placeholder="{{pathName}}" [(ngModel)]="givenPathName" name="first">
         </div>
 
         <div class="input-group input-group-sm my-1">
@@ -62,6 +54,14 @@
               <td>Direction</td>
               <td>{{pathDirection}}</td>
             </tr>
+            <tr>
+              <td>Public</td>
+              <td>{{isPublic}}</td>
+            </tr>
+            <tr *ngIf="isPublic">
+              <td>Created by</td>
+              <td>{{createdBy}}</td>
+            </tr>
 
             <!-- Elevations shown only if isElevations is true -->
 
@@ -88,7 +88,7 @@
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Lumpiness</td>
-              <td>{{pathStats.elevations.lumpiness | units: 'elevation': units.elevation: units.distance}}</td>
+              <td>{{pathStats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}</td>
             </tr>
           </tbody>
         </table>

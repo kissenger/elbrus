@@ -1,8 +1,7 @@
 "use strict"
 
-/**
- * A relatively mature set of test for gpxRead
- * TODO: tests for gpxWrite
+/** 
+ * TODO: Needs to be reworked to pull in data using the gpx 
  */
 
 import chai from 'chai';

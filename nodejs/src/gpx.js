@@ -26,8 +26,8 @@
  * parameters
  */
 
-import { createWriteStream } from 'fs';
-import { debugMsg } from './debugging.js';
+const createWriteStream = require('fs').createWriteStream;
+const debugMsg = require('./debug').debugMsg;
 
 /**
 * readGPX(data)
@@ -43,8 +43,12 @@ import { debugMsg } from './debugging.js';
 *   > If at the end of the search all array values are '', the paramater is set to null
 *   > If at the end of the search only some array values are '', those blank values are set to null
 */
-export function gpxRead(data) {
+
+
+function gpxRead(data) {
+  // data = data.slice(0,100);
   debugMsg('gpxRead()');
+  // console.log(data);
 
   // declare function variables
   const MAX_LOOPS = 1000000;
@@ -90,7 +94,7 @@ export function gpxRead(data) {
   lineData = data.slice(a,b)
   a = lineData.indexOf("<name>");
   b = lineData.indexOf("</name>");
-  if ( a !== -1 && b !== -1 ) {
+  if ( a > 0 && b > 0 ) {
     nameOfPath = lineData.slice(a + 6, b);
   }
 
@@ -181,7 +185,7 @@ export function gpxRead(data) {
 /**
  * Converts the document data into a key/value object taken by gpxWrite
  */
-export function gpxWriteFromDocument(document) {
+function gpxWriteFromDocument(document) {
 
   return new Promise( (resolve, reject) => {
 
@@ -211,7 +215,7 @@ export function gpxWriteFromDocument(document) {
  * @returns Name of the file
  */
 
-export function gpxWrite(writeObject){
+function gpxWrite(writeObject){
 
   debugMsg('writeGPX()');
 
@@ -260,4 +264,9 @@ export function gpxWrite(writeObject){
     debugMsg('writeGPX() finished');
   })
 
+}
+
+module.exports = {
+  gpxRead,
+  gpxWriteFromDocument
 }

@@ -4,21 +4,21 @@
  * Utilities used for debugging
  */
 
-export function debugMsg(msgString) {
+function debugMsg(msgString) {
   if (process.env.DEBUG) {
     console.log(timeStamp() + ' >> ' + msgString);
   }
 }
 
 
-export function padInt(num, size) {
+function padInt(num, size) {
   let s = num;
   while (s.length < size) s = '0' + s 
   return s;
 }
 
 
-export function timeStamp() {
+function timeStamp() {
 
   var now = new Date();
   var ms = String(now.getMilliseconds()).padStart(2,'0')
@@ -38,7 +38,7 @@ export function timeStamp() {
  * export geoJson to file - for debugging
  * @param {GeoJSON} geoJSON class instance
  */
-export function exportGeoJSON(geoJSON) {
+function exportGeoJSON(geoJSON) {
 
   const fs = require('fs');
   JSON.stringify(geoJSON)
@@ -51,7 +51,7 @@ export function exportGeoJSON(geoJSON) {
  * export data to CSV - For debugging
  * @param {Path} path
  */
-export function exportCSV(path) {
+function exportCSV(path) {
 
   const fs = require('fs');
   let file = fs.createWriteStream("../node.out");
@@ -62,3 +62,11 @@ export function exportCSV(path) {
 
 }
 
+
+module.exports = {
+  debugMsg,
+  padInt,
+  timeStamp,
+  exportGeoJSON,
+  exportCSV
+}

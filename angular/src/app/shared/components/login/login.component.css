@@ -6,3 +6,6 @@
   transform: translate(-50%, -50%);
 }
 
+.input-group-text {
+  width : 32px;
+}

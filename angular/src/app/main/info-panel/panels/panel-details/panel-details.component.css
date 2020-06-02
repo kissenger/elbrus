@@ -1,12 +1,14 @@
 .input{
   font-size: 12px;
   padding: 3px 6px;
+  cursor: text;
 }
 
 .inner {
   /* border: 1px red dotted; */
   overflow-y: auto;
   overflow-x: hidden;
+  cursor: default;
 }
 
 .table thead tr th, .table tbody tr td {

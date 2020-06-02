@@ -22,3 +22,7 @@
   margin: 0px;
   /* margin-top: 0px; */
  }
+
+ .list-container{
+  cursor: pointer;
+ }

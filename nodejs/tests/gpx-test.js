@@ -5,16 +5,14 @@
  * TODO: tests for gpxWrite
  */
 
-import chai from 'chai';
-import chaiAsPromised from "chai-as-promised";
+const chai = require('chai');
 var expect = chai.expect;
-var reject = chai.reject;
-chai.use(chaiAsPromised);
+var reject = chai.reject;;
+require('dotenv').config();
+const readFile = require('fs').readFile;
+const gpxRead = require('../src/gpx').gpxRead;
 
-import { readFile } from 'fs';
-import { gpxRead } from '../gpx.js';
-
-const dir = './data/';
+const dir = './tests/data/';
 
 const tests = [
   {
@@ -68,7 +66,7 @@ it('wrapper it to wait for promise.all to complete', function () {
         this.timeout(30000);
         return loadFile(dir+testItem.fileName)
           .then( function(buffer) {
-            gpxResult = readGPX(buffer.toString() );
+            gpxResult = gpxRead(buffer.toString() );
             console.log(gpxResult.lngLat.length, gpxResult)
           })
           .catch( function(error) {

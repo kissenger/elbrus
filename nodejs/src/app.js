@@ -6,19 +6,36 @@
  * (with some others in app-auth.js) with suppporting functions abstracted to 'app-functions.js'
  */
 
-import express from 'express';
-import multer from 'multer';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import 'dotenv/config.js';
+const express = require('express');
+const multer = require('multer');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+require('dotenv').config();
 const app = express();
 
-import { authRoute, verifyToken } from './auth.js';
-import { GeoJSON } from './class-geojson.js';
-import { gpxRead, gpxWriteFromDocument } from './gpx-read-write.js';
-import { debugMsg } from './debugging.js';
-import { mongoModel, getPathDocFromId, createMongoModel, bbox2Polygon } from './app-functions.js';
-import { getListData, getRouteInstance } from './app-functions.js';
+// const spawn = require('threads').spawn;
+// const Thread = require('threads').Thread;
+const Worker = require('threads').Worker;
+const spawn = require('threads').spawn;
+const Pool = require('threads').Pool;
+
+const auth = require('./auth');
+const GeoJSON = require('./geojson').GeoJSON;
+// const gpxRead = require('./gpx').gpxRead;   // uncomment if dont want to use threads
+const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
+const debugMsg = require('./debug').debugMsg;
+const mongoModel = require('./app-helpers.js').mongoModel;
+const bbox2Polygon = require('./app-helpers.js').bbox2Polygon;
+const getListData = require('./app-helpers.js').getListData;
+const getRouteInstance = require('./path-helpers.js').getRouteInstance;
+const getMongoObject = require('./path-helpers.js').getMongoObject;
+const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
+
+let threadPool;
+if (process.env.USE_THREADS) {
+  threadPool = require('./worker-pool').threadPool;
+  threadPool.create();
+}
 
 
 // apply middleware - note setheaders must come first
@@ -29,12 +46,13 @@ app.use( (req, res, next) => {
   next();
 });
 app.use(bodyParser.json());
-app.use(authRoute);
+app.use(auth.authRoute);
 
 
 // mongo as a service
-mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-gplhv.mongodb.net/trailscape?retryWrites=true`,
-  {useUnifiedTopology: true, useNewUrlParser: true });
+// console.log(process.env.MONGODB_PASSWORD)
+mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-5h6di.gcp.mongodb.net/test?retryWrites=true&w=majority`,
+  {useUnifiedTopology: true, useNewUrlParser: true }); 
 
 mongoose.connection
   .on('error', console.error.bind(console, 'connection error:'))
@@ -50,43 +68,60 @@ const upload = multer({
 });
 
 
-
 /*****************************************************************
  * import a route from a gpx file
  ******************************************************************/
-app.post('/import-route/', verifyToken, upload.single('filename'), (req, res) => {
+app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (req, res) => {
 
   debugMsg('import-route');
 
-  const pathFromGPX = readGPX(req.file.buffer.toString());
-  getRouteInstance(pathFromGPX.nameOfPath, null, pathFromGPX.lngLat, pathFromGPX.elev)
-    .then( route => createMongoModel('route', route.asMongoObject(req.userId, false)) )
-    .then( doc => res.status(201).json( {hills: new GeoJSON().fromDocument(doc).toGeoHills()} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+  try {
 
-});
+    const bufferString = req.file.buffer.toString();
+    let routeInstance;
+    if (process.env.USE_THREADS) {
+      const gpxData = await threadPool.addTaskToQueue('gpxRead', bufferString);
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData.name, null, gpxData.lngLat, gpxData.elev);
+    } else {
+      const gpxData = gpxRead(bufferString);
+      routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);  
+    }
+    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
+    res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
+}); 
 
 
 /*****************************************************************
  * Save a path to database - path has already been saved to the
  * database, all we are doing is updating some fields, and
  * changing isSaved flag to true; id of path is provided
- * TODO: use findByIdAndUpdate()? condition does not need to include userId as _id is unique
  *****************************************************************/
-app.post('/save-imported-path/', verifyToken, (req, res) => {
+app.post('/save-imported-path/', auth.verifyToken, async (req, res) => {
 
-  debugMsg('save-imported-path');
+  debugMsg(`save-imported-path, type=${req.body.pathType}, id=${req.body.pathId}`);
 
-  // set up query
-  const condition = {_id: req.body.pathId, userId: req.userId};
-  const filter = {isSaved: true, "info.name": req.body.name, "info.description": req.body.description};
+  try {
 
-  // query database, updating changed data and setting isSaved to true
-  mongoModel(req.body.pathType)
-    .updateOne(condition, {$set: filter}, {upsert: true, writeConcern: {j: true}})
-    .then( () => res.status(201).json({pathId: req.body.pathId}) )
-    .catch( (error) => res.status(500).json(error.toString()) );
+    const condition = {_id: req.body.pathId};
+    const filter = {isSaved: true, "info.name": req.body.name, "info.description": req.body.description};
+    await mongoModel(req.body.pathType).updateOne(condition, {$set: filter}, {upsert: true, writeConcern: {j: true}})
+    res.status(201).json({pathId: req.body.pathId});
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
 
 });
 
@@ -95,14 +130,28 @@ app.post('/save-imported-path/', verifyToken, (req, res) => {
 /*****************************************************************
  * Save a user-created route to database; geoJSON is supplied in POST body
  *****************************************************************/
-app.post('/save-created-route/', verifyToken, (req, res) => {
+app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
 
-  debugMsg('save-created-route' );
 
-  getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev)
-    .then( route => mongoModel('route').create( route.asMongoObject(req.userId, true) ))
-    .then( doc => res.status(201).json( {pathId: doc._id} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+  debugMsg(`save-created-route`);
+
+  try {
+
+    let routeInstance;
+    if (process.env.USE_THREADS) {
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body.name, req.body.description, req.body.coords, req.body.elev);
+    } else {
+      routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
+    }
+    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
+    res.status(201).json( {pathId: document._id} )
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
 
 });
 
@@ -112,17 +161,25 @@ app.post('/save-created-route/', verifyToken, (req, res) => {
  *  Retrieve a single path from database
  *  id of required path is supplied
  *****************************************************************/
-app.get('/get-path-by-id/:type/:id', verifyToken, (req, res) => {
+app.get('/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
 
-  debugMsg('get-path-by-id');
+  debugMsg(`get-path-by-id, type=${req.params.type}, id=${req.params.id}` );
 
-  getPathDocFromId(req.params.id, req.params.type, req.userId)
-    .then( doc => {
-      res.status(201).json({
-      hills: new GeoJSON().fromDocument(doc).toGeoHills(),
-      basic: new GeoJSON().fromDocument(doc).toBasic()
-    }) })
-    .catch( (error) => res.status(500).json( error.toString()) );
+  try {
+
+    const document = await mongoModel(req.params.type).findOne( {_id: req.params.id});
+    res.status(201).json({
+      hills: new GeoJSON().fromDocument(document).toGeoHills(),
+      basic: new GeoJSON().fromDocument(document).toBasic()
+    }) 
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
 })
 
 
@@ -135,27 +192,41 @@ app.get('/get-path-by-id/:type/:id', verifyToken, (req, res) => {
  * pathType is the type of path (obvs)
  * offset is used by list to request chunks of x paths at a time
  *****************************************************************/
-app.get('/get-paths-list/:pathType/:offset/:limit', verifyToken, (req, res) => {
+app.get('/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
 
-  debugMsg('get-paths-list');
+  debugMsg(`get-paths-list, type=${req.params.type}, id=${req.params.id}`);
 
-  let condition = {isSaved: true, userId: req.userId};
-  if (req.query.bbox !== '0') {
-    const geometry = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
-    condition = {...condition, geometry: { $geoIntersects: { $geometry: geometry} } }
+  try {
+
+    let condition;
+
+    if (req.params.isPublic === 'false') {
+      condition = {isSaved: true, userId: req.userId};
+    } else {
+      condition = {isSaved: true, isPublic: true};
+    }
+
+    // if a boundingbox was supplied construct the geo query
+    if (req.query.bbox !== '0') {
+      const geometry = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
+      condition = {...condition, geometry: { $geoIntersects: { $geometry: geometry} } }
+    }
+    const filter = {stats: 1, info: 1, startTime: 1, creationDate: 1};
+    const sort = req.params.pathType === 'track' ? {startTime: -1} : {creationDate: -1};
+    const limit = req.params.limit;
+    const offset = req.params.offset
+    const pathType = req.params.pathType;
+
+    const count = await mongoModel(pathType).countDocuments(condition);
+    const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));
+    res.status(201).json( getListData(docs, count) );
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
   }
-  const filter = {stats: 1, info: 1, startTime: 1, creationDate: 1};
-  const sort = req.params.pathType === 'track' ? {startTime: -1} : {creationDate: -1};
-  const limit = req.params.limit;
-  const offset = req.params.offset
-  const pathType = req.params.pathType;
-
-  mongoModel(pathType).countDocuments(condition)
-    .then( count => {
-      mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset))
-        .then( documents => res.status(201).json( getListData(documents, count) ))
-      })                          // this 'then' is nested rather than chained so it has access to 'count'
-    .catch( (error) => res.status(500).json(error.toString()) );
 
 })
 
@@ -163,21 +234,23 @@ app.get('/get-paths-list/:pathType/:offset/:limit', verifyToken, (req, res) => {
 
 /*****************************************************************
  * Delete a path from database
- * id of path is provided - doesnt actually delete, just sets isSaved to false
- * and delete will occur at the next flush
+ * id of path is provided in both public and private dbs
  *****************************************************************/
-app.delete('/delete-path/:type/:id', verifyToken, (req, res) => {
+app.delete('/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
 
-  debugMsg('delete-path');
+  debugMsg(`delete-path, type=${req.params.type}, id=${req.params.id}`);
 
-  // construct query
-  let condition = {_id: req.params.id, userId: req.userId};
-  let filter = {isSaved: false};
+  try {
 
-  // query database, updating change data and setting isSaved to true
-  mongoModel(req.params.type).updateOne(condition, {$set: filter})
-    .then( () => res.status(201).json( {'result': 'delete ok'} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+    await mongoModel(req.params.type).deleteOne( {_id: req.params.id} );
+    res.status(201).json( {'result': 'delete ok'} );
+  
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
 
 });
 
@@ -190,29 +263,44 @@ app.delete('/delete-path/:type/:id', verifyToken, (req, res) => {
  * 2) download-file: allow the browser to download the file
  *****************************************************************/
  // Step 1, write the data to gpx file
-app.get('/write-path-to-gpx/:type/:id', verifyToken, (req, res) => {
+app.get('/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) => {
 
-  debugMsg('Write path to gpx');
+  debugMsg(`Write path to gpx, type=${req.params.type}, id=${req.params.id}`);
 
-  mongoModel(req.params.type)
-    .find({_id: req.params.id, userId: req.userId})
-    .then( documents => gpxWriteFromDocument(documents[0]))
-    .then( fileName => res.status(201).json( {fileName} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+  try {
+
+    const document = await mongoModel(req.params.type).findOne({_id: req.params.id});
+    const fileName = await gpxWriteFromDocument(document);
+    res.status(201).json( {fileName} );
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
 })
 
 // Step 2, download the file to browser
-app.get('/download-file/:fname', verifyToken, (req, res) => {
+app.get('/download-file/:fname', auth.verifyToken, (req, res) => {
 
-  debugMsg('Download file from server');
+  debugMsg(`Download file from server, filename=${req.params.fname}`);
 
-  res.download('../' + req.params.fname + '.gpx', (err) => {
-    if (err) {
-      console.log('error: ' + err);
-    } else {
-      console.log('success');
-    }
-  });
+  try {
+
+    res.download('../' + req.params.fname + '.gpx', (err) => {
+      if (err) {
+        throw new Error(err);
+      }
+    });
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(401).send(error.message);
+
+  }
 
 })
 
@@ -223,20 +311,125 @@ app.get('/download-file/:fname', verifyToken, (req, res) => {
  * creates a Path object in order to get elevations and statistics,
  * and returns it back to the front end
  *****************************************************************/
-app.post('/get-path-from-points/', verifyToken, (req, res) => {
+app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
   debugMsg('get-path-from-points')
 
-  const lngLats = req.body.coords.map(coord => [coord.lng, coord.lat]);
+  try {
 
-  getRouteInstance(null, null, lngLats, null)
-    .then( route => res.status(201).json({
-      hills: new GeoJSON().fromPath(route).toGeoHills(),
-      basic: new GeoJSON().fromPath(route).toBasic()
-    }))
-    // .catch( (error) => res.status(500).json( error.toString() ));
+    const lngLats = req.body.coords.map(coord => [coord.lng, coord.lat]);
+    let routeInstance;
+    if (process.env.USE_THREADS) {
+      console.log('a')
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', null, null, lngLats, null);
+      console.log('b')
+
+    } else {
+      routeInstance = await getRouteInstance(null, null, lngLats, null);  
+    }
+    console.log('c')
+
+    res.status(201).json({
+        hills: new GeoJSON().fromPath(routeInstance).toGeoHills(),
+        basic: new GeoJSON().fromPath(routeInstance).toBasic()
+      });
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(401).send(error.message);
+
+  }
+})
+
+
+
+
+/*****************************************************************
+ * Toggles a path from public --> private or opposite
+ *****************************************************************/
+
+app.post('/toggle-path-public/', auth.verifyToken, async (req, res) => {
+
+  debugMsg(`toggle-path-public, pathType=${req.body.pathType}, pathId=${req.body.pathId}`)
+
+  try {
+
+    // query database path database to determine current status of path
+    const result = await mongoModel(req.body.pathType).findOne({_id: req.body.pathId}, {isPublic: 1});
+    console.log(result);
+    await mongoModel(req.body.pathType).updateOne( {_id: req.body.pathId}, {$set: {isPublic: !result.isPublic}} );
+    res.status(201).json({isPathPublic: !result.isPublic});
+
+  } 
+  catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
 
 })
+
+
+/*****************************************************************
+ * Copies a public path into private database
+ *****************************************************************/
+
+app.post('/copy-public-path/', auth.verifyToken, async (req, res) => {
+
+  debugMsg(`copy-public-path, pathType=${req.body.pathType}, pathId=${req.body.pathId}`)
+
+  try {
+
+    const document = await mongoModel(req.body.pathType).findOne({_id: req.body.pathId});
+    const newDate = new Date(Date.now());
+    document.userId = req.userId;
+    document.creationDate = newDate,
+    document.lastEditDate = newDate,
+    document.isPublic = false;
+    document.info.createdBy = req.userName;
+    
+    await mongoModel(req.body.pathType).create(document);
+    res.status(201).json({success: 'success'});
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
+})
+
+
+
+/*****************************************************************
+ * Return the reverse of a route
+ *****************************************************************/
+
+app.get('/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
+
+  debugMsg(`reverse-route, pathId=${req.params.pathId}`)
+
+  try {
+
+    const sourceDoc = await mongoModel(req.params.pathType).findOne({_id: req.params.pathId});
+    const {lngLats, elevs} = getReverseOfRoute(sourceDoc.geometry.coordinates, sourceDoc.params.elev);
+    const routeInstance = await getRouteInstance(null, null, lngLats, elevs);
+    const newDoc = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
+    res.status(201).json( {hills: new GeoJSON().fromDocument(newDoc).toGeoHills()} );
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
+})
+
+
 
 
 
@@ -244,18 +437,25 @@ app.post('/get-path-from-points/', verifyToken, (req, res) => {
  * Flush database of all unsaved entries
  * note we are only flushing routes at the moment
  *****************************************************************/
-app.post('/flush/', verifyToken, (req, res) => {
+app.post('/flush/', auth.verifyToken, async (req, res) => {
 
   debugMsg('flush db');
 
-  mongoModel('route').deleteMany( {'userId': userId, 'isSaved': false} )
-    .then( () => res.status(201).json( {result: 'db flushed'} ))
-    .catch( (error) => res.status(500).json(error.toString()) );
+  try {
+
+    await mongoModel('route').deleteMany( {userId: userId, isSaved: false} )
+    res.status(201).json( {result: 'db flushed'} );
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
 
 })
 
+// export default app;
 
-
-export default app;
-
+module.exports = app;
 

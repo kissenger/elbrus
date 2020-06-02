@@ -1,6 +1,6 @@
 {
-  "name": "elbrus-frontend",
-  "version": "0.0.0",
+  "name": "elbrus-angular",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

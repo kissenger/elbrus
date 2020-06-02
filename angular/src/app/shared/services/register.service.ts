@@ -20,6 +20,11 @@ export class RegisterService {
 
   showAsElement() {
 
+    // prevent multiple instances being active at once
+    if (document.body.contains(this.register)) {
+      document.body.removeChild(this.register);
+    }
+
     this.register = document.createElement('register-box') as any;
     document.body.appendChild(this.register);
 

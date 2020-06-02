@@ -1,34 +1,34 @@
 
 
 <div class="info-panel position-absolute h-100">
-    
-    <!-- invisible container to give d-flex to child divs -->
-    <div class="position-relative h-100 w-100 d-flex flex-column ">
 
-        <!-- Outer container  - outer visible border -->
-        <div  class="outer-container flex-grow-1 order-left border-top border-left border-bottom mt-2 mb-4 rounded-left">
-    
-            <!-- TABS -->
-            <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
-            <ul class="nav nav-tabs mt-2 ml-2 p-0 nav-justified" id="myTab" role="tablist">
-                <li *ngFor="let tab of tabsArray" class="nav-item">
-                    <a [ngClass]="tab.active ? 'active' : ''" id="{{tab.title}}" class='nav-link' data-toggle="tab" href={{tab.href}} role="tab"  (click)="onClick($event)">
-                        {{tab.title}}
-                    </a>
-                </li>
-            </ul>                
-    
-            <!-- TAB CONTENT -->
-            <!-- Inject panels depending on the type of page -->
-            <div #div *ngFor="let tab of tabsArray" [ngClass]="tab.active ? 'active show' : ''" id={{tab.name}} role="tabpanel"
-                 class="position-absolute panel-size-calc tab-panel fade border-left border-bottom bg-white ml-2">
-                
-                <div class="ml-2 mr-1 pr-1 pt-1 h-100 overflow-auto">
-                    <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
-                </div>
+  <!-- invisible container to give d-flex to child divs -->
+  <div class="position-relative h-100 w-100 d-flex flex-column ">
 
-            </div>
+    <!-- Outer container  - outer visible border -->
+    <div  class="outer-container flex-grow-1 order-left border-top border-left border-bottom mt-2 mb-4 rounded-left">
 
+      <!-- TABS -->
+      <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
+      <ul class="nav nav-tabs mt-2 ml-2 p-0 nav-justified" id="myTab" role="tablist">
+        <li *ngFor="let tab of tabsArray" class="nav-item">
+          <a [ngClass]="tab.active ? 'active' : ''" id="{{tab.title}}" class='nav-link' data-toggle="tab" href={{tab.href}} role="tab"  (click)="onClick($event)">
+            {{tab.title}}
+          </a>
+        </li>
+      </ul>
+
+      <!-- TAB CONTENT -->
+      <!-- Inject panels depending on the type of page -->
+      <div #div *ngFor="let tab of tabsArray" [ngClass]="tab.active ? 'active show' : ''" id={{tab.name}} role="tabpanel"
+        class="position-absolute panel-size-calc tab-panel fade border-left border-bottom bg-white ml-2">
+
+        <div class="ml-2 mr-1 pr-1 pt-1 h-100 overflow-auto">
+          <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
         </div>
+
+      </div>
+
     </div>
+  </div>
 </div>

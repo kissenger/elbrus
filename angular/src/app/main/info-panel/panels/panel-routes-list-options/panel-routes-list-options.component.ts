@@ -5,6 +5,7 @@ import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-panel-routes-list-options',
@@ -13,20 +14,34 @@ import { SpinnerService } from 'src/app/shared/services/spinner.service';
 })
 export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
 
+  private activePathSubscription: Subscription;
   private subscription: Subscription;
+  public isPathPublic: boolean;
+  public createdBy: string;
+  public pathId: string;
+  private pathType: string;
+  private geoJson;
 
   constructor(
     private router: Router,
     private httpService: HttpService,
     private dataService: DataService,
     private alert: AlertService,
-    private spinner: SpinnerService
-  ) {
-
-   }
+    private spinner: SpinnerService,
+    private auth: AuthService
+  ) {}
 
   ngOnInit() {
+    this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
+      this.isPathPublic = geoJson.properties.info.isPublic;
+      this.createdBy = geoJson.properties.info.createdBy;
+      this.pathId = geoJson.properties.pathId;
+      this.pathType = geoJson.properties.info.pathType;
+    });
+
   }
+
+
 
   /** virtually clicks the hidden form element to launch the select file dialogue */
   onLoadFileClick() {
@@ -35,10 +50,12 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
 
   onDeleteClick() {
 
-    const activePath = this.dataService.getFromStore('activePath', false);
+    // TODO: why are we not making use of the geoJSON pulled in in onInit?
+    // const activePath = this.dataService.getFromStore('activePath', false);
+
     this.alert.showAsElement('Are you sure?', 'Cannot undo delete!', true, true).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
-        this.httpService.deletePath(activePath.properties.pathId).subscribe( () => {
+        this.httpService.deletePath(this.pathId).subscribe( () => {
           this.reloadListComponent();
         });
       }
@@ -52,10 +69,10 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
    */
   onExportGpxClick() {
 
-    const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
-    const pathType = 'route';
+    // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
+    // const pathType = 'route';
 
-    this.subscription = this.httpService.exportToGpx(pathType, pathId).subscribe( (fname) => {
+    this.subscription = this.httpService.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
 
       // this was the original attempt which does not work with authentication injection, so needed a new approach
       // window.location.href = 'http://localhost:3000/download';
@@ -70,6 +87,55 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
       });
     });
 
+  }
+
+
+  // Show option to toggle public/private its its a private path, or if its public and created by this user
+  allowMakePrivate() {
+    return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
+  }
+
+  allowDelete() {
+    return this.createdBy === this.auth.getUser().userName;
+  }
+
+
+  onMakePublicClick() {
+    // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
+    // const pathType = 'route';
+    this.subscription = this.httpService.makePathPublic(this.pathType, this.pathId).subscribe( (result) => {
+      // this.isPathPublic = !this.isPathPublic;
+      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+      this.router.onSameUrlNavigation = 'reload';
+      this.router.navigate(['route/list']);
+      // this.alert
+        // .showAsElement('Success', `Path is now ${result.isPathPublic}`, false, true)
+        // .subscribe( () => {} );
+    });
+  }
+
+
+  onMakeCopyClick() {
+    // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
+    // const pathType = 'route';
+    this.subscription = this.httpService.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
+      // this.isPathPublic = !this.isPathPublic;
+      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+      this.router.onSameUrlNavigation = 'reload';
+      this.router.navigate(['route/list']);
+      // this.alert
+        // .showAsElement('Success', `Path is now ${result.isPathPublic}`, false, true)
+        // .subscribe( () => {} );
+    });
+  }
+
+  onReverseClick() {
+    this.subscription = this.httpService.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
+      const pathAsGeoJSON = result.hills;
+      this.dataService.saveToStore('activePath', {source: 'created', pathAsGeoJSON});
+      this.spinner.removeElement();
+      this.router.navigate(['route/review/']);
+    });
   }
 
 

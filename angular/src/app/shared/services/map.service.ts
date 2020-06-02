@@ -37,22 +37,40 @@ export class MapService {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
     return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
+
+      console.log('tsMap');
       this.tsMap = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g',
+        // style: 'mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g',
+        style: 'mapbox://styles/kissenger/ckapl476e00p61iqeivumz4ey',
         center: location ? location : this.auth.getUser().homeLngLat,
         zoom: zoom ? zoom : 13
       });
 
       this.tsMap.on('load', () => {
+        this.dataService.saveToStore('mapView', this.getMapView());
         resolve();
       });
 
+      // this.tsMap.on('mousemove', function(e) {
+      //   document.getElementById('info').innerHTML =
+      //   // e.point is the x, y coordinates of the mousemove event relative
+      //   // to the top-left corner of the map
+      //   JSON.stringify(e.point) +
+      //   '<br />' +
+      //   // e.lngLat is the longitude, latitude geographical position of the event
+      //   JSON.stringify(e.lngLat.wrap());
+      //   });
+
+
+      // called when the map is moved by user, or when the initial animation is complete
       this.tsMap.on('moveend', (ev) => {
+        this.dataService.saveToStore('mapView', this.getMapView());
         try {
           this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
         } catch {}
       });
+
 
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
@@ -63,8 +81,10 @@ export class MapService {
 
   /**
    * Two methods to determine what is being shown
-   * getMapView - reutrns the centrepoint and zoom level
-   * getMapBounds - returns the bounding box of the current view - called by this class
+   * getMapView - reutrns the centrepoint and zoom level - used by other services to determine what was being shown
+   * before option was selected
+   * getMapBounds - returns the bounding box of the current view - called by this class but who is the listener? (TODO:)
+   * TODO: Do we need both methods?
    */
   getMapView() {
     const centre = this.tsMap.getCenter();
@@ -73,6 +93,7 @@ export class MapService {
   }
 
   getMapBounds() {
+    // called by list - used to filter shown routes to those intersecting the current view
     const mapBounds = this.tsMap.getBounds();
     return [mapBounds.getSouthWest().lng, mapBounds.getSouthWest().lat, mapBounds.getNorthEast().lng, mapBounds.getNorthEast().lat];
   }
@@ -127,6 +148,7 @@ export class MapService {
     // this.addPointsLayer(pathAsGeoJSON);
 
     // plot a marker at the start and end of the route, pushing the new markers to activeLayers
+    // console.log(pathAsGeoJSON);
     const nFeatures = pathAsGeoJSON.features.length;
     const nPoints = pathAsGeoJSON.features[nFeatures - 1].geometry.coordinates.length;
     if (nPoints > 0 && plotOptions.booPlotMarkers) {
