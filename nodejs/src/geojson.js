@@ -9,6 +9,7 @@
   */
  
 const PathWithStats = require('./path-class').PathWithStats;
+const debugMsg = require('./debug').debugMsg;
 
 const FLAT_COLOUR =   require('./globals').FLAT_COLOUR;
 const ROUTE_COLOUR =  require('./globals').ROUTE_COLOUR;
@@ -17,6 +18,8 @@ const DOWN_COLOUR =   require('./globals').DOWN_COLOUR;
 
 class GeoJSON {
   constructor() {
+    debugMsg(`GeoJSON`);
+    
   }
 
   /**
@@ -25,13 +28,14 @@ class GeoJSON {
 
   // populates the class instance with data from supplied Path instance
   fromPath(path) {
+    
+
     // this._checkIsPath(path);
-    this._lngLats = path.lngLats;
+    this._lngLats = path.properties.geometry.coordinates;
     this._properties = path.properties
     this._elevs = this._properties.params.elev;
     this._bbox = this._properties.stats.bbox;
     this._features = [];
-    console.log(this);
     return this;
   }
 
@@ -52,7 +56,6 @@ class GeoJSON {
     };
     this._bbox = doc.stats.bbox;
     this._features = [];
-    // console.log(this)
     return this;
   }
 

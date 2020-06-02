@@ -80,7 +80,6 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
     }
 
   } // close for loop
-
   // check we didnt end on a hill
   if (Math.abs(dSum) > ASCENT_THRESH) {
     if (dSum > 0) { ascent += dSum; }

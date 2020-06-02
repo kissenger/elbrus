@@ -102,8 +102,9 @@ authRoute.post('/register', async (req, res) => {
 
     // create user in the database
     const hash = await bcrypt.hash(req.body.password, saltRounds);
-    const validationString = cryptoRandomString({length: 10, type: 'url-safe'});
-    const newUser = await Users.create({...req.body, hash, validationString});
+    // const validationString = cryptoRandomString({length: 10, type: 'url-safe'});
+    // const newUser = await Users.create({...req.body, hash, validationString});
+    const newUser = await Users.create({...req.body, hash});
 
     // const message = `Click <a href="http://trailscape.cc/validation/${user._id}/${validationString}">here</a> to validate your account`;
     // await sendAnEmail(req.body.email, message);

@@ -148,6 +148,7 @@ export class MapService {
     // this.addPointsLayer(pathAsGeoJSON);
 
     // plot a marker at the start and end of the route, pushing the new markers to activeLayers
+    // console.log(pathAsGeoJSON);
     const nFeatures = pathAsGeoJSON.features.length;
     const nPoints = pathAsGeoJSON.features[nFeatures - 1].geometry.coordinates.length;
     if (nPoints > 0 && plotOptions.booPlotMarkers) {

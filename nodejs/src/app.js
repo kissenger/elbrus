@@ -31,9 +31,11 @@ const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 const getMongoObject = require('./path-helpers.js').getMongoObject;
 const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
 
-const threadPool = require('./worker-pool').threadPool;
-threadPool.create();
-
+let threadPool;
+if (process.env.USE_THREADS) {
+  threadPool = require('./worker-pool').threadPool;
+  threadPool.create();
+}
 
 
 // apply middleware - note setheaders must come first
@@ -76,10 +78,14 @@ app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (r
   try {
 
     const bufferString = req.file.buffer.toString();
-    // const gpxData = gpxRead(bufferString);          // dont use threads
-    const gpxData = await threadPool.addTaskToQueue('gpxRead', bufferString);  // use threads
-    // const routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);  // dont use threads
-    const routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData.name, null, gpxData.lngLat, gpxData.elev);  // use threads
+    let routeInstance;
+    if (process.env.USE_THREADS) {
+      const gpxData = await threadPool.addTaskToQueue('gpxRead', bufferString);
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData.name, null, gpxData.lngLat, gpxData.elev);
+    } else {
+      const gpxData = gpxRead(bufferString);
+      routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);  
+    }
     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 
@@ -131,7 +137,12 @@ app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
 
   try {
 
-    const routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);
+    let routeInstance;
+    if (process.env.USE_THREADS) {
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body.name, req.body.description, req.body.coords, req.body.elev);
+    } else {
+      routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
+    }
     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
     res.status(201).json( {pathId: document._id} )
 
@@ -307,7 +318,17 @@ app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
   try {
 
     const lngLats = req.body.coords.map(coord => [coord.lng, coord.lat]);
-    const routeInstance = await getRouteInstance(null, null, lngLats, null);
+    let routeInstance;
+    if (process.env.USE_THREADS) {
+      console.log('a')
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', null, null, lngLats, null);
+      console.log('b')
+
+    } else {
+      routeInstance = await getRouteInstance(null, null, lngLats, null);  
+    }
+    console.log('c')
+
     res.status(201).json({
         hills: new GeoJSON().fromPath(routeInstance).toGeoHills(),
         basic: new GeoJSON().fromPath(routeInstance).toBasic()

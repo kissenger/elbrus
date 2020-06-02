@@ -43,7 +43,6 @@ function getRouteInstance(name, description, lngLat, elevs) {
       const path = new Route(name, description, prePath.lngLat, prePath.elev);
 
       const {cw, category, direction, matchedPoints} = analysePath(path);
-      // const {cw, category, direction, matchedPoints} = await addTaskToQueue('analysePath', path);
       path.properties.info.cw = cw;
       path.properties.info.category = category;
       path.properties.info.direction = direction;
@@ -53,7 +52,6 @@ function getRouteInstance(name, description, lngLat, elevs) {
       if (path.properties.info.isElevations) {
         path.properties.stats = {
           ...path.properties.stats,
-          // ...await addTaskToQueue('analyseElevations', path),
           ...analyseElevations(path)
         };
 
