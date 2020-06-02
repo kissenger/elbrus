@@ -1,0 +1,19 @@
+Description of key files and folders, names are in general important and any change will need additional changes to setup:
+
+folders
+- angular --> source for the front end
+- build-scripts --> scripts for setting up a new vm instance
+- certbot-info --> automatically placed by certbot
+- data --> mounted google persistant drive, containing elevation data
+- dhparam --> contains key file for https authentication
+- nginx-conf --> nginx configuration files. Subfolders are 'certbot' (use this path for launching server to obtain certbot certificates) and 'prod' (use this path for production)
+- nodejs --> source for the backend
+- delete-me --> containing files generate during build that I dont think are neeeded but which I'm not confident of deleting
+
+files
+- docker-compose.yml --> for building docker containers, see notes below
+
+
+
+How to install certbot certificates and run server
+
