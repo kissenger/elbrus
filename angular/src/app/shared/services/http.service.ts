@@ -10,9 +10,10 @@ export class HttpService {
 
   private mapBoxAccessToken = globals.mapboxAccessToken;
 
+  private protocol = environment.BACKEND_PROTOCOL;
   private host = environment.BACKEND_HOST;
   private port = environment.BACKEND_PORT;
-  private backendURL = `${this.host}:${this.port}`;
+  private backendURL = `${this.protocol}://${this.host}:${this.port}`;
 
   constructor( private http: HttpClient ) {
 
@@ -37,19 +38,19 @@ export class HttpService {
    *  calls to the backend
    ********************************************************************************************/
   importRoute(formData: Object) {
-    return this.http.post<any>(`http://${this.backendURL}/import-route/`, formData);
+    return this.http.post<any>(`${this.backendURL}/import-route/`, formData);
   }
 
   saveCreatedRoute(pathData: Object) {
-    return this.http.post<any>(`http://${this.backendURL}/save-created-route/`, pathData);
+    return this.http.post<any>(`${this.backendURL}/save-created-route/`, pathData);
   }
 
   saveImportedPath(pathData: Object) {
-    return this.http.post<any>(`http://${this.backendURL}/save-imported-path/`, pathData);
+    return this.http.post<any>(`${this.backendURL}/save-imported-path/`, pathData);
   }
 
   flushDatabase() {
-    return this.http.post<any>(`http://${this.backendURL}/flush/`, '');
+    return this.http.post<any>(`${this.backendURL}/flush/`, '');
   }
 
   getPathsList(type: string, isPublic: boolean, offset: number, limit: number, bbox: Array<number>) {
@@ -63,37 +64,37 @@ export class HttpService {
         if (index !== bbox.length - 1) { query += '&'; }
       });
     }
-    return this.http.get<any>(`http://${this.backendURL}/get-paths-list/${type}/${isPublic}/${offset}/${limit}${query}`);
+    return this.http.get<any>(`${this.backendURL}/get-paths-list/${type}/${isPublic}/${offset}/${limit}${query}`);
   }
 
   getPathById(type: string, id: string) {
-    return this.http.get<any>(`http://${this.backendURL}/get-path-by-id/${type}/${id}`);
+    return this.http.get<any>(`${this.backendURL}/get-path-by-id/${type}/${id}`);
   }
 
   deletePath(id: string) {
-    return this.http.delete<any>(`http://${this.backendURL}/delete-path/route/${id}`);
+    return this.http.delete<any>(`${this.backendURL}/delete-path/route/${id}`);
   }
 
   exportToGpx(pathType: string, pathId: string) {
-    return this.http.get<any>(`http://${this.backendURL}/write-path-to-gpx/${pathType}/${pathId}`);
+    return this.http.get<any>(`${this.backendURL}/write-path-to-gpx/${pathType}/${pathId}`);
   }
 
   downloadFile(fileName: string) {
     // note responseType in options and <Blob> type
-    return this.http.get<Blob>(`http://${this.backendURL}/download-file/${fileName}`,
+    return this.http.get<Blob>(`${this.backendURL}/download-file/${fileName}`,
       {responseType: 'blob' as 'json'});
   }
 
   getPathFromPoints(coords: Array<TsCoordinate>) {
-    return this.http.post<any>(`http://${this.backendURL}/get-path-from-points/`, {coords});
+    return this.http.post<any>(`${this.backendURL}/get-path-from-points/`, {coords});
   }
 
   registerUser(userData) {
-    return this.http.post<any>(`http://${this.backendURL}/register/`, userData);
+    return this.http.post<any>(`${this.backendURL}/register/`, userData);
   }
 
   loginUser(userData) {
-    return this.http.post<any>(`http://${this.backendURL}/login/`, userData);
+    return this.http.post<any>(`${this.backendURL}/login/`, userData);
   }
 
   // verifyAccount(userId: string, verificationString: string) {
@@ -101,19 +102,19 @@ export class HttpService {
   // }
 
   updateUserData(userData: TsUser) {
-    return this.http.post<any>(`http://${this.backendURL}/update-user-data/`, userData);
+    return this.http.post<any>(`${this.backendURL}/update-user-data/`, userData);
   }
 
   makePathPublic(pathType: string, pathId: string) {
-    return this.http.post<any>(`http://${this.backendURL}/toggle-path-public/`, {pathType, pathId});
+    return this.http.post<any>(`${this.backendURL}/toggle-path-public/`, {pathType, pathId});
   }
 
   copyPublicPath(pathType: string, pathId: string) {
-    return this.http.post<any>(`http://${this.backendURL}/copy-public-path/`, {pathType, pathId});
+    return this.http.post<any>(`${this.backendURL}/copy-public-path/`, {pathType, pathId});
   }
 
   reverseRoute(pathType: string, pathId: string) {
-    return this.http.get<any>(`http://${this.backendURL}/reverse-route/${pathType}/${pathId}`);
+    return this.http.get<any>(`${this.backendURL}/reverse-route/${pathType}/${pathId}`);
   }
 
 
