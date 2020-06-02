@@ -17,6 +17,10 @@ creates backend .env file if there is already one there (to avoid overwritting m
 ** Note need to copy-paste MONGODB_PASSWORD and AUTH_KEY manually into this file
 creates front end production environment file at ~/angular/src/environments/environment.prod.ts, with the cuurent public ip address.
 
+Other Steps
+
+
+
 Optional
 
 - gitpull
