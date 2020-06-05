@@ -1,5 +1,5 @@
 
-  import { TsCoordinate, TsFeatureCollection } from 'src/app/shared/interfaces';
+  import { TsCoordinate, TsFeatureCollection, TsFeature, TsPosition } from 'src/app/shared/interfaces';
   import { emptyGeoJson } from '../globals';
 
   export class PathHistory {
@@ -37,8 +37,15 @@
 
     coords(): Array<TsCoordinate> {
       // return only the coordinates from the last geoJson, note there could be multiple features so concat first
+      // NOTE this returns duplicate points where lines meet (last point of feature n and first point of feature n+1)
       const coords = this.history[this.history.length - 1].features.reduce( (a, b) => a.concat(b.geometry.coordinates), []);
       return coords.map(c => ({lng: c[0], lat: c[1]}));
+    }
+
+    pointsGeoJSON() {
+      const points = this.history[this.history.length - 1].features.reduce( (a, b) => a.concat(b.geometry.coordinates), []);
+      const pointFeatures = points.map( (coord, index) => this.getPointFeature(coord) );
+      return this.getFeatureCollection(pointFeatures);
     }
 
     elevs() {
@@ -86,4 +93,24 @@
     length() {
       return this.history.length;
     }
+
+    getFeatureCollection(features: Array<TsFeature>) {
+      return <TsFeatureCollection>{
+        type: 'FeatureCollection',
+        features: features
+      };
+    }
+
+    getPointFeature(point: TsPosition) {
+      return <TsFeature> {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: point
+        }
+      };
+    }
   }
+
+
+

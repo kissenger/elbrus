@@ -104,6 +104,7 @@ export const emptyGeoJson: TsFeatureCollection = {
   bbox: null,
   type: 'FeatureCollection',
   features: [{
+      id: null,
       bbox: null,
     type: 'Feature',
     geometry: {

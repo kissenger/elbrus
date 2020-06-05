@@ -75,14 +75,14 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
       // if pathId is not in overlaidPaths then add it
       if (!this.overlaidPaths.includes(pathId)) {
         this.httpService.getPathById('route', pathId).subscribe( (result) => {
-          this.mapCreateService.removeLayerFromMap(pathId);
-          this.mapCreateService.addLayerToMap(result.basic, globals.overlayLineStyle, this.overlayPlotOptions);
+          this.mapCreateService.removePathFromMap(pathId);
+          this.mapCreateService.addPathToMap(result.basic, globals.overlayLineStyle, this.overlayPlotOptions);
           this.overlaidPaths.push(pathId);
         });
 
       // otherwise pathID is present, so remove from map and delete key from object
       } else {
-        this.mapCreateService.removeLayerFromMap(pathId);
+        this.mapCreateService.removePathFromMap(pathId);
         this.overlaidPaths.splice(this.overlaidPaths.indexOf(pathId), 1);
       }
 

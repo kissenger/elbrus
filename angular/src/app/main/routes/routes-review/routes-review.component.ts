@@ -31,7 +31,7 @@ export class RoutesReviewComponent implements OnInit {
       this.mapService.initialiseMap(cog, 10)
         .then( () => {
           const plotOptions = {booReplaceExisting: false, booResizeView: true, booSaveToStore: true};
-          this.mapService.addLayerToMap(geoJSON, {}, plotOptions);
+          this.mapService.addPathToMap(geoJSON, {}, plotOptions);
         })
         .catch( e => {
           throw new Error(e);

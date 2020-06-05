@@ -12,6 +12,7 @@ export interface TsPlotPathOptions {
     booResizeView?: boolean;
     booSaveToStore?: boolean;
     booPlotMarkers?: boolean;
+    booPlotPoints?: boolean;
 }
 
 export interface TsLineStyle {
@@ -108,6 +109,7 @@ export interface TsFeatureCollection {
 
 export interface TsFeature {
   bbox?: TsBoundingBox;
+  id: string;
   type: 'Feature';
   geometry: TsGeometry;
   properties: TsProperties | null;

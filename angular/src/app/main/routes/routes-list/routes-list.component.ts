@@ -67,7 +67,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
           // as initialisation will temporarily show default location, only run it if map doesnt currently exist
           this.initialiseMapIfNeeded().then( () => {
             this.mapService.clearMap();
-            this.mapService.addLayerToMap(this.geoJSON, this.lineStyle, this.plotOptions);
+            this.mapService.addPathToMap(this.geoJSON, this.lineStyle, this.plotOptions);
           });
 
         });
