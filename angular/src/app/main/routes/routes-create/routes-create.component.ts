@@ -58,6 +58,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
         if (fromMenu.command === 'undo') { this.mapCreateService.undo(); }
         if (fromMenu.command === 'close') { this.mapCreateService.closePath(); }
         if (fromMenu.command === 'clear') { this.mapCreateService.clearPath(); }
+        if (fromMenu.command === 'simplify') { this.mapCreateService.simplify(); }
       } else {
         const optionKey = Object.keys(fromMenu.option)[0];
         this.mapCreateService.getOptions()[optionKey] = fromMenu.option[optionKey];

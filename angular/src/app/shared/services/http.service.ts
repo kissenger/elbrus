@@ -85,8 +85,8 @@ export class HttpService {
       {responseType: 'blob' as 'json'});
   }
 
-  getPathFromPoints(coords: Array<TsCoordinate>) {
-    return this.http.post<any>(`${this.backendURL}/get-path-from-points/`, {coords});
+  getPathFromPoints(coords: Array<TsCoordinate>, options: {simplify: boolean} = {simplify: false}) {
+    return this.http.post<any>(`${this.backendURL}/get-path-from-points/`, {coords, options});
   }
 
   registerUser(userData) {
@@ -116,6 +116,5 @@ export class HttpService {
   reverseRoute(pathType: string, pathId: string) {
     return this.http.get<any>(`${this.backendURL}/reverse-route/${pathType}/${pathId}`);
   }
-
 
 }

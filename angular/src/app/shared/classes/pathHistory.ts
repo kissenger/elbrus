@@ -42,20 +42,15 @@
       return coords.map(c => ({lng: c[0], lat: c[1]}));
     }
 
-    pointsGeoJSON() {
-      const points = this.history[this.history.length - 1].features.reduce( (a, b) => a.concat(b.geometry.coordinates), []);
-      const pointFeatures = points.map( (coord, index) => this.getPointFeature(coord) );
-      return this.getFeatureCollection(pointFeatures);
-    }
+    // pointsGeoJSON() {
+    //   const points = this.history[this.history.length - 1].features.reduce( (a, b) => a.concat(b.geometry.coordinates), []);
+    //   const pointFeatures = points.map( (coord, index) => this.getPointFeature(coord) );
+    //   return this.getFeatureCollection(pointFeatures);
+    // }
 
     elevs() {
      // return only the elevations from the last geoJson
      return this.history[this.history.length - 1].properties.params.elev;
-    }
-
-    geoJson() {
-      // return the last GeoJson in the history
-      return this.history[this.history.length - 1];
     }
 
     setFirstPoint(point: TsCoordinate) {
@@ -69,12 +64,13 @@
 
     add(geoJson: TsFeatureCollection) {
       // push new path to history
-      this.history.push(geoJson);
+      this.history.push(JSON.parse(JSON.stringify(geoJson)));
     }
 
     undo() {
-      // remove the most recent item in the history
+      // remove the most recent item in the history and return the new last item
       this.history.pop();
+      return this.history[this.history.length - 1];
     }
 
     lastPoint(): TsCoordinate {
@@ -89,27 +85,32 @@
       return {lng: firstPoint[0], lat: firstPoint[1]};
     }
 
+    // clear() {
+    //   // this.history = [];
+    //   return { type: 'FeatureCollection', features: [] };
+    // }
+
 
     length() {
       return this.history.length;
     }
 
-    getFeatureCollection(features: Array<TsFeature>) {
-      return <TsFeatureCollection>{
-        type: 'FeatureCollection',
-        features: features
-      };
-    }
+  //   getFeatureCollection(features: Array<TsFeature>) {
+  //     return <TsFeatureCollection>{
+  //       type: 'FeatureCollection',
+  //       features: features
+  //     };
+  //   }
 
-    getPointFeature(point: TsPosition) {
-      return <TsFeature> {
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: point
-        }
-      };
-    }
+  //   getPointFeature(point: TsPosition) {
+  //     return <TsFeature> {
+  //       type: 'Feature',
+  //       geometry: {
+  //         type: 'Point',
+  //         coordinates: point
+  //       }
+  //     };
+  //   }
   }
 
 

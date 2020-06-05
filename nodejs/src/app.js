@@ -30,6 +30,8 @@ const getListData = require('./app-helpers.js').getListData;
 const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 const getMongoObject = require('./path-helpers.js').getMongoObject;
 const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
+const geoFunctions = require('geo-points-and-paths').geoFunctions;
+
 
 let threadPool;
 if (process.env.USE_THREADS) {
@@ -313,21 +315,27 @@ app.get('/download-file/:fname', auth.verifyToken, (req, res) => {
  *****************************************************************/
 app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
-  debugMsg('get-path-from-points')
+  debugMsg(`get-path-from-points, options=${req.body.options.simplify}`)
 
   try {
 
-    const lngLats = req.body.coords.map(coord => [coord.lng, coord.lat]);
+    let coords;
+    if (req.body.options.simplify) {
+      coords = geoFunctions.simplifyPath(req.body.coords, 20).points;
+      console.log(coords);
+    } else {
+      coords = req.body.coords;
+    }
+
+    // TODO: is it really needed to convert from {lat:, lng:} to lngLat?
+    const lngLats = coords.map(coord => [coord.lng, coord.lat]);
+
     let routeInstance;
     if (process.env.USE_THREADS) {
-      console.log('a')
       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', null, null, lngLats, null);
-      console.log('b')
-
     } else {
       routeInstance = await getRouteInstance(null, null, lngLats, null);  
     }
-    console.log('c')
 
     res.status(201).json({
         hills: new GeoJSON().fromPath(routeInstance).toGeoHills(),

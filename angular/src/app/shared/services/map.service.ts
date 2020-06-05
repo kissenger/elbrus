@@ -499,11 +499,11 @@ export class MapService {
       });
     });
 
-    console.log(coordsArray.length)
+    console.log(coordsArray.length);
 
     // create features
     const pointFeatures = coordsArray.map( (coord, index) => this.getPointFeature(coord, `${index}`) );
-    console.log(pointFeatures)
+    console.log(pointFeatures);
 
     return this.getFeatureCollection(pointFeatures);
 

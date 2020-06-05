@@ -7,7 +7,6 @@ import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared//classes/pathHistory';
 import { AlertService } from './alert.service';
-import { Icu } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Injectable({
   providedIn: 'root'
@@ -31,8 +30,6 @@ export class MapCreateService extends MapService {
   private styleOptions: TsLineStyle = {};
   private activePath: TsFeatureCollection;
   private activePoints: TsFeatureCollection;
-
-
 
 
   constructor(
@@ -61,37 +58,91 @@ export class MapCreateService extends MapService {
 
   }
 
+
+
+  onClickGetCoords = async (e) => {
+
+    // console.log(this.tsMap.queryRenderedFeatures(e.point).some(point => point.source === 'points') );
+        const isClickedOnPoint = this.tsMap.queryRenderedFeatures(e.point).some(point => point.source === 'points');
+        // console.log(isClickedOnPoint);
+
+        if (!isClickedOnPoint) {
+
+          this.spinner.showAsElement();
+          const clickedPoint: TsCoordinate = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+
+          if (!this.history.isFirstPointSet()) {
+            // First click on map
+            this.history.setFirstPoint(clickedPoint);
+            this.addMarkerToMap(clickedPoint, '0000');
+            this.spinner.removeElement();
+
+          } else {
+            // subsequent loops: get path according to snap option, send to backend for missing elevations
+
+            // await this.getPath(this.history.lastPoint(), clickedPoint);
+            try {
+
+              const newCoords = await this.getNextPathCoords(this.history.lastPoint(), clickedPoint);
+              const backendResult = await this.getPathFromBackend(this.history.coords().concat(newCoords));
+              this.history.add(backendResult);
+              this.activePath = backendResult;
+              this.updateMap();
+              this.spinner.removeElement();
+
+            } catch (error) {
+
+              this.spinner.removeElement();
+              this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
+                .subscribe( () => {});
+
+            }
+
+          }
+        }
+      }
+
+
+
   private updateMap() {
 
-
-    this.activePath = this.history.geoJson();
     this.activePoints = this.getPointsGeoJson(this.activePath);
-
-    // this.addPathToMap(this.activePath, this.styleOptions, this.plotOptions);
     (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.activePath);
     (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints);
-    // this.addPointsLayer(geoJson);\
+
+    this.dataService.activePathEmitter.emit(this.activePath);
+    this.dataService.saveToStore('activePath', this.activePath);
+
 
   }
 
 
+  async simplify() {
 
-  private getPath(start: TsCoordinate, end: TsCoordinate) {
+    try {
+      this.spinner.showAsElement();
+      const backendResult = await this.getPathFromBackend(this.history.coords(), {simplify: true});
+      this.history.add(backendResult);
+      this.activePath = backendResult;
+      this.updateMap();
+      this.spinner.removeElement();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
-    return new Promise( async (resolve, reject) => {
 
-      try {
-        const newCoords = await this.getNextPathCoords(start, end);
-        this.httpService.getPathFromPoints(this.history.coords().concat(newCoords)).subscribe( (result) => {
-          this.history.add(result.hills);
-          this.updateMap();
-          resolve();
-        });
-      } catch (error) {
-        reject(error);
-      }
+  private getPathFromBackend(coords, options: {simplify: boolean} = {simplify: false}) {
+
+    return new Promise<TsFeatureCollection>( (resolve, reject) => {
+
+      this.httpService.getPathFromPoints(coords, options).subscribe( (result) => {
+        resolve(result.hills);
+      }, error => reject(error));
 
     });
+
+
   }
 
 
@@ -132,31 +183,39 @@ export class MapCreateService extends MapService {
     if (this.history.length() === 1) {
       this.clearPath();
     } else {
-      this.history.undo();
-      this.removePathFromMap('0000');
-      this.addPathToMap(this.history.geoJson(), this.styleOptions, this.plotOptions);
+      this.activePath = this.history.undo();
+      this.updateMap();
     }
   }
 
 
   public clearPath() {
-    this.removePathFromMap('0000');
-    // this.removeMarkersFromMap();
-    this.history = new PathHistory();
+    this.history.add(this.activePath);
+    this.activePath = { type: 'FeatureCollection', features: [] };
+    this.updateMap();
   }
+
 
 
   public async closePath() {
 
     this.spinner.showAsElement();
+
     try {
-      await this.getPath(this.history.lastPoint(), this.history.firstPoint());
-      this.spinner.removeElement();
+
+      const newCoords = await this.getNextPathCoords(this.history.lastPoint(), this.history.firstPoint());
+      const backendResult = await this.getPathFromBackend(this.history.coords().concat(newCoords));
+      this.history.add(backendResult);
+      this.activePath = backendResult;
       this.updateMap();
+      this.spinner.removeElement();
+
     } catch (error) {
+
       this.spinner.removeElement();
       this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
         .subscribe( () => {});
+
     }
   }
 
@@ -213,17 +272,23 @@ export class MapCreateService extends MapService {
     this.tsMap.on('click', this.onClickGetCoords);
 
     const onMove = (e) => {
-      const coords = e.lngLat;
+      const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
       this.tsMap.getCanvas().style.cursor = 'grabbing';
-      selectedPointFeature.geometry.coordinates = [coords.lng, coords.lat];
+      selectedPointFeature.geometry.coordinates = coords;
+      selectedLineFeature.forEach( feat => {
+        this.activePath.features[feat.featureIndex].geometry.coordinates[feat.coordIndex] = coords;
+      });
       (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints);
+      (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.activePath);
     };
+
+
 
 
     // define leave behaviour
     const onMouseLeave = (e) => {
       this.tsMap.getCanvas().style.cursor = 'crosshair';
-      this.tsMap.removeFeatureState( {source: 'points', id: selectedPointId} );
+      this.tsMap.removeFeatureState( {source: 'points'} );
     };
 
     this.tsMap.on('mouseleave', 'points', onMouseLeave);
@@ -237,85 +302,111 @@ export class MapCreateService extends MapService {
 
     this.tsMap.on('mouseenter', 'points', onMouseEnter);
 
+
+
+    // returns the indices of the feature and coordinate in the line geoJSON for the selected point
     const getLineFeature = (pointCoord) => {
-      console.log('++++', pointCoord);
+
+      const nFeatures = this.activePath.features.length;
       const stringyCoord = JSON.stringify(pointCoord);
-      this.activePath.features.forEach( (feature, featureIndex) => {
-        feature.geometry.coordinates.forEach( (coord, coordIndex) => {
-          console.log(JSON.stringify(coord), stringyCoord);
-          if (JSON.stringify(coord) === stringyCoord) {
-            return {featureIndex, coordIndex };
+
+      // for loops chosen as need access to indexes, and need to be able to jump out of loop
+      for (let fi = 0; fi < nFeatures; fi++) {
+        const nCoords = this.activePath.features[fi].geometry.coordinates.length;
+        for (let ci = 0; ci < nCoords; ci++) {
+          if (JSON.stringify(this.activePath.features[fi].geometry.coordinates[ci]) === stringyCoord) {
+            const result = [{featureIndex: fi, coordIndex: ci}];
+            if (fi !== nFeatures - 1 && ci === nCoords - 1) {
+              result.push({featureIndex: fi + 1, coordIndex: 0});
+            }
+            return result;
           }
-        });
-      });
+        }
+      }
     };
+
+
 
     this.tsMap.on('mousedown', 'points', (e) => {
 
-      selectedPointId = e.features[0].id;
-      selectedPointFeature = this.activePoints.features.find( feature => parseInt(feature.id, 10) === selectedPointId );
-      selectedLineFeature = getLineFeature(selectedPointFeature.geometry.coordinates);
-      console.log(selectedLineFeature);
+      if (e.originalEvent.button === 0) {
+        // left button mouse-down
 
-      // turn off enter and leave events - we no longer want to interact with points
-      this.tsMap.off('mouseleave', 'points', onMouseLeave);
-      this.tsMap.off('mouseenter', 'points', onMouseEnter);
-      e.preventDefault();       // Prevent the default map drag behavior.
+        selectedPointId = e.features[0].id;
+        selectedPointFeature = this.activePoints.features.find( feature => parseInt(feature.id, 10) === selectedPointId );
+        selectedLineFeature = getLineFeature(selectedPointFeature.geometry.coordinates);
 
-      this.tsMap.getCanvas().style.cursor = 'grab';
-      this.tsMap.on('mousemove', onMove);
+        this.tsMap.off('mouseleave', 'points', onMouseLeave);
+        this.tsMap.off('mouseenter', 'points', onMouseEnter);
+        e.preventDefault();       // Prevent the default map drag behavior.
+
+        this.tsMap.getCanvas().style.cursor = 'grab';
+        this.tsMap.on('mousemove', onMove);
+      }
 
     });
 
 
-    this.tsMap.on('mouseup', 'points', (e) => {
 
-      // reinstate enter and leave behaviour
-      this.tsMap.on('mouseleave', 'points', onMouseLeave);
-      this.tsMap.on('mouseenter', 'points', onMouseEnter);
-
-      this.tsMap.getCanvas().style.cursor = 'pointer';
-      this.tsMap.off('mousemove', onMove);
-    });
-
-
-
-
-  }
-
-  onClickGetCoords = (e) => {
-
-// console.log(this.tsMap.queryRenderedFeatures(e.point).some(point => point.source === 'points') );
-    const isClickedOnPoint = this.tsMap.queryRenderedFeatures(e.point).some(point => point.source === 'points');
-    console.log(isClickedOnPoint);
-
-    if (!isClickedOnPoint) {
+    /**
+     * Delete current point on right-click
+     */
+    this.tsMap.on('contextmenu', 'points', async (e) => {
 
       this.spinner.showAsElement();
-      const clickedPoint: TsCoordinate = { lat: e.lngLat.lat, lng: e.lngLat.lng };
 
-      if (!this.history.isFirstPointSet()) {
-        // First click on map
-        this.history.setFirstPoint(clickedPoint);
-        this.addMarkerToMap(clickedPoint, '0000');
+      try {
+
+        selectedPointId = e.features[0].id;
+        const pathCoords = this.activePoints.features
+          .map(point => ({lat: point.geometry.coordinates[1], lng: point.geometry.coordinates[0]}));
+        pathCoords.splice(selectedPointId, 1);
+
+        const backendResult = await this.getPathFromBackend(pathCoords);
+        this.history.add(backendResult);
+        this.activePath = backendResult;
+        this.updateMap();
         this.spinner.removeElement();
 
-      } else {
-        // subsequent loops: get path according to snap option, send to backend for missing elevations
-        this.getPath(this.history.lastPoint(), clickedPoint)
-          .then( () => {
-            this.spinner.removeElement();
-            this.updateMap();
-          })
-          .catch( (error) => {
-            this.spinner.removeElement();
-            this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
-              .subscribe( () => {});
-        });
-
+      } catch (error) {
+        console.log(error);
       }
-    }
+
+
+
+
+
+    });
+
+
+
+    /**
+     * Reset behaviours after point has moved
+     */
+    this.tsMap.on('mouseup', 'points', (e) => {
+
+      if (e.originalEvent.button === 0) {
+
+          console.log('mouseup');
+
+          this.tsMap.on('mouseleave', 'points', onMouseLeave);
+          this.tsMap.on('mouseenter', 'points', onMouseEnter);
+          this.tsMap.off('mousemove', onMove);
+
+          this.tsMap.getCanvas().style.cursor = 'pointer';
+
+          this.history.add(this.activePath);
+      }
+
+    });
+
+
+
+
+
+
   }
+
 
 
 
