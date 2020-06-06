@@ -1,7 +1,5 @@
 'use strict';
-import { TsUnits, TsLineStyle, TsFeatureCollection, TsProperties, TsPathStats } from 'src/app/shared/interfaces';
-
-export const mapboxAccessToken = 'pk.eyJ1Ijoia2lzc2VuZ2VyIiwiYSI6ImNrMWYyaWZldjBtNXYzaHFtb3djaDJobmUifQ.ATRTeTi2mygBXAoXd42KSw';
+import { TsUnits, TsLineStyle, TsFeatureCollection, TsGeoJsonProperties, TsPathStats } from 'src/app/shared/interfaces';
 
 export const KM_TO_MILE = 0.6213711922;
 export const M_TO_FT = 3.28084;
@@ -73,7 +71,7 @@ export const emptyStats: TsPathStats = {
 
 
 
-const emptyProps: TsProperties = {
+const emptyProps: TsGeoJsonProperties = {
   pathId: '',
   info: {
     direction: '',

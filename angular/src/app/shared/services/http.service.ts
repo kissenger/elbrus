@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsElevationQuery, TsUser } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsElevationQuery, TsUser, TsPosition } from 'src/app/shared/interfaces';
 import { environment } from 'src/environments/environment';
+import * as path from 'path';
+import { flush } from '@angular/core/testing';
+import { get } from 'http';
+import { by } from 'protractor';
+import { write } from 'fs';
+import { from } from 'rxjs';
 
 @Injectable()
 export class HttpService {
 
 
-  private mapBoxAccessToken = globals.mapboxAccessToken;
-
+  private mapBoxAccessToken = environment.MAPBOX_TOKEN;
   private protocol = environment.BACKEND_PROTOCOL;
   private host = environment.BACKEND_HOST;
   private port = environment.BACKEND_PORT;
@@ -25,13 +30,9 @@ export class HttpService {
   *  Mapping queries
   ********************************************************************************************/
   mapboxDirectionsQuery(profile: string, start: TsCoordinate, end: TsCoordinate) {
-    const coords: string =  start.lng.toFixed(6) + ',' + start.lat.toFixed(6) + ';' + end.lng.toFixed(6) + ',' + end.lat.toFixed(6);
-    return this.http.get<any>('https://api.mapbox.com/directions/v5/mapbox/'
-      + profile
-      + '/'
-      + coords
-      + '?geometries=geojson&access_token='
-      + this.mapBoxAccessToken);
+    const coords = `${start.lng.toFixed(6)},${start.lat.toFixed(6)};${end.lng.toFixed(6)},${end.lat.toFixed(6)}`;
+    const token = `geometries=geojson&access_token=${this.mapBoxAccessToken}`;
+    return this.http.get<any>(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${coords}?${token}`);
   }
 
   /********************************************************************************************

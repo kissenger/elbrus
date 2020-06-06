@@ -104,15 +104,15 @@ export interface TsFeatureCollection {
   type: 'FeatureCollection';
   features: TsFeature[];
   bbox?: TsBoundingBox;
-  properties?: TsProperties;
+  properties?: TsGeoJsonProperties;
 }
 
 export interface TsFeature {
   bbox?: TsBoundingBox;
-  id: string;
+  id?: string; //mapbox
   type: 'Feature';
   geometry: TsGeometry;
-  properties: TsProperties | null;
+  properties: TsGeoJsonProperties | TsMapboxProperties | null;
 }
 
 export type TsGeometry = TsPoint | TsLineString;
@@ -130,7 +130,7 @@ export interface TsLineString {
 export type TsPosition = [number, number];
 export type TsBoundingBox = [number, number, number, number];
 
-export interface TsProperties {
+export interface TsGeoJsonProperties {
     pathId: string;
     info: TsInfo;
     params: TsParams;
@@ -143,6 +143,11 @@ export interface TsProperties {
     latitude?: number;   // front need, used by map service when creating points geoJson
     matched?: boolean;
 }
+
+export interface TsMapboxProperties {
+  description?: string;
+  title?: string;
+} // mapbox labels}
 
 export interface TsInfo {
     direction: string;

@@ -3,15 +3,17 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsLineString, TsFeature, TsPosition } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsLineString, TsFeature, TsPosition, TsPoint } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MapService {
 
-  private accessToken: string = globals.mapboxAccessToken;
+  private accessToken: string = environment.MAPBOX_TOKEN;
+
   public tsMap: mapboxgl.Map;
   // keep track of what is plotted in activeLayers object
   // if a path is plotted its pathId will be present as a key in the object.  The value of the objects is an array of the associated markers
@@ -479,52 +481,6 @@ export class MapService {
       features: lineFeatures
     };
 
-  }
-
-
-
-
-  getPointsGeoJson(geoJson: TsFeatureCollection) {
-
-    const coordsArray = [];
-
-    // get list of coordinates from all features
-    geoJson.features.forEach( (feature, fIndex) => {
-      feature.geometry.coordinates.forEach( (coordinate, cIndex) => {
-        if (fIndex !== 0 && cIndex === 0 ) {
-          // prevents duplicating first point
-        } else {
-          coordsArray.push(coordinate);
-        }
-      });
-    });
-
-    console.log(coordsArray.length);
-
-    // create features
-    const pointFeatures = coordsArray.map( (coord, index) => this.getPointFeature(coord, `${index}`) );
-    console.log(pointFeatures);
-
-    return this.getFeatureCollection(pointFeatures);
-
-  }
-
-  getFeatureCollection(features: Array<TsFeature>) {
-    return <TsFeatureCollection>{
-      type: 'FeatureCollection',
-      features: features
-    };
-  }
-
-  getPointFeature(point: TsPosition, pointId: string) {
-    return <TsFeature> {
-      type: 'Feature',
-      id: pointId,
-      geometry: {
-        type: 'Point',
-        coordinates: point
-      }
-    };
   }
 
 
