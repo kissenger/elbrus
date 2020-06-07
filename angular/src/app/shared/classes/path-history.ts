@@ -17,7 +17,13 @@
      *   when the undo history becomes too long.
      */
 
-    private history: Array<TsFeatureCollection> = [];
+    private history: Array<TsFeatureCollection>;
+    private newGeoJson: TsFeatureCollection;
+    private _firstPoint: TsCoordinate = null;
+    private isNewRoute: boolean;
+    private pathName: string;
+    private pathDescription: string;
+    private pathId: string;
 
     constructor(existingGeoJson = null) {
 
@@ -29,14 +35,18 @@
        * // const newGeoJson = {...emptyGeoJson};
        * // const newGeoJson = Object.assign({}, emptyGeoJson);
        */
-      if (existingGeoJson) {
-        this.history.push(existingGeoJson);
-      } else {
-        const newGeoJson = JSON.parse(JSON.stringify(emptyGeoJson));
-        this.history.push(newGeoJson);
-      }
 
-      this.history[0].properties.pathId = '0000';
+      this.newGeoJson = JSON.parse(JSON.stringify(emptyGeoJson));
+      if (existingGeoJson) {
+        this.history = [existingGeoJson];
+        this.isNewRoute = false;
+        this.pathName = existingGeoJson.properties.info.name;
+        this.pathDescription = existingGeoJson.properties.info.description;
+        this.pathId = existingGeoJson.properties.pathId;
+      } else {
+        this.history = [this.newGeoJson];
+        this.isNewRoute = true;
+      }
 
     }
 
@@ -49,36 +59,69 @@
 
     set firstPoint(point: TsCoordinate) {
       // after first click, save coords to the coordinate array on the existing first geoJson
-      this.history[0].features[0].geometry.coordinates[0] = [point.lng, point.lat];
+      // this.history[0].features[0].geometry.coordinates[0] = [point.lng, point.lat];
+      this._firstPoint = point;
     }
+
+    // addPointOnly(point: TsCoordinate) {
+    //   // TODO: note that this is an invalid geojson so should probably manage it in a different way...
+    //   this.history.push(this.newGeoJson);
+    //   this.history[this.length - 1].features[0].geometry.coordinates = [[point.lng, point.lat]];
+    // }
 
 
     add(geoJson: TsFeatureCollection) {
-      // push new path to history
+      // push new path to
       this.history.push(geoJson);
     }
 
 
     undo() {
       // remove the most recent item in the history and return the new last item
-      this.history.pop();
-    }
 
+      if ( this.isNewRoute ) {
+         if ( this.length === 1 ) {
+          this._firstPoint = null;
+        } else {
+          this.history.pop();
+        }
 
-    get firstPoint(): TsCoordinate {
-      // return the first point on the path - if its not set, return null
-      if (!this.history[0].features[0].geometry.coordinates[0]) {
-        return null;
       } else {
-        const firstPoint = this.history[0].features[0].geometry.coordinates[0];
-        return {lng: firstPoint[0], lat: firstPoint[1]};
+        if ( this.length > 1 ) {
+          this.history.pop();
+        }
       }
 
     }
 
 
+    get firstPoint(): TsCoordinate {
+        return this._firstPoint;
+
+    }
+
+
+    get lastPoint(): TsCoordinate {
+      // return the last point in the last geojson if it exists - if not return firstpoint
+      if ( !this.activePathCoords[this.activePathCoords.length - 1] ) {
+        return this.firstPoint;
+      } else {
+        return this.activePathCoords[this.activePathCoords.length - 1];
+      }
+    }
+
+
     get length() {
       return this.history.length;
+    }
+
+
+    clear() {
+
+      this.history.splice(1);
+      this._firstPoint = null;
+
+
     }
 
 
@@ -89,26 +132,39 @@
 
     get activePath() {
       // return the last GeoJson in the history
-      return this.history[this.history.length - 1];
+      // important to clone the object to avoid route edits affecting the undo history
+      const activePath = this.history[this.history.length - 1];
+      // console.log(activePath)
+
+      activePath.properties.info.name = this.pathName;
+      activePath.properties.info.description = this.pathDescription;
+      activePath.properties.pathId = this.pathId;
+      return  activePath;
+      // return this.history[this.history.length - 1];
+    }
+
+
+    get activePathClone() {
+      // return the last GeoJson in the history
+      // important to clone the object to avoid route edits affecting the undo history
+      const activePath = {type: 'FeatureCollection', features: this.history[this.history.length - 1].features};
+      // activePath.properties = null; // try to reduce the amount of data to stringify
+      return  JSON.parse(JSON.stringify( activePath ));
     }
 
 
     get activePathCoords(): Array<TsCoordinate> {
       // return only the coordinates from the last geoJson, note there could be multiple features so concat first
       // NOTE this returns duplicate points where lines meet (last point of feature n and first point of feature n+1)
-      const coords = this.history[this.history.length - 1].features.reduce( (a, b) => a.concat(b.geometry.coordinates), []);
+
+      const coords = this.activePath.features.reduce( (a, b) => a.concat(b.geometry.coordinates), []);
       return coords.map(c => ({lng: c[0], lat: c[1]}));
+
     }
 
 
     get activePathFeaturesLength() {
       return this.activePath.features.length;
-    }
-
-
-    get lastPoint(): TsCoordinate {
-      // return the last point in the last geojson
-      return this.activePathCoords[this.activePathCoords.length - 1];
     }
 
 
@@ -119,6 +175,8 @@
 
 
     updatePoint(featureIndex: number, coordIndex: number, newCoords: TsPosition) {
+      // returns activepath geojson with the requested point updated
+
       this.activePath.features[featureIndex].geometry.coordinates[coordIndex] = newCoords;
     }
 
@@ -155,9 +213,12 @@
    */
   get activePoints() {
 
-
-    if (this.activePath.features.length === 0)  {
-      return getFeatureCollection([getPointFeature([this.firstPoint.lng, this.firstPoint.lat], '0', 'start')]);
+    if ( this.activePath.features[0].geometry.coordinates.length === 0 ) {
+      if ( this.firstPoint ) {
+        return getFeatureCollection([getPointFeature([this.firstPoint.lng, this.firstPoint.lat], '0', 'start')]);
+      } else {
+        return getFeatureCollection([getPointFeature([])]);
+      }
     }
 
     const coordsArray = [];
@@ -193,7 +254,13 @@ function getFeatureCollection(features: Array<TsFeature>) {
   };
 }
 
-function getPointFeature(point: TsPosition, pointId: string, text?: string) {
+
+
+function getPointFeature(point: TsPosition | [], pointId?: string, text?: string) {
+
+  // if (!point) {
+  //   return {type: 'Feature', geometry: {type: 'Point', coordinates}}
+  // }
 
   const feature =  <TsFeature> {
     type: 'Feature',

@@ -12,8 +12,15 @@ export class InfoPanelService {
   /**
    * Define the tabs for each page - object key is the page name
    */
-  private tabsDefinition: {create?: TsTabsArray, review?: TsTabsArray, list?: TsTabsArray} =
+  private tabsDefinition: {create?: TsTabsArray, edit?: TsTabsArray, review?: TsTabsArray, list?: TsTabsArray} =
   { create:
+      [ { active: true,
+          name: 'details',
+          component: PanelRoutesCreateDetailsComponent },
+        { active: false,
+          name: 'overlay',
+          component: PanelRoutesListListComponent } ],
+    edit:
       [ { active: true,
           name: 'details',
           component: PanelRoutesCreateDetailsComponent },

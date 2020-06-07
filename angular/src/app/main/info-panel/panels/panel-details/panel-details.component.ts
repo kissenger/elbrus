@@ -26,7 +26,7 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   public givenPathName: string;     // name given to the path in the details form; overrides the default name
 
   public pathDescription = '';
-  public isListPage: boolean;
+  // public isListPage: boolean;
   public isLong: boolean;
   public isPublic: boolean;
   public createdBy: string;
@@ -53,7 +53,8 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     // show form inputs and buttons only for review or create pages, not for list
-    this.isListPage = this.callingPage === 'list';
+    // this.isListPage = this.callingPage === 'list';
+    // console.log(this.callingPage)
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
@@ -74,6 +75,7 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
       // if this is a create-route action, then path will not have a name until one is entered in the form; create a default one
       if (!geoJson.properties.info.name) {
         this.pathName = (this.pathCategory === 'None' ? 'Uncategorised' : this.pathCategory) + ' ' + this.pathType;
+
       } else {
         this.pathName = geoJson.properties.info.name;
       }
@@ -121,6 +123,8 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.dataService.getFromStore('activePath', false);
     const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
+
+    console.log(newPath.properties.pathId);
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend

@@ -18,7 +18,9 @@ function getMongoObject(path, userId, userName, isSaved) {
   return mongoObject;
 }
 
-
+/**
+ *TODO: include in geo-points-and-paths??
+ */
 function getReverseOfRoute(coords, elevs) {
   const n = coords.length;
   const revCoords = coords.map( (c, i, arr) => arr[n-i-1]);

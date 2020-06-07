@@ -5,7 +5,7 @@ import * as globals from 'src/app/shared/globals';
 import { Subscription } from 'rxjs';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { TsPlotPathOptions, TsLineStyle, TsCoordinate } from 'src/app/shared/interfaces';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -17,18 +17,21 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
   private menuSubscription: Subscription;
   private overlaySubscription: Subscription;
+  private callingPageSubscription: Subscription;
   private overlaidPaths = [];
   private overlayPlotOptions: TsPlotPathOptions = {
     booResizeView: false,
     booSaveToStore: false,
     booPlotMarkers: false
   };
+  public callingPage: string;
 
   constructor(
     private dataService: DataService,
     private mapCreateService: MapCreateService,
     private httpService: HttpService,
-    private router: Router
+    private router: Router,
+    private activatedRoute: ActivatedRoute
     ) { }
 
   ngOnInit() {
@@ -47,6 +50,10 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
       startZoom = mapView ? mapView.zoom : 5;
     }
 
+    this.callingPageSubscription = this.activatedRoute.data.subscribe( data => {
+      this.callingPage = data.callingPage;
+    });
+
     // initialise the map and launch createroute
     this.mapCreateService.initialiseMap(startPosition, startZoom).then( () => {
       this.mapCreateService.createRoute();
@@ -58,6 +65,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
         if (fromMenu.command === 'undo') { this.mapCreateService.undo(); }
         if (fromMenu.command === 'close') { this.mapCreateService.closePath(); }
         if (fromMenu.command === 'clear') { this.mapCreateService.clearPath(); }
+        if (fromMenu.command === 'reverse') { this.mapCreateService.reversePath(); }
         if (fromMenu.command === 'simplify') { this.mapCreateService.simplify(); }
       } else {
         const optionKey = Object.keys(fromMenu.option)[0];
@@ -95,6 +103,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if ( this.menuSubscription ) { this.menuSubscription.unsubscribe(); }
     if ( this.overlaySubscription ) { this.overlaySubscription.unsubscribe(); }
+    if ( this.callingPageSubscription ) { this.callingPageSubscription.unsubscribe(); }
     this.mapCreateService.kill();
   }
 

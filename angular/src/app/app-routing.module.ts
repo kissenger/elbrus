@@ -12,8 +12,8 @@ const appRoutes: Routes = [
   { path: 'welcome', component: WelcomeComponent},
   { path: '', component: WelcomeComponent, canActivate: [AuthGuard]},
   { path: ':pathType/list', component: RoutesListComponent, canActivate: [AuthGuard]},
-  { path: ':pathType/create', component: RoutesCreateComponent, canActivate: [AuthGuard]},
-  { path: ':pathType/edit', component: RoutesCreateComponent, canActivate: [AuthGuard]},
+  { path: ':pathType/create', component: RoutesCreateComponent, canActivate: [AuthGuard], data : {callingPage : 'create'}},
+  { path: ':pathType/edit', component: RoutesCreateComponent, canActivate: [AuthGuard], data : {callingPage : 'edit'}},
   { path: ':pathType/review', component: RoutesReviewComponent, canActivate: [AuthGuard]},
   { path: 'verification/:userId/:verificationString', component: WelcomeComponent},
 ];

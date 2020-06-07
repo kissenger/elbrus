@@ -32,7 +32,11 @@ export class MapCreateService extends MapService {
   private activePoints: ActivePoints;
   private selectedPointId: number;
   private selectedLineIds: Array<{featureIndex: number, coordIndex: number}>;
-  private pathToEdit;
+  private pathToEdit: TsFeatureCollection;
+  private pathName: string;
+  private pathDescription: string;
+  private activePathClone: TsFeatureCollection;
+
 
   constructor(
     httpService: HttpService,
@@ -47,7 +51,9 @@ export class MapCreateService extends MapService {
 
   public getOptions() {
     // Returns the options object - called from routes-create component
+
     return this.options;
+
   }
 
 
@@ -55,6 +61,7 @@ export class MapCreateService extends MapService {
   public createRoute() {
 
     this.pathToEdit = this.dataService.getFromStore('activePath', false);
+
     this.activePoints = new ActivePoints();
     this.history = new PathHistory(this.pathToEdit);
     this.initialiseCreateMap(this.styleOptions);
@@ -66,12 +73,10 @@ export class MapCreateService extends MapService {
   private updateMap() {
 
     this.activePoints.points = this.history.activePoints;
-    console.log(this.activePoints.points);
     (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.history.activePath);
     (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints.points);
 
-    // console.log(this.activePoints.length, this.activePoints);
-    if (this.activePoints.length >= 2) {
+    if (this.activePoints.length >= 1) {
       this.dataService.activePathEmitter.emit(this.history.activePath);
       this.dataService.saveToStore('activePath', this.history.activePath);
     }
@@ -147,20 +152,32 @@ export class MapCreateService extends MapService {
 
   public undo() {
 
-    if (this.history.length === 1) {
-      this.history = new PathHistory();
-      this.updateMap();
-    } else {
-      this.history.undo();
-      this.updateMap();
-    }
+    this.history.undo();
+    this.updateMap();
+
   }
 
 
 
 
   public clearPath() {
-    this.history = new PathHistory();
+
+    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, true).subscribe( (alertBoxResponse: boolean) => {
+      if (alertBoxResponse) {
+        this.history.clear();
+        this.updateMap();
+      }
+    });
+
+  }
+
+
+  public async reversePath() {
+
+    const n = this.history.activePathCoords.length;
+    const revCoords = this.history.activePathCoords.map( (c, i, arr) => arr[n - i - 1]);
+    const backendResult = await this.getPathFromBackend(revCoords);
+    this.history.add(backendResult);
     this.updateMap();
   }
 
@@ -307,10 +324,10 @@ export class MapCreateService extends MapService {
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
     this.tsMap.getCanvas().style.cursor = 'grabbing';
     this.activePoints.updatePoint(this.selectedPointId, coords);
-    this.selectedLineIds.forEach( ids => this.history.updatePoint(ids.featureIndex, ids.coordIndex, coords) );
+    this.selectedLineIds.forEach( ids => this.activePathClone.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
 
     (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints.points);
-    (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.history.activePath);
+    (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.activePathClone);
 
   }
 
@@ -361,6 +378,7 @@ export class MapCreateService extends MapService {
       this.selectedPointId = e.features[0].id;
       const pointCoords = this.activePoints.coordsAtIndex(this.selectedPointId);
       this.selectedLineIds = this.history.activePathMatchFeature(pointCoords);
+      this.activePathClone = this.history.activePathClone; // this enables the moving points to mot affect the undo history
 
       this.tsMap.off('mouseleave', 'points', this.onMouseLeave);
       this.tsMap.off('mouseenter', 'points', this.onMouseEnter);
@@ -429,7 +447,6 @@ export class MapCreateService extends MapService {
       this.updateMap();
       this.spinner.removeElement();
       this.tsMap.removeFeatureState( {source: 'points'} );
-
 
     }
 
