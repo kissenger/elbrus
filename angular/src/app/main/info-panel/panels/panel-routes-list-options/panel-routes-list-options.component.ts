@@ -50,9 +50,6 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
 
   onDeleteClick() {
 
-    // TODO: why are we not making use of the geoJSON pulled in in onInit?
-    // const activePath = this.dataService.getFromStore('activePath', false);
-
     this.alert.showAsElement('Are you sure?', 'Cannot undo delete!', true, true).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
         this.httpService.deletePath(this.pathId).subscribe( () => {
@@ -62,6 +59,10 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
     });
 
   }
+
+
+
+
 
 
   /**
@@ -139,9 +140,17 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
   }
 
 
-  onCreateOnMapClick() {
+  onCreateClick() {
+    this.dataService.saveToStore('activePath', null);
     this.router.navigate(['/route/create']);
   }
+
+
+  onEditClick() {
+    this.router.navigate(['/route/edit']);
+  }
+
+
 
   /** runs when file is selected */
   onFilePickedImport(event: Event, moreThanOneFile: boolean, pathType: string) {

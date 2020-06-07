@@ -22,7 +22,7 @@ export class ActivePoints {
   }
 
   get coords() {
-    return this._activePoints.features.map( c => ({lng: c.geometry.coordinates[0], lat: c.geometry.coordinates[1]}) );
+    return <Array<TsCoordinate>>this._activePoints.features.map( c => ({lng: c.geometry.coordinates[0], lat: c.geometry.coordinates[1]}) );
   }
 
 
@@ -32,10 +32,9 @@ export class ActivePoints {
 
   }
 
+  // returns coordinates for a given point index (id) as a TsPosition
   coordsAtIndex(pointIndex: number) {
-    console.log('££££');
-    console.log('$$$$', pointIndex, this._activePoints.features[pointIndex]);
-    return this._activePoints.features[pointIndex].geometry.coordinates;
+    return <TsPosition>this._activePoints.features[pointIndex].geometry.coordinates;
   }
 
 }

@@ -19,7 +19,7 @@
 
     private history: Array<TsFeatureCollection> = [];
 
-    constructor() {
+    constructor(existingGeoJson = null) {
 
       /**
        * Warning - need to make a deep clone of the emptyGeoJson object in order to
@@ -29,9 +29,13 @@
        * // const newGeoJson = {...emptyGeoJson};
        * // const newGeoJson = Object.assign({}, emptyGeoJson);
        */
-      const newGeoJson = JSON.parse(JSON.stringify(emptyGeoJson));
+      if (existingGeoJson) {
+        this.history.push(existingGeoJson);
+      } else {
+        const newGeoJson = JSON.parse(JSON.stringify(emptyGeoJson));
+        this.history.push(newGeoJson);
+      }
 
-      this.history.push(newGeoJson);
       this.history[0].properties.pathId = '0000';
 
     }
@@ -49,29 +53,27 @@
     }
 
 
-    get isFirstPointSet(): boolean {
-      return !!this.history[0].features[0].geometry.coordinates[0];
-    }
-
-
     add(geoJson: TsFeatureCollection) {
       // push new path to history
       this.history.push(geoJson);
-      // this.history.push(JSON.parse(JSON.stringify(geoJson)));
     }
 
 
     undo() {
       // remove the most recent item in the history and return the new last item
       this.history.pop();
-      // return this.history[this.history.length - 1];
     }
 
 
     get firstPoint(): TsCoordinate {
-      // return the first point on the path
-      const firstPoint = this.history[0].features[0].geometry.coordinates[0];
-      return {lng: firstPoint[0], lat: firstPoint[1]};
+      // return the first point on the path - if its not set, return null
+      if (!this.history[0].features[0].geometry.coordinates[0]) {
+        return null;
+      } else {
+        const firstPoint = this.history[0].features[0].geometry.coordinates[0];
+        return {lng: firstPoint[0], lat: firstPoint[1]};
+      }
+
     }
 
 
@@ -79,10 +81,6 @@
       return this.history.length;
     }
 
-
-    // clearFirstPoint() {
-    //   this._firstPoint = null;
-    // }
 
     /**
      *
@@ -125,6 +123,9 @@
     }
 
 
+    /**
+     * Returns the feature and coordinate indices of a given coordinate as a TsPosition
+     */
     activePathMatchFeature(pointCoord: TsPosition) {
 
       const nFeatures = this.activePathFeaturesLength;
@@ -134,7 +135,6 @@
       for (let fi = 0; fi < nFeatures; fi++) {
         const nCoords = this.activePath.features[fi].geometry.coordinates.length;
         for (let ci = 0; ci < nCoords; ci++) {
-          console.log(this.activePath.features[fi].geometry.coordinates[ci], stringyCoord);
           if (JSON.stringify(this.activePath.features[fi].geometry.coordinates[ci]) === stringyCoord) {
             const result = [{featureIndex: fi, coordIndex: ci}];
             if (fi !== nFeatures - 1 && ci === nCoords - 1) {
@@ -147,6 +147,7 @@
 
     }
 
+
   /**
    * Returns a points geoJson of all the coordinates in the activePath - duplicate points
    * removed.
@@ -156,12 +157,7 @@
 
 
     if (this.activePath.features.length === 0)  {
-      if (this.firstPoint ) {
-        return getFeatureCollection([getPointFeature([this.firstPoint.lng, this.firstPoint.lat], '0', 'start')]);
-      } else {
-        return <TsFeatureCollection>{type: 'FeatureCollection', features: [] };
-      }
-
+      return getFeatureCollection([getPointFeature([this.firstPoint.lng, this.firstPoint.lat], '0', 'start')]);
     }
 
     const coordsArray = [];
@@ -187,9 +183,6 @@
 
     }
   }
-
-
-
 
 
 function getFeatureCollection(features: Array<TsFeature>) {
