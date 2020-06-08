@@ -50,7 +50,7 @@ export class PanelRoutesListListComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     // configure based on type of calling page
-    if (this.callingPage === 'create') {
+    if (this.callingPage === 'create' || this.callingPage === 'edit') {
       this.dynamicUpdateOn();
       this.isMultiSelectOn = true;
       this.addPathsToList(AUTO_SELECT_OFF);
@@ -88,7 +88,7 @@ export class PanelRoutesListListComponent implements OnInit, OnDestroy {
 
     }, (error) => {
 
-      this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
+      this.alert.showAsElement('Something went wrong :(', error, true, false)
         .subscribe( () => {});
 
     });

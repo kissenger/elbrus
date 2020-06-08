@@ -25,15 +25,15 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   */
  function analyseElevations(path) {
 
-  debugMsg(`analyseElevations, ${path.properties.info.name}`);
+  debugMsg(`analyseElevations, ${path.pathData.info.name}`);
 
   // distance data needed to caculate gradients
-  const dDistance = path.properties.stats.dDistance;
-  const distance = path.properties.stats.distance;
-  const cumDistance = path.properties.params.cumDistance;
+  const dDistance = path.pathData.stats.dDistance;
+  const distance = path.pathData.stats.distance;
+  const cumDistance = path.pathData.params.cumDistance;
 
   // const elevations = this.getParamFromPoints('elev');
-  const smoothedElevations = getSmoothedElevations(path.properties.params.elev);
+  const smoothedElevations = getSmoothedElevations(path.pathData.params.elev);
   const grads = smoothedElevations.map( (e, i, eArr) => i === 0 ? 0 : (e - eArr[i-1]) / dDistance[i] * 100 );
   
 
@@ -47,7 +47,7 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   let descent = 0;
 
   // loop through points to calculate ascent and descent, and to detect hills
-  for (let i = 1; i < path.properties.stats.nPoints; i++ ) {
+  for (let i = 1; i < path.pathData.stats.nPoints; i++ ) {
 
     de = smoothedElevations[i] - smoothedElevations[i-1];
 
@@ -86,7 +86,7 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
     else { descent += dSum; }
   }
   if (Math.abs(hillSum) > HILL_THRESH) {
-    hillsArr.push([p0 - 1, path.properties.stats.nPoints - 1]);
+    hillsArr.push([p0 - 1, path.pathData.stats.nPoints - 1]);
   }
   
   // get stats for each hill in the list

@@ -6,7 +6,7 @@
 
 module.exports = {
 
-  LONG_PATH_THRESHOLD: 4000,     // number of points (before simplification) above which the path will be treated as long
+  LONG_PATH_THRESHOLD: 1000,     // number of points (after simplification) above which the path will be treated as long
 
   // Hills
   MATCH_BUFFER: 10,              // number of points ahead to skip when finding match (to avoid matching point in the same direction)

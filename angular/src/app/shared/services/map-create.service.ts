@@ -21,7 +21,7 @@ import { AlertService } from './alert.service';
 export class MapCreateService extends MapService {
 
   private history: PathHistory;
-  private options = { snapProfile: 'driving' };
+  private _options = { snapProfile: 'driving' };
   private plotOptions: TsPlotPathOptions = {
     booResizeView: false,
     booSaveToStore: true,
@@ -49,10 +49,10 @@ export class MapCreateService extends MapService {
   }
 
 
-  public getOptions() {
+  public set options(optionKey: string) {
     // Returns the options object - called from routes-create component
-
-    return this.options;
+    this._options.snapProfile = optionKey;
+    // return this._options;
 
   }
 
@@ -61,7 +61,7 @@ export class MapCreateService extends MapService {
   public createRoute() {
 
     this.pathToEdit = this.dataService.getFromStore('activePath', false);
-
+    this._options.snapProfile = 'driving';
     this.activePoints = new ActivePoints();
     this.history = new PathHistory(this.pathToEdit);
     this.initialiseCreateMap(this.styleOptions);
@@ -77,6 +77,8 @@ export class MapCreateService extends MapService {
     (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints.points);
 
     if (this.activePoints.length >= 1) {
+      console.log(this.history.activePath);
+      console.log(this.history);
       this.dataService.activePathEmitter.emit(this.history.activePath);
       this.dataService.saveToStore('activePath', this.history.activePath);
     }
@@ -109,6 +111,7 @@ export class MapCreateService extends MapService {
     return new Promise<TsFeatureCollection>( (resolve, reject) => {
 
       this.httpService.getPathFromPoints(coords, options).subscribe( (result) => {
+        console.log(result.hills);
         resolve(result.hills);
       }, error => reject(error));
 
@@ -127,13 +130,13 @@ export class MapCreateService extends MapService {
     return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
 
       // if we dont need to get directions, just return the supplied coords as an array
-      if (this.options.snapProfile === 'none') {
+      if (this._options.snapProfile === 'none') {
         resolve([start, end]);
 
       // otherwise, get coords from directions service
       } else {
 
-        this.httpService.mapboxDirectionsQuery(this.options.snapProfile, start, end).subscribe( (result) => {
+        this.httpService.mapboxDirectionsQuery(this._options.snapProfile, start, end).subscribe( (result) => {
 
           if (result.code === 'Ok') {
             const coords = result.routes[0].geometry.coordinates.map( (c: TsPosition) => ({lat: c[1], lng: c[0]}) );
@@ -152,7 +155,10 @@ export class MapCreateService extends MapService {
 
   public undo() {
 
-    this.history.undo();
+    if ( !this.history.undo() ) {
+      this.alert.showAsElement('Warning', 'No more to undo ...', true, false)
+        .subscribe( (alertBoxResponse: boolean) => {});
+    }
     this.updateMap();
 
   }
@@ -162,7 +168,7 @@ export class MapCreateService extends MapService {
 
   public clearPath() {
 
-    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, true).subscribe( (alertBoxResponse: boolean) => {
+    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, false).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
         this.history.clear();
         this.updateMap();
@@ -322,7 +328,7 @@ export class MapCreateService extends MapService {
   private onMove = (e) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
-    this.tsMap.getCanvas().style.cursor = 'grabbing';
+    // this.tsMap.getCanvas().style.cursor = 'grabbing';
     this.activePoints.updatePoint(this.selectedPointId, coords);
     this.selectedLineIds.forEach( ids => this.activePathClone.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
 
@@ -384,7 +390,8 @@ export class MapCreateService extends MapService {
       this.tsMap.off('mouseenter', 'points', this.onMouseEnter);
       e.preventDefault();       // Prevent the default map drag behavior.
 
-      this.tsMap.getCanvas().style.cursor = 'grab';
+      // this.tsMap.getCanvas().style.cursor = 'grab';
+      this.tsMap.getCanvas().style.cursor = 'grabbing';
       this.tsMap.on('mousemove', this.onMove);
     }
 
@@ -420,7 +427,7 @@ export class MapCreateService extends MapService {
 
       try {
 
-        if (this.options.snapProfile === 'none') {
+        if (this._options.snapProfile === 'none') {
           newPath = await this.getPathFromBackend(coords);
 
         } else {

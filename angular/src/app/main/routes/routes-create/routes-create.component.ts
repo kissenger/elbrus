@@ -69,7 +69,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
         if (fromMenu.command === 'simplify') { this.mapCreateService.simplify(); }
       } else {
         const optionKey = Object.keys(fromMenu.option)[0];
-        this.mapCreateService.getOptions()[optionKey] = fromMenu.option[optionKey];
+        this.mapCreateService.options = fromMenu.option[optionKey];
       }
     });
 

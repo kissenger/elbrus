@@ -42,9 +42,13 @@ export class HttpService {
     return this.http.post<any>(`${this.backendURL}/import-route/`, formData);
   }
 
-  saveCreatedRoute(pathData: Object) {
+  saveRoute(pathData: Object) {
     return this.http.post<any>(`${this.backendURL}/save-created-route/`, pathData);
   }
+
+  // updateEditedRoute(pathData: Object) {
+  //   return this.http.post<any>(`${this.backendURL}/save-created-route/`, pathData);
+  // }
 
   saveImportedPath(pathData: Object) {
     return this.http.post<any>(`${this.backendURL}/save-imported-path/`, pathData);

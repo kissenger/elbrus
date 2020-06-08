@@ -29,14 +29,16 @@ class GeoJSON {
   // populates the class instance with data from supplied Path instance
   fromPath(path) {
     
-
-    // this._checkIsPath(path);
-    this._lngLats = path.properties.geometry.coordinates;
-    this._properties = path.properties
+    path = JSON.parse(JSON.stringify(path));
+    this._lngLats = path.pathData.geometry.coordinates;
+    this._properties = path.pathData;
+    this._properties.pathId = path.pathData.pathId;
     this._elevs = this._properties.params.elev;
     this._bbox = this._properties.stats.bbox;
     this._features = [];
+    delete this._properties.geometry;
     return this;
+
   }
 
 
@@ -69,16 +71,26 @@ class GeoJSON {
 
   // returns a geoJSON feature collection with features coloured depending on hill
   toGeoHills() {
-    if (this._properties.stats.hills.length > 0) {
+    
+    let isHills = false;
+    if (this._properties.stats.hills) {
+      if (this._properties.stats.hills.length > 0) {
+        isHills = true;
+      }
+    }
+
+    if (isHills) {
       this._getHillSegments().forEach( segment => {
         let coords = this._lngLats.slice(segment.start, segment.end + 1);
         let elevs = this._elevs.slice(segment.start, segment.end + 1);
         this._features.push(this._feature(coords, elevs, segment.colour));
       });
     } else {
-      this._features.push(this._feature(this._lngLats, this._elevs, ROUTE_COLOUR));
+      this._features = [ this._feature(this._lngLats, this._elevs, ROUTE_COLOUR) ];
     }
+
     return this._featureCollection();
+    
   }
 
 

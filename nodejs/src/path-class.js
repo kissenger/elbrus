@@ -44,7 +44,7 @@ class PathWithStats extends Path{
 
     //note that geometry is incorrectly on properties - this is fixed in geoJson but would be nice to 
     // do it properly in the first place...
-    this.properties = {
+    this.pathData = {
       pathId: '0000',    // assumes that path is 'created'
       geometry: {
         type: 'LineString',
@@ -97,6 +97,7 @@ class PathWithStats extends Path{
       if (isElevationsProvided) {
         path.addParam('elev', elev);
       };
+      
       path.simplify(SIMPLIFICATION_FACTOR_PASS_1);
       debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 1`);
 

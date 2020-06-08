@@ -109,7 +109,7 @@ export interface TsFeatureCollection {
 
 export interface TsFeature {
   bbox?: TsBoundingBox;
-  id?: string; //mapbox
+  id?: string; // mapbox
   type: 'Feature';
   geometry: TsGeometry;
   properties: TsGeoJsonProperties | TsMapboxProperties | null;

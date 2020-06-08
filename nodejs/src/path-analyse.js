@@ -51,9 +51,9 @@ const FIGURE_OF_EIGHT =          require('./globals').FIGURE_OF_EIGHT;
  */
 function analysePath(path) {
   
-  debugMsg(`analysePath, ${path.properties.info.name}`);
+  debugMsg(`analysePath, ${path.pathData.info.name}`);
 
-  const pathLength = path.properties.stats.nPoints;
+  const pathLength = path.pathData.stats.nPoints;
   // const lngLats = path.points;
 
   const matchedPoints = getMatchedPoints(path);
@@ -65,8 +65,8 @@ function analysePath(path) {
   
   // const boundingBox = this.boundingBox;
   const origin = {
-    lat: (path.properties.stats.bbox.maxLat + path.properties.stats.bbox.minLat)/2,
-    lng: (path.properties.stats.bbox.maxLng + path.properties.stats.bbox.minLng)/2
+    lat: (path.pathData.stats.bbox.maxLat + path.pathData.stats.bbox.minLat)/2,
+    lng: (path.pathData.stats.bbox.maxLng + path.pathData.stats.bbox.minLng)/2
   }
   const {cw, _brngRange} = bearingAnalysis(path.points, origin);         // best signal for cw by taking origin at the cog of the route
   const {_cw, brngRange} = bearingAnalysis(path.points, path.points[0]);   // best signal for brngRange byt taking origin as the start point
@@ -143,8 +143,8 @@ function getMatchedPoints(path) {
   debugMsg('PointsList.getMatchedPoints()');
 
   const mp = [];
-  for ( let i = 0; i < path.properties.stats.nPoints; i++ ) {  // look at each point
-    for ( let j = i + MATCH_BUFFER; j < path.properties.stats.nPoints; j++ ) {  // look at each point ahead of it
+  for ( let i = 0; i < path.pathData.stats.nPoints; i++ ) {  // look at each point
+    for ( let j = i + MATCH_BUFFER; j < path.pathData.stats.nPoints; j++ ) {  // look at each point ahead of it
 
       const dist = geoFunctions.p2p(path.points[i], path.points[j]);
       if ( dist < MATCH_DISTANCE ) {

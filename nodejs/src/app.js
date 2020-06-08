@@ -135,7 +135,14 @@ app.post('/save-imported-path/', auth.verifyToken, async (req, res) => {
 app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
 
 
-  debugMsg(`save-created-route`);
+  debugMsg(`save-created-route, delete path = ${req.body.pathId}`);
+
+  if (req.body.pathId === '0000') {
+    console.log('new route, just add ');
+  } else {
+    console.log('existing route, add and delete old');
+
+  }
 
   try {
 
@@ -146,6 +153,10 @@ app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
       routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
     }
     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
+    if (req.body.pathId !== '0000') {
+      // we are saving an edited path, delete the old one
+      await mongoModel('route').deleteOne( {_id: req.body.pathId} );
+    }
     res.status(201).json( {pathId: document._id} )
 
   } catch (error) {
@@ -156,6 +167,39 @@ app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
   }
 
 });
+
+
+
+// /*****************************************************************
+//  * Update an existing route by creating new and deleting old geoJSON is supplied in POST body
+//  *****************************************************************/
+// app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
+
+
+//   debugMsg(`save-created-route`);
+
+//   try {
+
+//     let routeInstance;
+//     if (process.env.USE_THREADS) {
+//       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body.name, req.body.description, req.body.coords, req.body.elev);
+//     } else {
+//       routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
+//     }
+//     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
+//     res.status(201).json( {pathId: document._id} )
+
+//   } catch (error) {
+
+//     debugMsg('ERROR: ' + error);
+//     res.status(500).send(error.message);
+
+//   }
+
+// });
+
+
+
 
 
 
@@ -317,7 +361,7 @@ app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
   debugMsg(`get-path-from-points, options=${req.body.options.simplify}`)
 
-  try {
+  // try {
 
     let coords;
     if (req.body.options.simplify) {
@@ -342,12 +386,12 @@ app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
         basic: new GeoJSON().fromPath(routeInstance).toBasic()
       });
 
-  } catch (error) {
+  // } catch (error) {
 
-    debugMsg('ERROR: ' + error);
-    res.status(401).send(error.message);
+  //   debugMsg('ERROR: ' + error);
+  //   res.status(401).send(error.message);
 
-  }
+  // }
 })
 
 

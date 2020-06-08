@@ -17,9 +17,12 @@
 
       <span class="global-make-text-look-like-link" (click)="onReverseClick()"> Reverse route </span> <br>
 
-      <span class="global-make-text-look-like-link" (click)="onEditClick()"> Edit Route </span> <br>
+      <div *ngIf="allowEdit()">
+        <span class="global-make-text-look-like-link" (click)="onEditClick()"> Edit Route </span> <br>
+      </div>
 
       <span class="text-muted">Export to .fit file</span><br>
+
       <span class="global-make-text-look-like-link" (click)="onExportGpxClick()"> Export to .gpx file </span> <br>
       <!-- <hr> -->
     </div>

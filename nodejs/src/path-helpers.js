@@ -10,7 +10,7 @@ const Route = require('./path-class').Route;
  * Returns an object from the Path Class that can be delivered to Mongo
  */
 function getMongoObject(path, userId, userName, isSaved) {
-  const mongoObject = path.properties;
+  const mongoObject = path.pathData;
   mongoObject.userId = userId,
   mongoObject.info.createdBy = userName
   mongoObject.isSaved = isSaved,
@@ -45,25 +45,22 @@ function getRouteInstance(name, description, lngLat, elevs) {
       const path = new Route(name, description, prePath.lngLat, prePath.elev);
 
       const {cw, category, direction, matchedPoints} = analysePath(path);
-      path.properties.info.cw = cw;
-      path.properties.info.category = category;
-      path.properties.info.direction = direction;
-      path.properties.info.isPublic = false;
-      path.properties.params.matchedPoints = matchedPoints; 
+      path.pathData.info.cw = cw;
+      path.pathData.info.category = category;
+      path.pathData.info.direction = direction;
+      path.pathData.info.isPublic = false;
+      path.pathData.params.matchedPoints = matchedPoints; 
 
-      if (path.properties.info.isElevations) {
-        path.properties.stats = {
-          ...path.properties.stats,
+      if (path.pathData.info.isElevations) {
+        path.pathData.stats = {
+          ...path.pathData.stats,
           ...analyseElevations(path)
         };
-
         
-        
-        path.properties.params.smoothedElev = path.properties.stats.smoothedElevations;
-        delete path.properties.stats.smoothedElevations;
+        path.pathData.params.smoothedElev = path.pathData.stats.smoothedElevations;
+        delete path.pathData.stats.smoothedElevations;
       }
 
-      // console.log(path);
       resolve(path);
 
     } catch (error) {

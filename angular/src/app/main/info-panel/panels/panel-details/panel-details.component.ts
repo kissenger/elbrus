@@ -82,7 +82,11 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
 
       this.isLong = geoJson.properties.info.isLong;
       this.isElevations = geoJson.properties.info.isElevations && !this.isLong;
-      this.isHills = this.pathStats.hills.length > 0;
+      if (this.pathStats.hills) {
+        this.isHills = this.pathStats.hills.length > 0;
+      } else {
+        this.isHills = false;
+      }
       this.isPublic = geoJson.properties.info.isPublic;
       this.createdBy = geoJson.properties.info.createdBy;
 
@@ -124,30 +128,45 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
     const newPath = this.dataService.getFromStore('activePath', false);
     const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
 
-    console.log(newPath.properties.pathId);
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
-    if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
+    // if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
+    console.log(this.callingPage);
+    if ( this.callingPage === 'create' || this.callingPage === 'edit' ) {
 
-      // if this is a create-route action then pathName is null, so take givenPathName (input from form) if it exists, otherwise use default
       const sendObj = {
+        pathId: newPath.properties.pathId,
         coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
         elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),
         name: pathName,
         description: this.pathDescription
       };
 
-      this.httpService.saveCreatedRoute(sendObj).subscribe( () => {
+      this.httpService.saveRoute( sendObj ).subscribe( () => {
 
         this.router.navigate(['/route/list/']);
 
       }, (error) => {
 
         this.alert
-          .showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false)
+          .showAsElement('Something went wrong :(', error, true, false)
           .subscribe( () => {} );
 
       });
+
+    // } else if ( this.callingPage === 'edit' ) {
+
+    //     this.httpService.updateEditedRoute( getSendObj() ).subscribe( () => {
+
+    //       this.router.navigate(['/route/list/']);
+
+    //     }, (error) => {
+
+    //       this.alert
+    //         .showAsElement('Something went wrong :(', error, true, false)
+    //         .subscribe( () => {} );
+
+    //     });
 
     // imported file, backend only needs to knw the pathType, pathId, name and description, so create theis object and call http
     } else {
@@ -162,6 +181,18 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
         this.router.navigate(['/route/list/']);
       });
     }
+
+    // const getSendObj = () => {
+
+    //   return {
+    //     pathId: newPath.properties.pathId,
+    //     coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
+    //     elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),
+    //     name: pathName,
+    //     description: this.pathDescription
+    //   };
+
+    // }
 
   }
 

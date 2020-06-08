@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { TsFeatureCollection } from 'src/app/shared/interfaces';
 
 @Component({
   selector: 'app-panel-routes-list-options',
@@ -20,7 +21,8 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
   public createdBy: string;
   public pathId: string;
   private pathType: string;
-  private geoJson;
+  private geoJson: TsFeatureCollection;
+  private nPoints: number;
 
   constructor(
     private router: Router,
@@ -37,6 +39,7 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
       this.createdBy = geoJson.properties.info.createdBy;
       this.pathId = geoJson.properties.pathId;
       this.pathType = geoJson.properties.info.pathType;
+      this.nPoints = geoJson.properties.stats.nPoints;
     });
 
   }
@@ -96,8 +99,14 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
     return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
   }
 
+
   allowDelete() {
     return this.createdBy === this.auth.getUser().userName;
+  }
+
+
+  allowEdit() {
+    return this.createdBy === this.auth.getUser().userName && this.nPoints < 3500;
   }
 
 

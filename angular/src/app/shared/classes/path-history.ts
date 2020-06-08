@@ -24,6 +24,7 @@
     private pathName: string;
     private pathDescription: string;
     private pathId: string;
+    private UNDO_LENGTH = 30;
 
     constructor(existingGeoJson = null) {
 
@@ -46,6 +47,7 @@
       } else {
         this.history = [this.newGeoJson];
         this.isNewRoute = true;
+        this.pathId = '0000';
       }
 
     }
@@ -71,26 +73,40 @@
 
 
     add(geoJson: TsFeatureCollection) {
-      // push new path to
+      // push new path but limit the number of undo items to UNDO_LENGTH
+
+      if ( this.length === this.UNDO_LENGTH ) {
+        this.history.splice(0, 1);
+      }
+
       this.history.push(geoJson);
+
     }
 
 
     undo() {
-      // remove the most recent item in the history and return the new last item
+      // remove the most recent item in the history and return true is something was removed, false if no more to undo
 
       if ( this.isNewRoute ) {
-         if ( this.length === 1 ) {
+
+        if ( this.length === 1 ) {
           this._firstPoint = null;
-        } else {
+          return true;
+        } else if ( this.length > 1) {
           this.history.pop();
+          return true;
         }
 
       } else {
+
         if ( this.length > 1 ) {
           this.history.pop();
+          return true;
         }
+
       }
+
+      return false;
 
     }
 
@@ -131,16 +147,11 @@
      */
 
     get activePath() {
-      // return the last GeoJson in the history
-      // important to clone the object to avoid route edits affecting the undo history
       const activePath = this.history[this.history.length - 1];
-      // console.log(activePath)
-
       activePath.properties.info.name = this.pathName;
       activePath.properties.info.description = this.pathDescription;
       activePath.properties.pathId = this.pathId;
       return  activePath;
-      // return this.history[this.history.length - 1];
     }
 
 
@@ -148,7 +159,6 @@
       // return the last GeoJson in the history
       // important to clone the object to avoid route edits affecting the undo history
       const activePath = {type: 'FeatureCollection', features: this.history[this.history.length - 1].features};
-      // activePath.properties = null; // try to reduce the amount of data to stringify
       return  JSON.parse(JSON.stringify( activePath ));
     }
 
