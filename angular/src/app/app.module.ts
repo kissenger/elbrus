@@ -24,6 +24,7 @@ import { RoutesReviewComponent } from './main/routes/routes-review/routes-review
 import { LoginComponent } from 'src/app/shared/components/login/login.component';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { RegisterComponent } from 'src/app/shared/components/register/register.component';
+import { ProfileComponent } from './shared/components/profile/profile.component';
 
 // Services
 import { HttpService } from './shared/services/http.service';
@@ -36,11 +37,11 @@ import { LoginService } from './shared/services/login.service';
 import { RegisterService } from './shared/services/register.service';
 import { TokenInterceptorService } from './shared/services/token-interceptor.service';
 import { AuthGuard } from './auth.guard';
+import { ProfileService } from './shared/services/profile.service';
 
 // Pipes
 import { UnitPipe } from './shared/unit.pipe';
-import { ProfileComponent } from './shared/components/profile/profile.component';
-import { ProfileService } from './shared/services/profile.service';
+import { GeoJsonPipe } from './shared/geojson.pipe';
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { ProfileService } from './shared/services/profile.service';
     LoginService,
     RegisterService,
     ProfileService,
+    GeoJsonPipe,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,

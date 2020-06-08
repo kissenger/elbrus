@@ -8,6 +8,8 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared/classes/path-history';
 import { ActivePoints } from 'src/app/shared/classes/active-points';
 import { AlertService } from './alert.service';
+import { Path } from '../classes/path-class';
+import { GeoJsonPipe } from '../geojson.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +45,8 @@ export class MapCreateService extends MapService {
     dataService: DataService,
     auth: AuthService,
     private spinner: SpinnerService,
-    private alert: AlertService
+    private alert: AlertService,
+    private geoJsonPipe: GeoJsonPipe,
   ) {
     super(httpService, dataService, auth);
   }
@@ -63,7 +66,11 @@ export class MapCreateService extends MapService {
     this.pathToEdit = this.dataService.getFromStore('activePath', false);
     this._options.snapProfile = 'driving';
     this.activePoints = new ActivePoints();
-    this.history = new PathHistory(this.pathToEdit);
+    if ( this.pathToEdit ) {
+      this.history = new PathHistory( new Path( this.pathToEdit ) );
+    } else {
+      this.history = new PathHistory();
+    }
     this.initialiseCreateMap(this.styleOptions);
     this.updateMap();
 
@@ -73,14 +80,12 @@ export class MapCreateService extends MapService {
   private updateMap() {
 
     this.activePoints.points = this.history.activePoints;
-    (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.history.activePath);
+    (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.history.simpleGeo);
     (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints.points);
 
-    if (this.activePoints.length >= 1) {
-      console.log(this.history.activePath);
-      console.log(this.history);
-      this.dataService.activePathEmitter.emit(this.history.activePath);
-      this.dataService.saveToStore('activePath', this.history.activePath);
+    if (this.history.length >= 1) {
+      this.dataService.activePathEmitter.emit(this.history.fullGeo);
+      this.dataService.saveToStore('activePath', this.history.fullGeo);
     }
   }
 
@@ -92,8 +97,8 @@ export class MapCreateService extends MapService {
     try {
 
       this.spinner.showAsElement();
-      const backendResult = await this.getPathFromBackend(this.history.activePathCoords, {simplify: true});
-      this.history.add(backendResult);
+      const backendResult = await this.getPathFromBackend(this.history.coords, {simplify: true});
+      this.history.add( new Path( backendResult ) );
       this.updateMap();
       this.spinner.removeElement();
 
@@ -111,7 +116,6 @@ export class MapCreateService extends MapService {
     return new Promise<TsFeatureCollection>( (resolve, reject) => {
 
       this.httpService.getPathFromPoints(coords, options).subscribe( (result) => {
-        console.log(result.hills);
         resolve(result.hills);
       }, error => reject(error));
 
@@ -168,11 +172,14 @@ export class MapCreateService extends MapService {
 
   public clearPath() {
 
-    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, false).subscribe( (alertBoxResponse: boolean) => {
+    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, false)
+      .subscribe( (alertBoxResponse: boolean) => {
+
       if (alertBoxResponse) {
         this.history.clear();
         this.updateMap();
       }
+
     });
 
   }
@@ -180,11 +187,12 @@ export class MapCreateService extends MapService {
 
   public async reversePath() {
 
-    const n = this.history.activePathCoords.length;
-    const revCoords = this.history.activePathCoords.map( (c, i, arr) => arr[n - i - 1]);
-    const backendResult = await this.getPathFromBackend(revCoords);
-    this.history.add(backendResult);
+    const n = this.history.nPoints;
+    const revCoords = this.history.coords.map( (c, i, arr) => arr[n - i - 1]);
+    const backendResult = await this.getPathFromBackend( revCoords );
+    this.history.add( new Path(backendResult) );
     this.updateMap();
+
   }
 
 
@@ -197,8 +205,8 @@ export class MapCreateService extends MapService {
     try {
 
       const newCoords = await this.getNextPathCoords(this.history.lastPoint, this.history.firstPoint);
-      const backendResult = await this.getPathFromBackend(this.history.activePathCoords.concat(newCoords));
-      this.history.add(backendResult);
+      const backendResult = await this.getPathFromBackend(this.history.coords.concat(newCoords));
+      this.history.add( new Path(backendResult) );
       this.updateMap();
 
     } catch (error) {
@@ -298,17 +306,15 @@ export class MapCreateService extends MapService {
 
       try {
 
-        let newCoords: Array<TsCoordinate>;
-
         if (this.history.firstPoint) {
 
-          newCoords = await this.getNextPathCoords(this.history.lastPoint, clickedPoint);
-          const backendResult = await this.getPathFromBackend(this.history.activePathCoords.concat(newCoords));
-          this.history.add(backendResult);
+          const newCoords = await this.getNextPathCoords(this.history.lastPoint, clickedPoint);
+          const backendResult = await this.getPathFromBackend(this.history.coords.concat(newCoords));
+          this.history.add( new Path(backendResult) );
 
         } else {
 
-          newCoords = await this.getNextPathCoords(clickedPoint, clickedPoint);
+          const newCoords = await this.getNextPathCoords(clickedPoint, clickedPoint);
           this.history.firstPoint = newCoords[0];
 
         }
@@ -363,7 +369,7 @@ export class MapCreateService extends MapService {
       const pathCoords = this.activePoints.coords;
       pathCoords.splice(<number>e.features[0].id, 1);
       const backendResult = await this.getPathFromBackend(pathCoords);
-      this.history.add(backendResult);
+      this.history.add( new Path (backendResult) );
       this.updateMap();
       this.tsMap.removeFeatureState( {source: 'points'} );
 
@@ -383,8 +389,8 @@ export class MapCreateService extends MapService {
 
       this.selectedPointId = e.features[0].id;
       const pointCoords = this.activePoints.coordsAtIndex(this.selectedPointId);
-      this.selectedLineIds = this.history.activePathMatchFeature(pointCoords);
-      this.activePathClone = this.history.activePathClone; // this enables the moving points to mot affect the undo history
+      this.selectedLineIds = this.history.matchFeature(pointCoords);
+      this.activePathClone = this.history.simpleGeo; // this enables the moving points to not affect the undo history
 
       this.tsMap.off('mouseleave', 'points', this.onMouseLeave);
       this.tsMap.off('mouseenter', 'points', this.onMouseEnter);
@@ -411,7 +417,7 @@ export class MapCreateService extends MapService {
       this.spinner.showAsElement();
 
       const coords = this.activePoints.coords;
-      let newPath: TsFeatureCollection;
+      let backendResult: TsFeatureCollection;
 
       const linesAfterPoint = async (point: number) => {
         let c: Array<TsCoordinate>;
@@ -428,7 +434,7 @@ export class MapCreateService extends MapService {
       try {
 
         if (this._options.snapProfile === 'none') {
-          newPath = await this.getPathFromBackend(coords);
+          backendResult = await this.getPathFromBackend(coords);
 
         } else {
 
@@ -442,7 +448,7 @@ export class MapCreateService extends MapService {
             newCoords = (await linesBeforePoint(this.selectedPointId)).concat( await linesAfterPoint(this.selectedPointId) );
           }
 
-          newPath = await this.getPathFromBackend(newCoords);
+          backendResult = await this.getPathFromBackend(newCoords);
 
         }
 
@@ -450,7 +456,7 @@ export class MapCreateService extends MapService {
         this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
       }
 
-      this.history.add(newPath);
+      this.history.add( new Path(backendResult) );
       this.updateMap();
       this.spinner.removeElement();
       this.tsMap.removeFeatureState( {source: 'points'} );

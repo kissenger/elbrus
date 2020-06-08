@@ -184,7 +184,6 @@ export class MapService {
       delete this.activeLayers[pid];
     }
 
-
   }
 
   clearMap() {
