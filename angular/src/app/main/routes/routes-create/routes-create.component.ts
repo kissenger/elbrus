@@ -43,7 +43,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     let startZoom: number;
 
     if ( !mapView ) {
-      this.mapCreateService.kill();
+      this.mapCreateService.clear();
       this.router.navigate(['/route/list']);
     } else {
       startPosition = mapView ? mapView.centre : <TsCoordinate>{lat: -999, lng: -999};
@@ -55,7 +55,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     });
 
     // initialise the map and launch createroute
-    this.mapCreateService.initialiseMap(startPosition, startZoom).then( () => {
+    this.mapCreateService.newMap(startPosition, startZoom).then( () => {
       this.mapCreateService.createRoute();
     });
 
@@ -64,7 +64,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
       if (fromMenu.command) {
         if (fromMenu.command === 'undo') { this.mapCreateService.undo(); }
         if (fromMenu.command === 'close') { this.mapCreateService.closePath(); }
-        if (fromMenu.command === 'clear') { this.mapCreateService.clearPath(); }
+        if (fromMenu.command === 'clear') { this.mapCreateService.undoAll(); }
         if (fromMenu.command === 'reverse') { this.mapCreateService.reversePath(); }
         if (fromMenu.command === 'simplify') { this.mapCreateService.simplify(); }
       } else {
@@ -84,14 +84,14 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
       // if pathId is not in overlaidPaths then add it
       if (!this.overlaidPaths.includes(pathId)) {
         this.httpService.getPathById('route', pathId).subscribe( (result) => {
-          this.mapCreateService.removePathFromMap(pathId);
-          this.mapCreateService.addPathToMap(result.basic, globals.overlayLineStyle, this.overlayPlotOptions);
+          this.mapCreateService.remove(pathId);
+          this.mapCreateService.add(result.basic, globals.overlayLineStyle, this.overlayPlotOptions);
           this.overlaidPaths.push(pathId);
         });
 
       // otherwise pathID is present, so remove from map and delete key from object
       } else {
-        this.mapCreateService.removePathFromMap(pathId);
+        this.mapCreateService.remove(pathId);
         this.overlaidPaths.splice(this.overlaidPaths.indexOf(pathId), 1);
       }
 
@@ -104,7 +104,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     if ( this.menuSubscription ) { this.menuSubscription.unsubscribe(); }
     if ( this.overlaySubscription ) { this.overlaySubscription.unsubscribe(); }
     if ( this.callingPageSubscription ) { this.callingPageSubscription.unsubscribe(); }
-    this.mapCreateService.kill();
+    this.mapCreateService.clear();
   }
 
 

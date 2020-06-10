@@ -42,7 +42,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     // if we come into list component from eg delet route, the map exists and is causing trouble, so delete it and start afresh
-    if (this.mapService.isMap()) { this.mapService.killMap(); }
+    if (this.mapService.isMap()) { this.mapService.kill(); }
 
     // listen for pathID emission from panel-routes-list-list, and get the path from the backend
     this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( (obj) => {
@@ -51,11 +51,9 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       this.plotOptions.booResizeView = obj.booResizeView;
 
       if (pathId === '0') {
-        // no path id found so default to users default location
-        this.mapService.initialiseMap();
-        // document.getElementById('Options').click();
-        // this.dataService.activeTabEmitter.emit('options');
 
+        // no path id found so default to users default location
+        this.mapService.newMap();
 
       } else {
 
@@ -66,8 +64,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
           // as initialisation will temporarily show default location, only run it if map doesnt currently exist
           this.initialiseMapIfNeeded().then( () => {
-            this.mapService.clearMap();
-            this.mapService.addPathToMap(this.geoJSON, this.lineStyle, this.plotOptions);
+            this.mapService.clear();
+            this.mapService.add(this.geoJSON, this.lineStyle, this.plotOptions);
           });
 
         });
@@ -82,18 +80,20 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     return new Promise( (resolve, reject) => {
 
-      if (!this.mapService.isMap()) {
+      if ( !this.mapService.isMap() ) {
 
         const cog = {
           lng: ( this.geoJSON.bbox[0] + this.geoJSON.bbox[2] ) / 2,
           lat: ( this.geoJSON.bbox[1] + this.geoJSON.bbox[3] ) / 2 };
 
-        this.mapService.initialiseMap(cog, 10)
+        this.mapService.newMap(cog, 10)
           .then( () => resolve() )
           .catch( e => reject(e) );
 
       } else {
+
         resolve();
+
       }
 
     });

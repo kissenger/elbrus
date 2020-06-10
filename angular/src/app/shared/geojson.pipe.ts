@@ -8,8 +8,16 @@ import { TsCoordinate, TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLi
 export class GeoJsonPipe implements PipeTransform {
 
 
-  transform(coords: Array<TsPosition>, type: 'Point' | 'LineString'): TsFeatureCollection {
+  transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', labels?: Array<string>): TsFeatureCollection {
 
+    if ( labels ) {
+      if ( coords.length !== labels.length ) {
+        throw new Error('Labels array not of same length as coords array');
+      }
+      if ( type === 'LineString' ) {
+        throw new Error('Labels array not expected for LineString geoJSON');
+      }
+    }
 
     if ( type === 'Point' ) {
 
@@ -18,9 +26,11 @@ export class GeoJsonPipe implements PipeTransform {
        * Places an id on each point, incrementally numbered from 0
        * Places 'start' as title on the first point, 'end' on the last point, and nothing on the other points
        */
-
+      let text: string;
       const pointFeatures = coords.map( (coord, index) => {
-        const text = index === 0 ? 'start' : index === coords.length - 1 ? 'end' : null;
+        if ( labels ) {
+          text = labels[index];
+        }
         return getPointFeature(coord, `${index}`, text);
       });
 

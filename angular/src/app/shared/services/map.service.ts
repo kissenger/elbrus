@@ -2,326 +2,226 @@ import { Injectable } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
-import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsLineString, TsFeature, TsPosition, TsPoint } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsPosition, TsBoundingBox } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
+import { ActiveLayers } from '../classes/active-layers';
+import { Path } from '../classes/path-class';
+import { GeoJsonPipe } from '../geojson.pipe';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class MapService {
 
-  private accessToken: string = environment.MAPBOX_TOKEN;
-
+  private accessToken = environment.MAPBOX_TOKEN;
   public tsMap: mapboxgl.Map;
-  // keep track of what is plotted in activeLayers object
-  // if a path is plotted its pathId will be present as a key in the object.  The value of the objects is an array of the associated markers
-  // this is public because it is acccessed by map-create, which extends map
-  public activeLayers: {[pathId: string]: Array<mapboxgl.Marker>} = {};
-  // public markers: Array<mapboxgl.Marker> = [];
-  private mapCanvas;
+  public layers: ActiveLayers;
 
   constructor(
     public httpService: HttpService,
     public dataService: DataService,
-    public auth: AuthService
+    private auth: AuthService,
+    private geoJsonPipe: GeoJsonPipe
   ) {
-    // get and set the mapbox access token to enable the api
     Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.accessToken);
   }
 
-  /**
-   * Shows the mapbox map
-   * @param location location on which to centre the map
-   * NOTE that no path is plotted during initialisation - need to call addLayer function
-   */
-  initialiseMap(location?: TsCoordinate, zoom?: number) {
+
+  newMap(location?: TsCoordinate, zoom?: number) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
     return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
 
-      console.log('tsMap');
       this.tsMap = new mapboxgl.Map({
         container: 'map',
-        // style: 'mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g',
         style: 'mapbox://styles/kissenger/ckapl476e00p61iqeivumz4ey',
         center: location ? location : this.auth.getUser().homeLngLat,
         zoom: zoom ? zoom : 13
       });
 
-      this.tsMap.on('load', () => {
-        this.dataService.saveToStore('mapView', this.getMapView());
-        this.mapCanvas = this.tsMap.getCanvasContainer();
-        resolve();
-      });
-
-      // this.tsMap.on('mousemove', function(e) {
-      //   document.getElementById('info').innerHTML =
-      //   // e.point is the x, y coordinates of the mousemove event relative
-      //   // to the top-left corner of the map
-      //   JSON.stringify(e.point) +
-      //   '<br />' +
-      //   // e.lngLat is the longitude, latitude geographical position of the event
-      //   JSON.stringify(e.lngLat.wrap());
-      //   });
-
-
-      // called when the map is moved by user, or when the initial animation is complete
-      this.tsMap.on('moveend', (ev) => {
-        this.dataService.saveToStore('mapView', this.getMapView());
-        try {
-          this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
-        } catch {}
-      });
-
+      this.layers = new ActiveLayers();
 
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
-
+      this.tsMap.on('moveend', this.onMoveEnd);
+      this.tsMap.on('load', () => {
+        this.dataService.saveToStore('mapView', this.getMapView());
+        resolve();
+      });
 
     });
 
   }
 
-  /**
-   * Two methods to determine what is being shown
-   * getMapView - reutrns the centrepoint and zoom level - used by other services to determine what was being shown
-   * before option was selected
-   * getMapBounds - returns the bounding box of the current view - called by this class but who is the listener? (TODO:)
-   * TODO: Do we need both methods?
-   */
-  getMapView() {
+
+  private onMoveEnd = (e) => {
+    this.dataService.saveToStore('mapView', this.getMapView());
+    try {
+      this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
+    } catch (error) {
+      // do nothing with the error - silently let it fail
+    }
+  }
+
+
+  public getMapView() {
+    // Used by other services to determine what is being shown so, for example, same view can be established after map change
     const centre = this.tsMap.getCenter();
     const zoom = this.tsMap.getZoom();
     return {centre, zoom};
   }
 
-  getMapBounds() {
-    // called by list - used to filter shown routes to those intersecting the current view
+
+  public getMapBounds() {
+    // called by list - required by backed to filter shown routes to those intersecting the current view
     const mapBounds = this.tsMap.getBounds();
     return [mapBounds.getSouthWest().lng, mapBounds.getSouthWest().lat, mapBounds.getNorthEast().lng, mapBounds.getNorthEast().lat];
   }
 
-  /**
-   * plots a geojson path on the map and centers the view on it
-   * @param pathAsGeoJSON path as geojson to view on map
-   * @param styleOptions object containing the desired style options; geoJson properties are used unless overridden with styleOptions
-   *          lineWidth
-   *          lineColor
-   *          lineOpacity
-   * @param plotOptions object containing the following options:
-   *          booReplaceExisting - if true will replace ALL existing plotted paths - DEFAULTS to false
-   *          booResizeView      - if true will resize the viewport around the new route - DEFAULTS to false
-   *          booSaveToStore     - if true will save to dataService - DEFAULTS to false
-   *          booPlotMarkers     - if true will plot markers at start and end (not desired for overlay)
-   * Performs the following tasks TODO split into seperate routines:
-   * 1) Remove existing layers **if booReplaceExisting is true**
-   * 2) Gets the supplied pathId and pushes to class array
-   * 3) Adds the new layer to the map
-   * 4) Plots markers at the start and end of the route **if booPlotMarkers is true**
-   * 5) Set the bounds of the view **if booResizeView is true**
-   * 6) Emits the new geoJSON so stats can be picked up by details panels (and prints to console) **if booSaveToStore is true**
-   * 7) When the map has finished navigating to the desired view, send save the view to datsaService to be picked up by create new
-   */
-  addPathToMap(pathAsGeoJSON, styleOptions?: TsLineStyle, plotOptions?: TsPlotPathOptions ) {
+
+  public add(pathAsGeoJSON: TsFeatureCollection, styleOptions?: TsLineStyle, plotOptions?: TsPlotPathOptions ) {
 
     console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
-    this.activeLayers[pathAsGeoJSON.properties.pathId] = [];
 
-    // used for debugging - allows points to be shown
-    // this.addMatchedPointsLayer(pathAsGeoJSON);
+    const path = new Path( pathAsGeoJSON );
+    const pathId = pathAsGeoJSON.properties.pathId;
 
-    this.addLineLayer(pathAsGeoJSON, styleOptions);
-
-    // if (plotOptions.booPlotPoints) {
-    //   this.addPointsLayer(pathAsGeoJSON);
-    // }
-
-    if (plotOptions.booPlotMarkers) {
-      this.addMarkers(pathAsGeoJSON);
-    }
+    this.layers.add(pathId);
+    this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
+    this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
 
     if (plotOptions.booResizeView) {
-      this.setMapBounds(pathAsGeoJSON);
+      this.bounds = pathAsGeoJSON.bbox;
     }
 
     if (plotOptions.booSaveToStore) {
-      this.emitPathStatsToStore(pathAsGeoJSON);
-    }
-
-    // share the map centre so we can use later if we want to create a new map on this position
-    // IMPORTANT to wait until the map has stopped moving or this doesnt work
-    // TODO: Emit when this has heppened so we can error check when someone clicks navigation too soon
-    this.tsMap.on('moveend', (ev) => {
-      this.dataService.saveToStore('mapView', this.getMapView());
-    });
-
-
-  }  // addLayerToMap
-
-
-  /***************************************************************************
-   * REMOVE STUFF
-   ***************************************************************************
-
-  /**
-   * Delete a layer and any associated points
-   * @param pid string defining the desire path Id
-   * If pathId is not specified defaults to layer [0] - if that doesnt exist will throw an error
-   */
-  removePathFromMap(pid: string) {
-
-    if (this.tsMap.getLayer(pid)) {
-      this.tsMap.removeLayer(pid);
-      this.tsMap.removeSource(pid);
-    } else {
-      console.log('removeLayerFromMap: pathId ' + pid + ' not found.');
-    }
-
-
-    if (pid in this.activeLayers) {
-      this.removeMarkersFromPath(pid);
-      delete this.activeLayers[pid];
+      this.dataService.activePathEmitter.emit(pathAsGeoJSON);
+      this.dataService.saveToStore('activePath', pathAsGeoJSON);
     }
 
   }
 
-  clearMap() {
-    for (const key in this.activeLayers) {
-      if (!this.activeLayers.hasOwnProperty(key)) {
-        continue;
-      }
-      if (this.tsMap.getLayer(key)) {
-        this.tsMap.removeLayer(key);
-        this.tsMap.removeSource(key);
-      }
-    }
-    this.removeMarkersFromMap();
-    this.activeLayers = {};
-  }
 
+  public addLineLayer(layerId: string, styleOptions: TsLineStyle, data?: TsFeatureCollection) {
 
-  /**
-   * Loop through each marker in a given path and remove all markers from the map
-   * @param pid string defining the desired path Id
-   */
-  removeMarkersFromPath(pid: string) {
-    console.log('delete markers', this.activeLayers);
-    this.activeLayers[pid].forEach( (marker: mapboxgl.Marker) => {
-      // console.log(marker);
-      marker.remove();
-    });
-    this.activeLayers[pid] = [];
-    // console.log(this.activeLayers);
-  }
+    data = data ? data : this.geoJsonPipe.transform([], 'LineString');
 
-  /**
-   * Loop through each key (path) in activeLayers and remove all markers from the map
-   */
-  removeMarkersFromMap() {
-    for (const key in this.activeLayers) {
-      if (!this.activeLayers.hasOwnProperty(key)) { continue; }
-      this.activeLayers[key].forEach( (marker: mapboxgl.Marker) => marker.remove());
-      this.activeLayers[key] = [];
-    }
-  }
-
-
-
-  /***************************************************************************
-   * ADD OR REPLACE STUFF
-   ***************************************************************************/
-
-  /**
-   * Add a marker to the map AND ASSOCIATES IT TO PATHID
-   * @param pos TsCoordinate defining the desired position of the marker
-   * @param pid string defining the desire path Id
-   * If pathId is not specified defaults to layer [0] - if that doesnt exist will throw an error
-   */
-
-  addMarkers(geoJson) {
-    const nFeatures = geoJson.features.length;
-    const nPoints = geoJson.features[geoJson.features.length - 1].geometry.coordinates.length;
-    if (nPoints > 0) {
-      this.addMarkerToMap(geoJson.features[0].geometry.coordinates[0], geoJson.properties.pathId);
-      this.addMarkerToMap(geoJson.features[geoJson.features.length - 1].geometry.coordinates[nPoints - 1], geoJson.properties.pathId);
-    }
-  }
-
-
-  addMarkerToMap(pos: TsCoordinate, pid: string) {
-    // deals with the specific case of creating a point before line is created, eg when creating a route
-    if (!(pid in this.activeLayers)) { this.activeLayers[pid] = []; }
-    const newMarker = new mapboxgl.Marker()
-      .setLngLat(pos)
-      .addTo(this.tsMap);
-    this.activeLayers[pid].push(newMarker);
-
-  }
-
-  addLineLayer(path, styleOptions) {
+    this.tsMap.addSource(layerId, {type: 'geojson', data } );
     this.tsMap.addLayer({
-      id: path.properties.pathId,
+      id: layerId,
       type: 'line',
-      source: {
-        type: 'geojson',
-        data: path
-      },
+      source: layerId,
       paint: {
-        // if property is defined in style options then use it, otherwise use what is provided on the geoJson
         'line-width': styleOptions.lineWidth ? styleOptions.lineWidth : ['get', 'lineWidth'],
         'line-color': styleOptions.lineColour ? styleOptions.lineColour : ['get', 'lineColour'],
         'line-opacity': styleOptions.lineOpacity ? styleOptions.lineOpacity : ['get', 'lineOpacity']
       }
     });
+
   }
 
 
-  /**
-   * Remove the last marker in the marker array for a given path id, and replace it with new one
-   * If there isnt already a marker it will just add a new one, no worries
-   * @param pos TsCoordinate defining the desired position of the marker
-   * @param pid string defining the desire path Id
-   */
-  // replaceLastMarkerOnPath(pos: TsCoordinate, pid: string) {
-  //   this.activeLayers[pid].pop().remove();
-  //   this.addMarkerToPath(pos, pid);
-  // }
+  public addPointsLayer(layerId: string, data?: TsFeatureCollection, ) {
 
-  /***************************************************************************
-   * UTILITIES
-   ***************************************************************************/
+    data = data ? data : this.geoJsonPipe.transform([], 'Point');
 
-  // function to determine if map has been created yet - called by routes-list component
-  isMap() {
+    this.tsMap.addSource(layerId, {type: 'geojson', data } );
+    this.tsMap.addLayer({
+      id: layerId,
+      type: 'circle',
+      source: layerId,
+      paint: {
+        'circle-radius': 4,
+        'circle-opacity': 0.5,
+        'circle-stroke-width': 1,
+        'circle-stroke-color': 'black',
+        'circle-color': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 'black', 'white' ]
+      }
+
+    });
+
+  }
+
+
+  public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
+
+    data = data ? data :  this.geoJsonPipe.transform([], 'Point');
+
+    this.tsMap.addSource(layerId, {type: 'geojson', data } );
+    this.tsMap.addLayer({
+      id: layerId,
+      type: 'symbol',
+      source: layerId,
+      layout: {
+        'symbol-placement': 'point',
+        // 'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+        'text-anchor': 'bottom-left',
+        'text-font': ['Open Sans Regular'],
+        'text-field': '{title}',
+        'text-size': 18
+      }
+    });
+
+  }
+
+
+  public remove(pathId: string) {
+
+    if (this.tsMap.getLayer( pathId + 'line' )) {
+
+      this.tsMap.removeLayer( pathId + 'line' );
+      this.tsMap.removeSource( pathId + 'line' );
+
+      this.tsMap.removeLayer( pathId + 'sym' );
+      this.tsMap.removeSource( pathId + 'sym' );
+
+    } else {
+
+      console.log('removeLayerFromMap: pathId ' + pathId + ' not found.');
+
+    }
+
+    this.layers.remove( pathId );
+
+  }
+
+
+  public clear() {
+    if ( this.layers ) {
+      this.layers.get.forEach( pathId => {
+        this.remove(pathId);
+      });
+    }
+
+  }
+
+
+  public isMap() {
+  // called by routes-list component
     return !!this.tsMap;
   }
 
-  // function to destroy the map - called in onDestroy of routes-list component
-  killMap() {
+
+  public kill() {
+  // called in onDestroy of routes-list component
     this.tsMap = null;
   }
 
-  setMapBounds(geoJSON) {
-    const bbox: [mapboxgl.LngLatLike, mapboxgl.LngLatLike] =
-      [[geoJSON.bbox[0], geoJSON.bbox[1]], [geoJSON.bbox[2], geoJSON.bbox[3]]];
+
+  public set bounds(boundingBox: TsBoundingBox) {
+
+    const bbox: mapboxgl.LngLatBoundsLike = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
     const options = {
-      padding: {top: 10, bottom: 10, left: 10, right: 10},
+      padding: {top: 20, bottom: 20, left: 10, right: 10},
       linear: true
     };
     this.tsMap.fitBounds(bbox, options);
   }
 
-  emitPathStatsToStore(geoJSON) {
-    this.dataService.activePathEmitter.emit(geoJSON);
-    this.dataService.saveToStore('activePath', geoJSON);
-  }
 
+  public getLocationOnClick() {
 
-  /***************************************************************************
-   * Set default location by clicking screen
-   ***************************************************************************/
-  getLocationOnClick() {
     this.tsMap.getCanvas().style.cursor = 'crosshair';
     return new Promise<TsCoordinate>( (resolve, reject) => {
       this.tsMap.on('click', (e) => {
@@ -329,13 +229,17 @@ export class MapService {
         resolve({ lat: e.lngLat.lat, lng: e.lngLat.lng });
       });
     });
+
   }
+
+
+
 
 
   /***************************************************************************
    *
    *
-   * USEFUL FOR DEBUGGING
+   * USEFUL FOR DEBUGGING - an necessary abhoration??
    *
    *
    * **************************************************************************/

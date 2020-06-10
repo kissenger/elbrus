@@ -23,8 +23,7 @@ export class Path {
 
 
   get firstPoint(): TsCoordinate {
-    const pos = this._geoJson.features[0].geometry.coordinates[0];
-    return {lng: pos[0], lat: pos[1] };
+    return this.coords[0];
   }
 
 
@@ -33,11 +32,12 @@ export class Path {
   }
 
 
-  get simplifiedGeoJson() {
+  get simplifiedGeoJson(): TsFeatureCollection {
     // return the last GeoJson in the history
     // important to clone the object to avoid route edits affecting the undo history
     const activePath = {type: 'FeatureCollection', features: this._geoJson.features};
     return  JSON.parse(JSON.stringify( activePath ));
+    // return activePath;
   }
 
 
@@ -109,6 +109,12 @@ export class Path {
 
     return this.geoJsonPipe.transform(this.positions, 'Point');
 
+  }
+
+
+  get startEndPoints() {
+
+    return this.geoJsonPipe.transform([this.positions[0], this.positions[this.positions.length - 1]], 'Point', ['start', 'end'] );
   }
 
 }

@@ -6,7 +6,6 @@ import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsPosition, TsFeature, Ts
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared/classes/path-history';
-import { ActivePoints } from 'src/app/shared/classes/active-points';
 import { AlertService } from './alert.service';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from '../geojson.pipe';
@@ -21,6 +20,7 @@ import { GeoJsonPipe } from '../geojson.pipe';
  * a benign bug - need to ensure if a create route is cancelled, we clear history as class is not reinstantiated
  */
 export class MapCreateService extends MapService {
+// export class MapCreateService {
 
   private history: PathHistory;
   private _options = { snapProfile: 'driving' };
@@ -31,7 +31,6 @@ export class MapCreateService extends MapService {
     booPlotPoints: true
   };
   private styleOptions: TsLineStyle = {};
-  private activePoints: ActivePoints;
   private selectedPointId: number;
   private selectedLineIds: Array<{featureIndex: number, coordIndex: number}>;
   private pathToEdit: TsFeatureCollection;
@@ -39,23 +38,27 @@ export class MapCreateService extends MapService {
   private pathDescription: string;
   private activePathClone: TsFeatureCollection;
 
+  // keeping the active layers on the class helps with responsiveness when moving (editing) a point
+  private line: TsFeatureCollection;
+  private points: TsFeatureCollection;
+  private symbols: TsFeatureCollection;
+
 
   constructor(
     httpService: HttpService,
     dataService: DataService,
     auth: AuthService,
+    geoJsonPipe: GeoJsonPipe,
     private spinner: SpinnerService,
-    private alert: AlertService,
-    private geoJsonPipe: GeoJsonPipe,
+    private alert: AlertService
   ) {
-    super(httpService, dataService, auth);
+    super(httpService, dataService, auth, geoJsonPipe);
   }
 
 
   public set options(optionKey: string) {
-    // Returns the options object - called from routes-create component
+    // sets snap behaviours - called from routes-create component
     this._options.snapProfile = optionKey;
-    // return this._options;
 
   }
 
@@ -65,7 +68,6 @@ export class MapCreateService extends MapService {
 
     this.pathToEdit = this.dataService.getFromStore('activePath', false);
     this._options.snapProfile = 'driving';
-    this.activePoints = new ActivePoints();
     if ( this.pathToEdit ) {
       this.history = new PathHistory( new Path( this.pathToEdit ) );
     } else {
@@ -79,16 +81,31 @@ export class MapCreateService extends MapService {
 
   private updateMap() {
 
-    this.activePoints.points = this.history.activePoints;
-    (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.history.simpleGeo);
-    (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints.points);
+    this.line = this.history.simpleGeo;
+    this.points = this.history.activePoints;
+    this.symbols = this.history.startEndPoints;
 
+    this.updateMapSource();
+    this.emitDetails();
+
+  }
+
+
+
+  updateMapSource() {
+    (this.tsMap.getSource('0000line') as mapboxgl.GeoJSONSource).setData(this.line);
+    (this.tsMap.getSource('0000pts') as mapboxgl.GeoJSONSource).setData(this.points);
+    (this.tsMap.getSource('0000sym') as mapboxgl.GeoJSONSource).setData(this.symbols);
+  }
+
+
+
+  emitDetails() {
     if (this.history.length >= 1) {
       this.dataService.activePathEmitter.emit(this.history.fullGeo);
       this.dataService.saveToStore('activePath', this.history.fullGeo);
     }
   }
-
 
 
 
@@ -111,7 +128,7 @@ export class MapCreateService extends MapService {
 
 
 
-  private getPathFromBackend(coords, options: {simplify: boolean} = {simplify: false}) {
+  private getPathFromBackend(coords: Array<TsCoordinate>, options: {simplify: boolean} = {simplify: false}) {
 
     return new Promise<TsFeatureCollection>( (resolve, reject) => {
 
@@ -170,13 +187,13 @@ export class MapCreateService extends MapService {
 
 
 
-  public clearPath() {
+  public undoAll() {
 
     this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, false)
       .subscribe( (alertBoxResponse: boolean) => {
 
       if (alertBoxResponse) {
-        this.history.clear();
+        this.history.undoAll();
         this.updateMap();
       }
 
@@ -218,72 +235,20 @@ export class MapCreateService extends MapService {
 
 
 
-
-
-  kill() {
-    this.activeLayers = {};
-    this.removeMarkersFromMap();
-  }
-
-
-
-
   initialiseCreateMap(lineStyleOptions) {
 
     this.tsMap.getCanvas().style.cursor = 'crosshair';
 
-    // Put an empty line layer on the map
-    this.tsMap.addLayer({
-      id: '0000',
-      type: 'line',
-      source: {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
-      },
-      paint: {
-        'line-width': lineStyleOptions.lineWidth ? lineStyleOptions.lineWidth : ['get', 'lineWidth'],
-        'line-color': lineStyleOptions.lineColour ? lineStyleOptions.lineColour : ['get', 'lineColour'],
-        'line-opacity': lineStyleOptions.lineOpacity ? lineStyleOptions.lineOpacity : ['get', 'lineOpacity']
-      }
-    });
-
-    // const data = { type: 'geojson', data: { type: 'FeatureCollection', features: [] }};
-    this.tsMap.addSource('points', { type: 'geojson', data: { type: 'FeatureCollection', features: [] }} );
-
-    // put an empty points layer on the map
-    this.tsMap.addLayer({
-      id: 'points',
-      type: 'circle',
-      source: 'points',
-      paint: {
-        'circle-radius': 4,
-        'circle-opacity': 0.5,
-        'circle-stroke-width': 1,
-        'circle-stroke-color': 'black',
-        'circle-color': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 'black', 'white' ]
-      }
-    });
-
-    this.tsMap.addLayer({
-      id: 'symbols',
-      type: 'symbol',
-      source: 'points',
-      filter: ['in', ['get', 'title'], ['literal', ['start', 'end']]],
-      layout: {
-        'symbol-placement': 'point',
-        'text-anchor': 'bottom-left',
-        'text-font': ['Open Sans Regular'],
-        'text-field': '{title}', // part 2 of this is how to do it
-        'text-size': 18
-      }
-    });
+    this.addLineLayer('0000line', lineStyleOptions );
+    this.addPointsLayer('0000pts');
+    this.addSymbolLayer('0000sym');
 
     this.tsMap.on('click', this.onClickGetCoords);
-    this.tsMap.on('mousedown', 'points', this.onMouseDown);
-    this.tsMap.on('mouseup', 'points', this.onMouseUp);
-    this.tsMap.on('contextmenu', 'points', this.onRightClick);
-    this.tsMap.on('mouseenter', 'points', this.onMouseEnter);
-    this.tsMap.on('mouseleave', 'points', this.onMouseLeave);
+    this.tsMap.on('mousedown', '0000pts', this.onMouseDown);
+    this.tsMap.on('mouseup', '0000pts', this.onMouseUp);
+    this.tsMap.on('contextmenu', '0000pts', this.onRightClick);
+    this.tsMap.on('mouseenter', '0000pts', this.onMouseEnter);
+    this.tsMap.on('mouseleave', '0000pts', this.onMouseLeave);
 
   }
 
@@ -334,12 +299,14 @@ export class MapCreateService extends MapService {
   private onMove = (e) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
-    // this.tsMap.getCanvas().style.cursor = 'grabbing';
-    this.activePoints.updatePoint(this.selectedPointId, coords);
-    this.selectedLineIds.forEach( ids => this.activePathClone.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
 
-    (this.tsMap.getSource('points') as mapboxgl.GeoJSONSource).setData(this.activePoints.points);
-    (this.tsMap.getSource('0000') as mapboxgl.GeoJSONSource).setData(this.activePathClone);
+    this.points.features[this.selectedPointId].geometry.coordinates = coords;
+    this.selectedLineIds.forEach( ids => this.line.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
+    if (this.selectedPointId === 0 || this.selectedPointId === this.points.features.length - 1) {
+      this.symbols.features[this.selectedPointId === 0 ? 0 : 1].geometry.coordinates = coords;
+    }
+
+    this.updateMapSource();
 
   }
 
@@ -348,14 +315,14 @@ export class MapCreateService extends MapService {
   private onMouseEnter = (e) => {
     this.selectedPointId = e.features[0].id;
     this.tsMap.getCanvas().style.cursor = 'pointer';
-    this.tsMap.setFeatureState( {source: 'points', id: e.features[0].id}, {hover: true} );
+    this.tsMap.setFeatureState( {source: '0000pts', id: e.features[0].id}, {hover: true} );
   }
 
 
   // when cursor leaves a point, reset cursor style and remove highlighting
   private onMouseLeave = (e) => {
     this.tsMap.getCanvas().style.cursor = 'crosshair';
-    this.tsMap.removeFeatureState( {source: 'points'} );
+    this.tsMap.removeFeatureState( {source: '0000pts'} );
   }
 
 
@@ -366,12 +333,12 @@ export class MapCreateService extends MapService {
 
     try {
 
-      const pathCoords = this.activePoints.coords;
+      const pathCoords = this.history.coords;
       pathCoords.splice(<number>e.features[0].id, 1);
       const backendResult = await this.getPathFromBackend(pathCoords);
       this.history.add( new Path (backendResult) );
       this.updateMap();
-      this.tsMap.removeFeatureState( {source: 'points'} );
+      this.tsMap.removeFeatureState( {source: '0000pts'} );
 
     } catch (error) {
       this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
@@ -388,12 +355,12 @@ export class MapCreateService extends MapService {
     if (e.originalEvent.button === 0) { // only if its the left button
 
       this.selectedPointId = e.features[0].id;
-      const pointCoords = this.activePoints.coordsAtIndex(this.selectedPointId);
+      const pointCoords = this.history.coordsAtIndex(this.selectedPointId);
       this.selectedLineIds = this.history.matchFeature(pointCoords);
-      this.activePathClone = this.history.simpleGeo; // this enables the moving points to not affect the undo history
+      // this.activePathClone = this.history.simpleGeo; // this enables the moving points to not affect the undo history
 
-      this.tsMap.off('mouseleave', 'points', this.onMouseLeave);
-      this.tsMap.off('mouseenter', 'points', this.onMouseEnter);
+      this.tsMap.off('mouseleave', '0000pts', this.onMouseLeave);
+      this.tsMap.off('mouseenter', '0000pts', this.onMouseEnter);
       e.preventDefault();       // Prevent the default map drag behavior.
 
       // this.tsMap.getCanvas().style.cursor = 'grab';
@@ -409,26 +376,26 @@ export class MapCreateService extends MapService {
 
     if (e.originalEvent.button === 0) {
 
-      this.tsMap.on('mouseleave', 'points', this.onMouseLeave);
-      this.tsMap.on('mouseenter', 'points', this.onMouseEnter);
+      this.tsMap.on('mouseleave', '0000pts', this.onMouseLeave);
+      this.tsMap.on('mouseenter', '0000pts', this.onMouseEnter);
       this.tsMap.off('mousemove', this.onMove);
 
       this.tsMap.getCanvas().style.cursor = 'pointer';
       this.spinner.showAsElement();
 
-      const coords = this.activePoints.coords;
+      const coords = this.history.coords;
       let backendResult: TsFeatureCollection;
 
       const linesAfterPoint = async (point: number) => {
         let c: Array<TsCoordinate>;
-        c = await this.getNextPathCoords(coords[point], coords[point + 1]);
+        c = await this.getNextPathCoords(e.lngLat, coords[point + 1]);
         return c.concat( coords.slice(point + 1) );
       };
 
       const linesBeforePoint = async (point: number) => {
         let c: Array<TsCoordinate>;
         c = coords.slice(0, point - 1);
-        return c.concat( await this.getNextPathCoords(coords[point - 1], coords[point]) );
+        return c.concat( await this.getNextPathCoords(coords[point - 1], e.lngLat) );
       };
 
       try {
@@ -442,7 +409,7 @@ export class MapCreateService extends MapService {
 
           if (this.selectedPointId === 0) {                                 // first point
             newCoords = await linesAfterPoint(this.selectedPointId);
-          } else if (this.selectedPointId === this.activePoints.length - 1) {   // last point
+          } else if (this.selectedPointId === this.history.coords.length - 1) {   // last point
             newCoords = await linesBeforePoint(this.selectedPointId);
           } else {                                                          // any other point
             newCoords = (await linesBeforePoint(this.selectedPointId)).concat( await linesAfterPoint(this.selectedPointId) );
@@ -459,7 +426,7 @@ export class MapCreateService extends MapService {
       this.history.add( new Path(backendResult) );
       this.updateMap();
       this.spinner.removeElement();
-      this.tsMap.removeFeatureState( {source: 'points'} );
+      this.tsMap.removeFeatureState( {source: '0000pts'} );
 
     }
 

@@ -28,10 +28,10 @@ export class RoutesReviewComponent implements OnInit {
         lng: ( geoJSON.bbox[0] + geoJSON.bbox[2] ) / 2,
         lat: ( geoJSON.bbox[1] + geoJSON.bbox[3] ) / 2 };
 
-      this.mapService.initialiseMap(cog, 10)
+      this.mapService.newMap(cog, 10)
         .then( () => {
           const plotOptions = {booReplaceExisting: false, booResizeView: true, booSaveToStore: true};
-          this.mapService.addPathToMap(geoJSON, {}, plotOptions);
+          this.mapService.add(geoJSON, {}, plotOptions);
         })
         .catch( e => {
           throw new Error(e);

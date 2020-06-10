@@ -106,9 +106,9 @@
     }
 
 
-    clear() {
+    undoAll() {
 
-      this.history.splice(1);
+      this.history = [];
       this._firstPoint = null;
 
     }
@@ -135,6 +135,14 @@
 
     }
 
+    coordsAtIndex(pointIndex: number): TsPosition {
+      if ( this.lastPath) {
+        return this.lastPath.positions[pointIndex];
+      } else if (this.firstPoint) {
+        return [this.firstPoint.lng, this.firstPoint.lat];
+      }
+    }
+
 
     get activePoints() {
       // return active points on the last active path. If there isnt one, return firstpoint or null
@@ -147,6 +155,16 @@
         return this.geoJsonPipe.transform([], 'Point');
       }
 
+    }
+
+    get startEndPoints() {
+      if ( this.lastPath ) {
+        return this.lastPath.startEndPoints;
+      } else if ( this.firstPoint ) {
+        return this.geoJsonPipe.transform([[this.firstPoint.lng, this.firstPoint.lat]], 'Point', ['start']);
+      } else {
+        return this.geoJsonPipe.transform([], 'Point');
+      }
     }
 
     get simpleGeo() {
@@ -179,6 +197,9 @@
     matchFeature(pointCoord: TsPosition) {
       return this.lastPath.matchFeature(pointCoord);
     }
+
+
+
 
   }
 
