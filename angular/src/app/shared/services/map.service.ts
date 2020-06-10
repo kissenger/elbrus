@@ -89,7 +89,9 @@ export class MapService {
 
     this.layers.add(pathId);
     this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
+    // this.addPointsLayer(pathId + 'pts', path.pointsGeoJson);
     this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
+
 
     if (plotOptions.booResizeView) {
       this.bounds = pathAsGeoJSON.bbox;
@@ -134,9 +136,19 @@ export class MapService {
       paint: {
         'circle-radius': 4,
         'circle-opacity': 0.5,
+        // 'circle-opacity': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 1, 0 ],
+        // 'circle-stroke-opacity': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 1, 0 ],
         'circle-stroke-width': 1,
-        'circle-stroke-color': 'black',
-        'circle-color': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 'black', 'white' ]
+        // 'circle-stroke-color': 'black',
+        // 'circle-color': 'black'
+        'circle-color':
+          [ 'case',
+            ['boolean', ['feature-state', 'enabled'], false ],
+            'blue',
+            ['boolean', ['feature-state', 'hover'], false ],
+            'black',
+            'white'
+          ]
       }
 
     });
@@ -168,21 +180,23 @@ export class MapService {
 
   public remove(pathId: string) {
 
-    if (this.tsMap.getLayer( pathId + 'line' )) {
-
-      this.tsMap.removeLayer( pathId + 'line' );
-      this.tsMap.removeSource( pathId + 'line' );
-
-      this.tsMap.removeLayer( pathId + 'sym' );
-      this.tsMap.removeSource( pathId + 'sym' );
-
-    } else {
-
-      console.log('removeLayerFromMap: pathId ' + pathId + ' not found.');
-
-    }
+    this.removeLayer(pathId, 'line');
+    this.removeLayer(pathId, 'sym');
+    this.removeLayer(pathId, 'pts');
 
     this.layers.remove( pathId );
+
+  }
+
+
+  private removeLayer(id: string, type: string) {
+
+    if (this.tsMap.getLayer( id + type )) {
+      this.tsMap.removeLayer( id + type );
+      this.tsMap.removeSource( id + type );
+    } else {
+      console.log(`removeLayer: layer ${id + type} not found.`);
+    }
 
   }
 
