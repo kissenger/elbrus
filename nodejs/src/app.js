@@ -15,9 +15,9 @@ const app = express();
 
 // const spawn = require('threads').spawn;
 // const Thread = require('threads').Thread;
-const Worker = require('threads').Worker;
-const spawn = require('threads').spawn;
-const Pool = require('threads').Pool;
+// const Worker = require('threads').Worker;
+// const spawn = require('threads').spawn;
+// const Pool = require('threads').Pool;
 
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
