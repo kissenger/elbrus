@@ -18,9 +18,9 @@
  * as possible.
  */
 
-const spawn = require('threads/dist').spawn;
-const Worker = require('threads/dist').Worker;
-const Pool = require('threads/dist').Pool;
+const spawn = require('threads').spawn;
+const Worker = require('threads').Worker;
+const Pool = require('threads').Pool;
 const os = require('os');
 
 

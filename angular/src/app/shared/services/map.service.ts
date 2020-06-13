@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
-import * as globals from 'src/app/shared/globals';
 import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsLineString, TsFeature, TsPosition } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MapService {
 
-  private accessToken: string = globals.mapboxAccessToken;
+  private accessToken: string = environment.MAPBOX_TOKEN;
   public tsMap: mapboxgl.Map;
   // keep track of what is plotted in activeLayers object
   // if a path is plotted its pathId will be present as a key in the object.  The value of the objects is an array of the associated markers

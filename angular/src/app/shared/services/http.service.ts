@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import * as globals from 'src/app/shared/globals';
 import { TsCoordinate, TsElevationQuery, TsUser } from 'src/app/shared/interfaces';
 import { environment } from 'src/environments/environment';
 
@@ -8,12 +7,11 @@ import { environment } from 'src/environments/environment';
 export class HttpService {
 
 
-  private mapBoxAccessToken = globals.mapboxAccessToken;
+  private mapBoxAccessToken = environment.MAPBOX_TOKEN;
 
   private protocol = environment.BACKEND_PROTOCOL;
-  private host = environment.BACKEND_HOST;
-  private port = environment.BACKEND_PORT;
-  private backendURL = `${this.protocol}://${this.host}:${this.port}`;
+  private url = environment.BACKEND_URL;
+  private backendURL = `${this.protocol}://${this.url}`;
 
   constructor( private http: HttpClient ) {
 
