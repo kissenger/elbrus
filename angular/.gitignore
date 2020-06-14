@@ -5,6 +5,9 @@
 /tmp
 /out-tsc
 
+# angular environment files
+/src/environments
+
 # linux scripts
 /scripts
 
