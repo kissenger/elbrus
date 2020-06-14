@@ -24,7 +24,7 @@ export const links = {
 // lineStyles are defined here and on geoJSON - when specified locally they will override the geoJSON lineStyle
 // export const overlayLineStyle = {lineWidth: 2, lineColour: 'blue', lineOpacity: 0.3};
 export const routeLineStyle: TsLineStyle = {lineWidth: 4, lineColour: 'red', lineOpacity: 0.5};
-export const overlayLineStyle: TsLineStyle = {lineWidth: 2, lineColour: 'red', lineOpacity: 0.3};
+export const overlayLineStyle: TsLineStyle = {lineWidth: 3, lineColour: 'red', lineOpacity: 0.3};
 export const createRouteLineStyle: TsLineStyle = {lineWidth: 2, lineColour: 'red', lineOpacity: 1.0};
 // export const routeReviewLineStyle: TsLineStyle = {lineWidth: 2, lineColour: 'red', lineOpacity: 1.0};
 

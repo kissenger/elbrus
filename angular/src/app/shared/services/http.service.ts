@@ -58,7 +58,7 @@ export class HttpService {
     } else {
       query = '?';
       bbox.forEach( (coord, index) => {
-        query += 'bbox=' + coord;
+        query += 'bbox=' + coord.toFixed(6);
         if (index !== bbox.length - 1) { query += '&'; }
       });
     }
