@@ -12,6 +12,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const app = express();
+const fs = require('fs');
+
 
 // const spawn = require('threads').spawn;
 // const Thread = require('threads').Thread;
@@ -284,16 +286,22 @@ app.get('/api/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) =
 })
 
 // Step 2, download the file to browser
-app.get('/api/download-file/:fname', auth.verifyToken, (req, res) => {
+app.get('/api/download-file/:fname', auth.verifyToken, async (req, res) => {
 
   debugMsg(`Download file from server, filename=${req.params.fname}`);
 
+  const fname = './downloads/' + req.params.fname;
+
   try {
 
-    res.download('../' + req.params.fname + '.gpx', (err) => {
+    res.download(fname, (err) => {
+
       if (err) {
         throw new Error(err);
       }
+
+      fs.unlink(fname, () => {});
+    
     });
 
   } catch (error) {
@@ -321,14 +329,11 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
     const lngLats = req.body.coords.map(coord => [coord.lng, coord.lat]);
     let routeInstance;
     if (process.env.USE_THREADS) {
-      console.log('a')
       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', null, null, lngLats, null);
-      console.log('b')
 
     } else {
       routeInstance = await getRouteInstance(null, null, lngLats, null);  
     }
-    console.log('c')
 
     res.status(201).json({
         hills: new GeoJSON().fromPath(routeInstance).toGeoHills(),

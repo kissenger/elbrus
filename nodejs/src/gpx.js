@@ -224,8 +224,14 @@ function gpxWrite(writeObject){
     const creator = 'Trailscape https://kissenger.github.io/trailscape/';
     const xmlns = 'http://www.topografix.com/GPX/1/0';
 
-    const fileName = writeObject.name;
-    const file = createWriteStream('../' + fileName + '.gpx');
+    // TODO: Unique filename needed otherwise cannot do export twice on the same filename, but of a hack, better way?
+    const filePath = './downloads/'
+    const fileName = writeObject.name + ' ' + (new Date()).getMilliseconds() + '.gpx';
+
+    console.log(fileName)
+
+
+    const file = createWriteStream(filePath + fileName);
     const s = '   ';
     const eol = '\r\n'
 
