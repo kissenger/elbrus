@@ -16,7 +16,7 @@ const fs = require('fs');
 
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
-// const gpxRead = require('./gpx').gpxRead;   // uncomment if dont want to use threads
+const gpxRead = require('./gpx').gpxRead;  
 const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
 const debugMsg = require('./debug').debugMsg;
 const mongoModel = require('./app-helpers.js').mongoModel;
