@@ -58,7 +58,7 @@ function verifyToken(req, res, next) {
 }
 
 
-authRoute.post('/update-user-data', verifyToken, async (req, res) => {
+authRoute.post('/api/update-user-data', verifyToken, async (req, res) => {
 
   debugMsg('updateUserData');
 
@@ -78,7 +78,7 @@ authRoute.post('/update-user-data', verifyToken, async (req, res) => {
 })
 
 
-authRoute.post('/register', async (req, res) => {
+authRoute.post('/api/register', async (req, res) => {
 // take incoming user data in the form {email, password}, hash password,
 // save to db, get json token and return to front end
 
@@ -123,7 +123,7 @@ authRoute.post('/register', async (req, res) => {
 
 
 
-authRoute.post('/login', async (req, res) => {
+authRoute.post('/api/login', async (req, res) => {
 
   debugMsg(`login user, userName: ${req.body.userName}`);
 

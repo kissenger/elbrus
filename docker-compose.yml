@@ -3,8 +3,8 @@ services:
 
   angular:
     build: angular
-    #depends_on:
-    #  - nodejs
+    depends_on:
+      - nodejs
     ports:
       - "80:80"
       - "443:443"

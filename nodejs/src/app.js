@@ -39,6 +39,7 @@ if (process.env.USE_THREADS) {
 
 
 // apply middleware - note setheaders must come first
+// TODO: (1) Use middleware to pring debug message (2) to inject /api on routes
 app.use( (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin","*");
   res.setHeader("Access-Control-Allow-Headers","Origin, X-Request-With, Content-Type, Accept, Authorization, Content-Disposition");
@@ -71,7 +72,7 @@ const upload = multer({
 /*****************************************************************
  * import a route from a gpx file
  ******************************************************************/
-app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (req, res) => {
+app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), async (req, res) => {
 
   debugMsg('import-route');
 
@@ -104,7 +105,7 @@ app.post('/import-route/', auth.verifyToken, upload.single('filename'), async (r
  * database, all we are doing is updating some fields, and
  * changing isSaved flag to true; id of path is provided
  *****************************************************************/
-app.post('/save-imported-path/', auth.verifyToken, async (req, res) => {
+app.post('/api/save-imported-path/', auth.verifyToken, async (req, res) => {
 
   debugMsg(`save-imported-path, type=${req.body.pathType}, id=${req.body.pathId}`);
 
@@ -130,7 +131,7 @@ app.post('/save-imported-path/', auth.verifyToken, async (req, res) => {
 /*****************************************************************
  * Save a user-created route to database; geoJSON is supplied in POST body
  *****************************************************************/
-app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
+app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
 
 
   debugMsg(`save-created-route`);
@@ -161,7 +162,7 @@ app.post('/save-created-route/', auth.verifyToken, async (req, res) => {
  *  Retrieve a single path from database
  *  id of required path is supplied
  *****************************************************************/
-app.get('/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
+app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
 
   debugMsg(`get-path-by-id, type=${req.params.type}, id=${req.params.id}` );
 
@@ -192,7 +193,7 @@ app.get('/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
  * pathType is the type of path (obvs)
  * offset is used by list to request chunks of x paths at a time
  *****************************************************************/
-app.get('/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
+app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
 
   debugMsg(`get-paths-list, type=${req.params.type}, id=${req.params.id}`);
 
@@ -236,7 +237,7 @@ app.get('/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, 
  * Delete a path from database
  * id of path is provided in both public and private dbs
  *****************************************************************/
-app.delete('/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
+app.delete('/api/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
 
   debugMsg(`delete-path, type=${req.params.type}, id=${req.params.id}`);
 
@@ -263,7 +264,7 @@ app.delete('/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
  * 2) download-file: allow the browser to download the file
  *****************************************************************/
  // Step 1, write the data to gpx file
-app.get('/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) => {
+app.get('/api/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) => {
 
   debugMsg(`Write path to gpx, type=${req.params.type}, id=${req.params.id}`);
 
@@ -283,7 +284,7 @@ app.get('/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) => {
 })
 
 // Step 2, download the file to browser
-app.get('/download-file/:fname', auth.verifyToken, (req, res) => {
+app.get('/api/download-file/:fname', auth.verifyToken, (req, res) => {
 
   debugMsg(`Download file from server, filename=${req.params.fname}`);
 
@@ -311,7 +312,7 @@ app.get('/download-file/:fname', auth.verifyToken, (req, res) => {
  * creates a Path object in order to get elevations and statistics,
  * and returns it back to the front end
  *****************************************************************/
-app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
+app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
   debugMsg('get-path-from-points')
 
@@ -349,7 +350,7 @@ app.post('/get-path-from-points/', auth.verifyToken, async (req, res) => {
  * Toggles a path from public --> private or opposite
  *****************************************************************/
 
-app.post('/toggle-path-public/', auth.verifyToken, async (req, res) => {
+app.post('/api/toggle-path-public/', auth.verifyToken, async (req, res) => {
 
   debugMsg(`toggle-path-public, pathType=${req.body.pathType}, pathId=${req.body.pathId}`)
 
@@ -376,7 +377,7 @@ app.post('/toggle-path-public/', auth.verifyToken, async (req, res) => {
  * Copies a public path into private database
  *****************************************************************/
 
-app.post('/copy-public-path/', auth.verifyToken, async (req, res) => {
+app.post('/api/copy-public-path/', auth.verifyToken, async (req, res) => {
 
   debugMsg(`copy-public-path, pathType=${req.body.pathType}, pathId=${req.body.pathId}`)
 
@@ -408,7 +409,7 @@ app.post('/copy-public-path/', auth.verifyToken, async (req, res) => {
  * Return the reverse of a route
  *****************************************************************/
 
-app.get('/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
+app.get('/api/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
 
   debugMsg(`reverse-route, pathId=${req.params.pathId}`)
 
@@ -437,7 +438,7 @@ app.get('/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) =
  * Flush database of all unsaved entries
  * note we are only flushing routes at the moment
  *****************************************************************/
-app.post('/flush/', auth.verifyToken, async (req, res) => {
+app.post('/api/flush/', auth.verifyToken, async (req, res) => {
 
   debugMsg('flush db');
 
@@ -455,7 +456,14 @@ app.post('/flush/', auth.verifyToken, async (req, res) => {
 
 })
 
-// export default app;
+
+/*****************************************************************
+ * Useful for server debugging
+ *****************************************************************/
+app.get('/api/ping/', (req, res) => {
+  debugMsg('ping');
+  res.status(201).json({hello: 'world'});
+})
 
 module.exports = app;
 
