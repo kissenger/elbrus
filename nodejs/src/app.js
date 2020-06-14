@@ -14,13 +14,6 @@ require('dotenv').config();
 const app = express();
 const fs = require('fs');
 
-
-// const spawn = require('threads').spawn;
-// const Thread = require('threads').Thread;
-// const Worker = require('threads').Worker;
-// const spawn = require('threads').spawn;
-// const Pool = require('threads').Pool;
-
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
 // const gpxRead = require('./gpx').gpxRead;   // uncomment if dont want to use threads
@@ -41,7 +34,7 @@ if (process.env.USE_THREADS) {
 
 
 // apply middleware - note setheaders must come first
-// TODO: (1) Use middleware to pring debug message (2) to inject /api on routes
+// TODO:  (2) to inject /api on routes
 app.use( (req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin","*");
   res.setHeader("Access-Control-Allow-Headers","Origin, X-Request-With, Content-Type, Accept, Authorization, Content-Disposition");
@@ -50,6 +43,10 @@ app.use( (req, res, next) => {
 });
 app.use(bodyParser.json());
 app.use(auth.authRoute);
+app.use((req, res, next) => {
+  debugMsg(`${req.method}: ${req.originalUrl}`);
+  next()
+})
 
 
 // mongo as a service
@@ -75,8 +72,6 @@ const upload = multer({
  * import a route from a gpx file
  ******************************************************************/
 app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), async (req, res) => {
-
-  debugMsg('import-route');
 
   try {
 
@@ -109,8 +104,6 @@ app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), asyn
  *****************************************************************/
 app.post('/api/save-imported-path/', auth.verifyToken, async (req, res) => {
 
-  debugMsg(`save-imported-path, type=${req.body.pathType}, id=${req.body.pathId}`);
-
   try {
 
     const condition = {_id: req.body.pathId};
@@ -134,9 +127,6 @@ app.post('/api/save-imported-path/', auth.verifyToken, async (req, res) => {
  * Save a user-created route to database; geoJSON is supplied in POST body
  *****************************************************************/
 app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
-
-
-  debugMsg(`save-created-route`);
 
   try {
 
@@ -166,8 +156,6 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
  *****************************************************************/
 app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
 
-  debugMsg(`get-path-by-id, type=${req.params.type}, id=${req.params.id}` );
-
   try {
 
     const document = await mongoModel(req.params.type).findOne( {_id: req.params.id});
@@ -196,8 +184,6 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
  * offset is used by list to request chunks of x paths at a time
  *****************************************************************/
 app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
-
-  debugMsg(`get-paths-list, type=${req.params.type}, id=${req.params.id}`);
 
   try {
 
@@ -241,8 +227,6 @@ app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyTok
  *****************************************************************/
 app.delete('/api/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
 
-  debugMsg(`delete-path, type=${req.params.type}, id=${req.params.id}`);
-
   try {
 
     await mongoModel(req.params.type).deleteOne( {_id: req.params.id} );
@@ -268,8 +252,6 @@ app.delete('/api/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
  // Step 1, write the data to gpx file
 app.get('/api/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) => {
 
-  debugMsg(`Write path to gpx, type=${req.params.type}, id=${req.params.id}`);
-
   try {
 
     const document = await mongoModel(req.params.type).findOne({_id: req.params.id});
@@ -287,8 +269,6 @@ app.get('/api/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) =
 
 // Step 2, download the file to browser
 app.get('/api/download-file/:fname', auth.verifyToken, async (req, res) => {
-
-  debugMsg(`Download file from server, filename=${req.params.fname}`);
 
   const fname = './downloads/' + req.params.fname;
 
@@ -321,8 +301,6 @@ app.get('/api/download-file/:fname', auth.verifyToken, async (req, res) => {
  * and returns it back to the front end
  *****************************************************************/
 app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
-
-  debugMsg('get-path-from-points')
 
   try {
 
@@ -357,8 +335,6 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
 app.post('/api/toggle-path-public/', auth.verifyToken, async (req, res) => {
 
-  debugMsg(`toggle-path-public, pathType=${req.body.pathType}, pathId=${req.body.pathId}`)
-
   try {
 
     // query database path database to determine current status of path
@@ -383,8 +359,6 @@ app.post('/api/toggle-path-public/', auth.verifyToken, async (req, res) => {
  *****************************************************************/
 
 app.post('/api/copy-public-path/', auth.verifyToken, async (req, res) => {
-
-  debugMsg(`copy-public-path, pathType=${req.body.pathType}, pathId=${req.body.pathId}`)
 
   try {
 
@@ -416,8 +390,6 @@ app.post('/api/copy-public-path/', auth.verifyToken, async (req, res) => {
 
 app.get('/api/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
 
-  debugMsg(`reverse-route, pathId=${req.params.pathId}`)
-
   try {
 
     const sourceDoc = await mongoModel(req.params.pathType).findOne({_id: req.params.pathId});
@@ -445,8 +417,6 @@ app.get('/api/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, re
  *****************************************************************/
 app.post('/api/flush/', auth.verifyToken, async (req, res) => {
 
-  debugMsg('flush db');
-
   try {
 
     await mongoModel('route').deleteMany( {userId: userId, isSaved: false} )
@@ -466,7 +436,6 @@ app.post('/api/flush/', auth.verifyToken, async (req, res) => {
  * Useful for server debugging
  *****************************************************************/
 app.get('/api/ping/', (req, res) => {
-  debugMsg('ping');
   res.status(201).json({hello: 'world'});
 })
 
