@@ -6,11 +6,11 @@ export const M_TO_FT = 3.28084;
 export const EXPORT_FILE_SIZE_LIMIT = 100000;
 export const LONG_PATH_THRESHOLD = 1000;
 
-export const links = {
-    wiki: {
-        elevations: 'https://github.com/kissenger/cotopaxi/wiki/Elevations'
-    }
-};
+// export const links = {
+//     wiki: {
+//         elevations: 'https://github.com/kissenger/cotopaxi/wiki/Elevations'
+//     }
+// };
 
 // the following will eventually be set by user profile
 
