@@ -14,7 +14,7 @@ import { AlertService } from 'src/app/shared/services/alert.service';
   templateUrl: './panel-details.component.html',
   styleUrls: ['./panel-details.component.css']
 })
-export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
+export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   // local variables
   @Input() callingPage: string;

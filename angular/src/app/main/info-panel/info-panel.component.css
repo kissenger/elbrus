@@ -1,16 +1,73 @@
+
+div{
+  --top-margin: 10px;
+  --bottom-margin: 30px;
+  --collapse-bar-height: 10px;
+  --tabs-height: 50px;
+}
+
+
+.hide {
+  display: none;
+  pointer-events: none;
+}
+
+
 .info-panel {
-    top: 0px;
+
+    top: var(--top-margin);
     right: 0px;
     width: 225px;
     font-size: smaller;
-    /* pointer-events: none; */
+    height: calc(100% - var(--bottom-margin));
+    pointer-events: none;
     /* border: orange 1px solid; */
 }
 
 .outer-container {
+    /* top: 5px; */
     background: rgba(255,255,255,0.5); /* newer browsers */
-    /* border: purple 1px dashed; */
+    height: calc(100% - var(--collapse-bar-height));
+    border-bottom-left-radius: 5px;
+    pointer-events: auto;
 }
+
+.minimised-panel {
+  /* top: 5px; */
+  background: rgba(255,255,255,0.5); /* newer browsers */
+  border-bottom-left-radius: 5px;
+  pointer-events: auto;
+
+  /* border: purple 1px dashed; */
+}
+
+.collapse-btn {
+  height: var(--collapse-bar-height);
+  top: 0px;
+  pointer-events: auto;
+  background: rgba(255,255,255,0.5);
+  border-top-left-radius: 5px;
+}
+
+.collapse-btn:hover {
+  cursor: pointer;
+}
+
+
+.chevron {
+  opacity: 0.5;
+  top: -5px;
+}
+
+.chevron:hover {
+  opacity: 1;
+}
+
+
+/* .inner-container { */
+  /* background: rgba(255,255,255,0.5); */
+  /* border: purple 1px dashed; */
+/* } */
 
 /* this is needed to ensure that the tabs which are hidden and overlay
 the active tab, do not interfere with the active tab inputs */
@@ -20,5 +77,7 @@ the active tab, do not interfere with the active tab inputs */
 
 .panel-size-calc {
     width: calc(100% - 10px);
-    height: calc(100% - 90px);
+    height: calc(100% - var(--collapse-bar-height) - var(--tabs-height));
+    border-bottom-left-radius: 5px;
 }
+

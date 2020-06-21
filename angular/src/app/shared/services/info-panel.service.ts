@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { PanelRoutesCreateDetailsComponent } from 'src/app/main/info-panel/panels/panel-details/panel-details.component';
-import { PanelRoutesListListComponent } from 'src/app/main/info-panel/panels/panel-list/panel-list.component';
-import { PanelRoutesListOptionsComponent } from 'src/app/main/info-panel/panels/panel-routes-list-options/panel-routes-list-options.component';
+import { PanelDetailsComponent } from 'src/app/main/info-panel/panels/panel-details/panel-details.component';
+import { PanelListComponent } from 'src/app/main/info-panel/panels/panel-list/panel-list.component';
+import { PanelOptionsComponent } from 'src/app/main/info-panel/panels/panel-routes-list-options/panel-routes-list-options.component';
 import { TsTabsArray } from 'src/app/shared/interfaces';
 
 @Injectable({
@@ -16,31 +16,31 @@ export class InfoPanelService {
   { create:
       [ { active: true,
           name: 'details',
-          component: PanelRoutesCreateDetailsComponent },
+          component: PanelDetailsComponent },
         { active: false,
           name: 'overlay',
-          component: PanelRoutesListListComponent } ],
+          component: PanelListComponent } ],
     edit:
       [ { active: true,
           name: 'details',
-          component: PanelRoutesCreateDetailsComponent },
+          component: PanelDetailsComponent },
         { active: false,
           name: 'overlay',
-          component: PanelRoutesListListComponent } ],
+          component: PanelListComponent } ],
     review:
       [ { active: true,
           name: 'details',
-          component: PanelRoutesCreateDetailsComponent } ],
+          component: PanelDetailsComponent } ],
     list:
       [ { active: true,
           name: 'list',
-          component: PanelRoutesListListComponent },
+          component: PanelListComponent },
         { active: false,
           name: 'details',
-          component: PanelRoutesCreateDetailsComponent },
+          component: PanelDetailsComponent },
         { active: false,
           name: 'options',
-          component: PanelRoutesListOptionsComponent } ]
+          component: PanelOptionsComponent } ]
   };
 
   constructor() { }

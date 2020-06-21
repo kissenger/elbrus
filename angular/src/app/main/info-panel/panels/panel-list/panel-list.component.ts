@@ -16,7 +16,7 @@ const AUTO_SELECT_ON = true;
   templateUrl: './panel-list.component.html',
   styleUrls: ['./panel-list.component.css']
 })
-export class PanelRoutesListListComponent implements OnInit, OnDestroy {
+export class PanelListComponent implements OnInit, OnDestroy {
 
   @Input() callingPage: string;
 

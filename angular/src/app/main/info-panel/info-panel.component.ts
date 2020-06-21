@@ -14,6 +14,8 @@ export class InfoPanelComponent implements OnInit {
   // bind to property in parent to determine which page called the info panel
   @Input() callingPage: string;
   public tabsArray: TsTabsArray;
+  public icon = '-';
+  public isMinimised = false;
 
   constructor(
     private infoPanelService: InfoPanelService,
@@ -24,8 +26,21 @@ export class InfoPanelComponent implements OnInit {
     this.tabsArray = this.infoPanelService.getTabs(this.callingPage);
   }
 
-  onClick(e) {
-    // this.dataService.activeTabEmitter.emit(e.target.id);/
+  // onTabClick(e) {
+  //   // this.dataService.activeTabEmitter.emit(e.target.id);/
+  // }
+
+  onMinimiseClick() {
+    this.isMinimised = !this.isMinimised;
+    this.icon = this.isMinimised ? '+' : '-';
+  }
+
+  getClass(tab) {
+    if ( tab.active ) {
+      return 'active show';
+    } else {
+      return '';
+    }
   }
 
 }

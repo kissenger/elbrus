@@ -1,28 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-<<<<<<< HEAD
-import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsElevationQuery, TsUser, TsPosition } from 'src/app/shared/interfaces';
-=======
 import { TsCoordinate, TsElevationQuery, TsUser } from 'src/app/shared/interfaces';
->>>>>>> master
 import { environment } from 'src/environments/environment';
-import * as path from 'path';
-import { flush } from '@angular/core/testing';
-import { get } from 'http';
-import { by } from 'protractor';
-import { write } from 'fs';
-import { from } from 'rxjs';
 
 @Injectable()
 export class HttpService {
 
 
   private mapBoxAccessToken = environment.MAPBOX_TOKEN;
-<<<<<<< HEAD
-=======
-
->>>>>>> master
   private protocol = environment.BACKEND_PROTOCOL;
   private url = environment.BACKEND_URL;
   private backendURL = `${this.protocol}://${this.url}`;

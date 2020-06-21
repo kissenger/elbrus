@@ -13,7 +13,7 @@ import { TsFeatureCollection } from 'src/app/shared/interfaces';
   templateUrl: './panel-routes-list-options.component.html',
   styleUrls: ['./panel-routes-list-options.component.css']
 })
-export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
+export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   private activePathSubscription: Subscription;
   private subscription: Subscription;
