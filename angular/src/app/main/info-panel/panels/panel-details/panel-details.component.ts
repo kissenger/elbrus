@@ -34,7 +34,7 @@ export class PanelRoutesCreateDetailsComponent implements OnInit, OnDestroy {
   public isHills: boolean;
   public isData = false;
   public units: TsUnits = this.auth.getUser().units;
-  public wikiLink: string = globals.links.wiki.elevations;
+  // public wikiLink: string = globals.links.wiki.elevations;
   public pathCategory: string;
   public pathType: string;
   public pathStats: TsPathStats = globals.emptyStats;

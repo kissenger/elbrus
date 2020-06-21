@@ -2,12 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
+<<<<<<< HEAD
 import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsPosition, TsBoundingBox } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from '../geojson.pipe';
+=======
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsLineString, TsFeature, TsPosition } from 'src/app/shared/interfaces';
+import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
+>>>>>>> master
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +21,11 @@ import { GeoJsonPipe } from '../geojson.pipe';
 
 export class MapService {
 
+<<<<<<< HEAD
   private accessToken = environment.MAPBOX_TOKEN;
+=======
+  private accessToken: string = environment.MAPBOX_TOKEN;
+>>>>>>> master
   public tsMap: mapboxgl.Map;
   public layers: ActiveLayers;
 

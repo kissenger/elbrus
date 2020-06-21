@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+<<<<<<< HEAD
 import * as globals from 'src/app/shared/globals';
 import { TsCoordinate, TsElevationQuery, TsUser, TsPosition } from 'src/app/shared/interfaces';
+=======
+import { TsCoordinate, TsElevationQuery, TsUser } from 'src/app/shared/interfaces';
+>>>>>>> master
 import { environment } from 'src/environments/environment';
 import * as path from 'path';
 import { flush } from '@angular/core/testing';
@@ -15,10 +19,13 @@ export class HttpService {
 
 
   private mapBoxAccessToken = environment.MAPBOX_TOKEN;
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
   private protocol = environment.BACKEND_PROTOCOL;
-  private host = environment.BACKEND_HOST;
-  private port = environment.BACKEND_PORT;
-  private backendURL = `${this.protocol}://${this.host}:${this.port}`;
+  private url = environment.BACKEND_URL;
+  private backendURL = `${this.protocol}://${this.url}`;
 
   constructor( private http: HttpClient ) {
 
@@ -65,7 +72,7 @@ export class HttpService {
     } else {
       query = '?';
       bbox.forEach( (coord, index) => {
-        query += 'bbox=' + coord;
+        query += 'bbox=' + coord.toFixed(6);
         if (index !== bbox.length - 1) { query += '&'; }
       });
     }

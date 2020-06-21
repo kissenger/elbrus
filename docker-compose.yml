@@ -1,36 +1,19 @@
 version: '3'
 services:
 
-        #  certbot:
-        #    image: certbot/certbot
-    #    container_name: certbot
-    #    volumes:
-    #      - certbot-etc:/etc/letsencrypt
-    #      - certbot-var:/var/lib/letsencrypt
-    #      - web-root:/usr/share/nginx/html
-    #    depends_on:
-    #      - angular
-# Uncomment for certbot install, comment for production
-# command: certonly --webroot --webroot-path=/usr/share/nginx/html --email ivyterrace@hotmail.co.uk --agree-tos --no-eff-email --staging -d trailscape.cc -d www.trailscape.cc
-#    command: certonly --force-renewal --webroot --webroot-path=/usr/share/nginx/html --email ivyterrace@hotmail.co.uk --agree-tos --no-eff-email -d trailscape.cc -d www.trailscape.cc
-
   angular:
     build: angular
-    #depends_on:
-    #  - nodejs
+    depends_on:
+      - nodejs
     ports:
       - "80:80"
-# Comment for certbot install, uncomment for production
       - "443:443"
     volumes:
-# The first line is for certbox install, the second for production
-#- ./nginx-conf/certbot:/etc/nginx/conf.d
       - ./nginx-conf/prod:/etc/nginx/conf.d
+      - ./dhparam:/etc/ssl/certs
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
-      - web-root:/usr/share/nginx/html
-      - ./dhparam:/etc/ssl/certs
-  
+      
   nodejs:
     build: nodejs
 # volume needs to be mounted using the following command
@@ -43,4 +26,3 @@ services:
 volumes:
     certbot-etc:
     certbot-var:
-    web-root:

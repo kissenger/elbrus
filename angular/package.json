@@ -9,6 +9,9 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+  "resolutions": {
+    "@babel/preset-env": "7.5.5"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^9.0.1",

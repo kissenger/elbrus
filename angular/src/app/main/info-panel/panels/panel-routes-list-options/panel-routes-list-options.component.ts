@@ -86,7 +86,7 @@ export class PanelRoutesListOptionsComponent implements OnInit, OnDestroy {
       this.httpService.downloadFile(fname.fileName).subscribe( (response) => {
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(response);
-        link.download = fname.fileName + '.gpx';
+        link.download = fname.fileName;
         link.click();
       });
     });
