@@ -1,4 +1,4 @@
-import { TsFeatureCollection, TsCoordinate, TsPosition, TsFeature, TsPoint } from '../interfaces';
+import { TsFeatureCollection, TsCoordinate, TsPosition, TsFeature, TsPoint, TsBoundingBox } from '../interfaces';
 import { GeoJsonPipe } from '../geojson.pipe';
 import { Injector } from '@angular/core';
 
@@ -20,6 +20,21 @@ export class Path {
   get geoJson() {
     return  this._geoJson;
   }
+
+
+
+  get boundingBox() {
+
+    const bb = this.coords.reduce( (bbox, point) => ({
+      minLng: Math.min(point.lng, bbox.minLng),
+      maxLng: Math.max(point.lng, bbox.maxLng),
+      minLat: Math.min(point.lat, bbox.minLat),
+      maxLat: Math.max(point.lat, bbox.maxLat)
+    }), { minLng: 180, minLat: 90, maxLng: -180, maxLat: -90 });
+
+    return <TsBoundingBox>[bb.minLng, bb.minLat, bb.maxLng, bb.maxLat];
+  }
+
 
 
   get firstPoint(): TsCoordinate {

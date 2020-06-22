@@ -9,6 +9,8 @@ import { PathHistory } from 'src/app/shared/classes/path-history';
 import { AlertService } from './alert.service';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from '../geojson.pipe';
+import * as mapboxgl from 'mapbox-gl';
+// import { mapboxgl } from ''
 
 @Injectable({
   providedIn: 'root'
@@ -170,6 +172,21 @@ export class MapCreateService extends MapService {
         });
       }
     });
+  }
+
+
+
+  public fitView() {
+    // { minLng: 180, minLat: 90, maxLng: -180, maxLat: -90 }
+
+    const bbox = this.history.boundingBox;
+
+    this.bounds = bbox;
+    // const sw = new mapboxgl.LngLat(bbox.minLng, bbox.minLat);
+    // const ne = new mapboxgl.LngLat(bbox.maxLng, bbox.maxLat);
+    // const bounds = new mapboxgl.LngLatBounds(sw, ne);
+
+    // this.tsMap.fitBounds(bounds);
   }
 
 

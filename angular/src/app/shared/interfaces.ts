@@ -128,6 +128,8 @@ export interface TsLineString {
 }
 
 export type TsPosition = [number, number];
+
+/*minLng, minLat, maxLng, maxLat*/
 export type TsBoundingBox = [number, number, number, number];
 
 export interface TsGeoJsonProperties {

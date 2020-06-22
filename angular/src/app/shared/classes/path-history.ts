@@ -157,6 +157,13 @@
 
     }
 
+
+    get boundingBox() {
+      if ( this.lastPath ) {
+        return this.lastPath.boundingBox;
+      }
+    }
+
     get startEndPoints() {
       if ( this.lastPath ) {
         return this.lastPath.startEndPoints;
