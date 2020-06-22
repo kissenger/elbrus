@@ -33,7 +33,7 @@ export class InfoPanelService {
           component: PanelDetailsComponent } ],
     list:
       [ { active: true,
-          name: 'list',
+          name: 'routes',
           component: PanelListComponent },
         { active: false,
           name: 'details',

@@ -21,6 +21,7 @@ const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
 const debugMsg = require('./debug').debugMsg;
 const mongoModel = require('./app-helpers.js').mongoModel;
 const bbox2Polygon = require('./app-helpers.js').bbox2Polygon;
+const bbox2Point = require('./app-helpers.js').bbox2Point;
 const getListData = require('./app-helpers.js').getListData;
 const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 const getMongoObject = require('./path-helpers.js').getMongoObject;
@@ -221,40 +222,87 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
  * bbox is delivered as a req parameter - either array or 0 if not reqd
  * pathType is the type of path (obvs)
  * offset is used by list to request chunks of x paths at a time
+ *****************************************************************
+ * v2 change - return all routes regardless of window, and add 
+ * boolean to identify those that are within the window
  *****************************************************************/
 app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
 
-  try {
+  // try {
 
-    let condition;
+    // let condition;
 
-    if (req.params.isPublic === 'false') {
-      condition = {isSaved: true, userId: req.userId};
-    } else {
-      condition = {isSaved: true, isPublic: true};
-    }
+    // if (req.params.isPublic === 'false') { 
+    //   condition = {isSaved: true, userId: req.userId};
+    // } else {
+    //   condition = {isSaved: true, isPublic: true};
+    // }
 
-    // if a boundingbox was supplied construct the geo query
-    if (req.query.bbox !== '0') {
-      const geometry = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
-      condition = {...condition, geometry: { $geoIntersects: { $geometry: geometry} } }
-    }
-    const filter = {stats: 1, info: 1, startTime: 1, creationDate: 1};
-    const sort = req.params.pathType === 'track' ? {startTime: -1} : {creationDate: -1};
-    const limit = req.params.limit;
-    const offset = req.params.offset
+  //   db.paging.aggregate([
+  //     { "$geoNear": {
+  //         "near": [106.606033,29.575897 ],
+  //         "spherical": true,
+  //         "distanceField": "distance",
+  //         "distanceMuliplier": 6371,
+  //         "maxDistance": 1/6371
+  //     }},
+  //     { "$sort": { "distance": 1, "createdate": -1 } },
+  //     { "$skip": ( 2-1 ) * 2 },
+  //     { "$limit": 5 }
+  // ])
+
     const pathType = req.params.pathType;
+    const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
+    const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
+    console.log(point);
+    console.log(req.query.bbox)
 
-    const count = await mongoModel(pathType).countDocuments(condition);
-    const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));
-    res.status(201).json( getListData(docs, count) );
+    const docs = await mongoModel(pathType).aggregate([
+      {$geoNear: {
+        near: point,
+        spherical: false,
+        distanceField: 'distance',
+        query: {userId: req.userId}
+        // query: { geometry: { $geoIntersects: { $geometry: box} } }
+      }},
+      {$facet: {
+        count: [{ $count: "count" }],
+        list: [
+          {$limit: req.params.limit * 1},
+          {$skip: (req.params.limit * 1) * req.params.offset } ]
+        }
+      }
+    ])
+    
+    console.log(docs[0].list);
+    console.log(docs[0].count[0].count);
 
-  } catch (error) {
+    res.status(201).json( getListData(docs[0].list, docs[0].count[0].count) );
 
-    debugMsg('ERROR: ' + error);
-    res.status(500).send(error.message);
+    // console.log(docs);
 
-  }
+    // // if a boundingbox was supplied construct the geo query
+    // if (req.query.bbox !== '0') {
+    //   const geometry = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
+    //   condition = {...condition, geometry: { $geoIntersects: { $geometry: geometry} } }
+    // }
+    // const filter = {stats: 1, info: 1, startTime: 1, creationDate: 1};
+    // const sort = req.params.pathType === 'track' ? {startTime: -1} : {creationDate: -1};
+    // const limit = req.params.limit;
+    // const offset = req.params.offset
+    // const pathType = req.params.pathType;
+
+    // const count = await mongoModel(pathType).countDocuments(condition);
+    // // const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));
+    // const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));
+    // res.status(201).json( getListData(docs, count) );
+
+  // } catch (error) {
+
+    // debugMsg('ERROR: ' + error);
+    // res.status(500).send(error.message);
+
+  // }
 
 })
 

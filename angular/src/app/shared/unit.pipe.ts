@@ -49,15 +49,15 @@ export class UnitPipe implements PipeTransform {
 
       if (unitA === 'm') {
         if (unitB === 'km' ) {
-          return value.toFixed(1) + unitString;
+          return value.toFixed(0) + unitString;
         } else if (unitB === 'mi') {
-          return (value / KM_2_MI).toFixed(1) + unitString;
+          return (value / KM_2_MI).toFixed(0) + unitString;
         }
       } else if (unitA === 'ft') {
         if (unitB === 'km' ) {
-          return (value * M_2_FT).toFixed(1) + unitString;
+          return (value * M_2_FT).toFixed(0) + unitString;
         } else if (unitB === 'mi') {
-          return (value * M_2_FT / KM_2_MI).toFixed(1) + unitString;
+          return (value * M_2_FT / KM_2_MI).toFixed(0) + unitString;
         }
       }
     }

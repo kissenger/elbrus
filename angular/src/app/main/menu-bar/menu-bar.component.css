@@ -4,11 +4,11 @@
 .menu-bar {
     top: 0px;
     left: 0px;
-    font-size: small;    
+    font-size: small;
     opacity: 0.5;
 }
 
-.menu-bar:hover { 
+.menu-bar:hover {
     opacity: 1.0;
 }
 
@@ -24,7 +24,10 @@
 
 .button {
     font-size: small;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
+
 .radio-btns  {
     border-top-left-radius: none;
     border-top-right-radius: none;

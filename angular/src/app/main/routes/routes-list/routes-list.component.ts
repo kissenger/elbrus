@@ -4,6 +4,7 @@ import { DataService } from 'src/app/shared/services/data.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
+import * as globals from 'src/app/shared/globals';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
@@ -16,10 +17,16 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
   private pathIdSubscription: Subscription;
   private geoJSON;
+  private overlaidPaths = [];
   private plotOptions: TsPlotPathOptions = {
     booResizeView: true,
     booSaveToStore: true,
     booPlotMarkers: true
+  };
+  private overlayPlotOptions: TsPlotPathOptions = {
+    booResizeView: false,
+    booSaveToStore: false,
+    booPlotMarkers: false
   };
   private lineStyle: TsLineStyle = {}; // take lineStyle from geoJSON
 
@@ -41,34 +48,61 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // if we come into list component from eg delet route, the map exists and is causing trouble, so delete it and start afresh
+    // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.mapService.isMap()) { this.mapService.kill(); }
+
+    this.mapService.newMap();
 
     // listen for pathID emission from panel-routes-list-list, and get the path from the backend
     this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( (obj) => {
 
       const pathId = obj.id;
+      const isOverlay = obj.isOverlay;
       this.plotOptions.booResizeView = obj.booResizeView;
 
       if (pathId === '0') {
 
         // no path id found so default to users default location
-        this.mapService.newMap();
+        // this.mapService.newMap();
 
       } else {
 
-        this.httpService.getPathById('route', pathId).subscribe( (result) => {
+        // this.httpService.getPathById('route', pathId).subscribe( (result) => {
 
-          // put on the class to avoid passing to functions
-          this.geoJSON = result.hills;
+          if ( isOverlay ) {
+            if (!this.overlaidPaths.includes(pathId)) {
 
-          // as initialisation will temporarily show default location, only run it if map doesnt currently exist
-          this.initialiseMapIfNeeded().then( () => {
-            this.mapService.clear();
-            this.mapService.add(this.geoJSON, this.lineStyle, this.plotOptions);
-          });
+              this.httpService.getPathById('route', pathId).subscribe( (result) => {
+                this.mapService.remove(pathId);
+                this.mapService.add(result.basic, globals.overlayLineStyle, this.overlayPlotOptions);
+                this.overlaidPaths.push(pathId);
+              });
 
-        });
+            // otherwise pathID is present, so remove from map and delete key from object
+            } else {
+
+              this.mapService.remove(pathId);
+              this.overlaidPaths.splice(this.overlaidPaths.indexOf(pathId), 1);
+
+            }
+
+          } else {
+            this.httpService.getPathById('route', pathId).subscribe( (result) => {
+              this.geoJSON = result.hills;
+
+              // as initialisation will temporarily show default location, only run it if map doesnt currently exist
+              this.initialiseMapIfNeeded().then( () => {
+                this.mapService.clear();
+                this.mapService.add(this.geoJSON, this.lineStyle, this.plotOptions);
+              });
+
+            });
+
+          }
+
+
+
+        // });
       }
     });
   }

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsListArray } from 'src/app/shared/interfaces';
+import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate } from 'src/app/shared/interfaces';
 import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { MapService } from 'src/app/shared/services/map.service';
@@ -29,13 +29,12 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public numberOfRoutes: number;
   public numberOfLoadedRoutes: number;
   public isEndOfList = false;
+  public homeLocation: TsCoordinate = this.auth.getUser().homeLngLat;
+  private boundingBox: TsBoundingBox = null;
   private pathId: string;
-  private boundingBox: Array<number> = [];
   private activePathsArray: Array<string> = [];     // array of pathsIds that are displayed on the map
-  public listData: TsListArray = [];               // the items in this array are displayed in the panel
-  private isDynamicUpdateOn = false;
+  public listData: TsListArray = [];                // the items in this array are displayed in the panel
   public publicOrPrivatePaths = 'private';
-  private isMultiSelectOn: boolean;
   public units: TsUnits = this.auth.getUser().units;
 
   constructor(
@@ -49,16 +48,47 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // configure based on type of calling page
-    if (this.callingPage === 'create' || this.callingPage === 'edit') {
-      this.dynamicUpdateOn();
-      this.isMultiSelectOn = true;
-      this.addPathsToList(AUTO_SELECT_OFF);
-    } else {
-      // dynamicUpdate is off by default, dont need to call it here
-      this.isMultiSelectOn = false;
-      this.addPathsToList(AUTO_SELECT_ON);
-    }
+    console.log(this.homeLocation);
+
+    // subscribe to change in map view
+    this.mapUpdateSubscription = this.dataService.mapBoundsEmitter.subscribe( (bb: Array<number>) => {
+      console.log('map view has changed');
+
+      this.boundingBox = <TsBoundingBox>bb;
+      this.listOffset = 0;
+      this.listData = [];
+
+      this.getPathsSubscription = this.httpService
+        .getPathsList('route', this.publicOrPrivatePaths === 'public', this.listOffset, this.limit, this.boundingBox)
+        .subscribe( fromBackEnd => {
+          console.log('new list from backend');
+          console.log(fromBackEnd);
+
+
+          // make sure we keep any selected items in the list, even if they are outside the current view
+          // get the full list items for each selected route, and add to the items returnd from the backend
+          const selectedListItems = this.listData.filter(listItem => this.activePathsArray.includes(listItem.pathId));
+          const fullList = [...selectedListItems, ...fromBackEnd];
+
+          // filter out duplicates
+          const fullListPathIds = fullList.map( item => item.pathId );
+          const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
+          this.listData = filteredList;
+
+          this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : this.listData[0].count;
+          this.numberOfLoadedRoutes = this.listData.length;
+          this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
+
+          // emit the first id in the list and highlight that row
+          // if (booAutoSelectPathId) {
+            // this.onRouteSelect(this.listData.length === 0 ? '0' : this.listData[0].pathId);
+          // }
+
+      });
+    });
+
+    // populate the list
+    this.addPathsToList(AUTO_SELECT_ON);
 
     // in case units are changed while viewing the list
     this.dataServiceSubscription = this.dataService.unitsUpdateEmitter.subscribe( () => {
@@ -71,9 +101,19 @@ export class PanelListComponent implements OnInit, OnDestroy {
   // update the list after 'more' button is pressed
   addPathsToList(booAutoSelectPathId = false) {
 
+    try {
+      this.boundingBox = <TsBoundingBox>this.mapCreateService.getMapBounds();
+    } catch {
+      this.boundingBox = <TsBoundingBox>this.mapService.getMapBounds();
+    }
+
+    console.log('add paths to list, bbox=', this.boundingBox);
+
     this.getPathsSubscription = this.httpService
       .getPathsList('route', this.publicOrPrivatePaths === 'public', this.listOffset, this.limit, this.boundingBox)
       .subscribe( fromBackEnd => {
+        console.log(fromBackEnd);
+        console.log(this.boundingBox);
 
         this.listData = this.listData.concat(fromBackEnd);
         this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : this.listData[0].count;
@@ -82,7 +122,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
         // emit the first id in the list and highlight that row
         if (booAutoSelectPathId) {
-          this.onLineClick(this.listData.length === 0 ? '0' : this.listData[0].pathId);
+          this.onRouteSelect(this.listData.length === 0 ? '0' : this.listData[0].pathId);
         }
 
 
@@ -96,79 +136,24 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * Handles the update of the map after a view change
-   * This behaviour is desired for 'create' overlay, and for listing public paths
-   * This is called within the subscription to 'moveend'
-   */
-  updateListAfterMapMove(booAutoSelectPathId) {
-
-    this.listOffset = 0;
-    this.listData = [];
-
-    this.getPathsSubscription = this.httpService
-      .getPathsList('route', this.publicOrPrivatePaths === 'public', this.listOffset, this.limit, this.boundingBox)
-      .subscribe( fromBackEnd => {
-
-        // make sure we keep any selected items in the list, even if they are outside the current view
-        // get the full list items for each selected route, and add to the items returnd from the backend
-        const selectedListItems = this.listData.filter(listItem => this.activePathsArray.includes(listItem.pathId));
-        const fullList = [...selectedListItems, ...fromBackEnd];
-
-        // filter out duplicates
-        const fullListPathIds = fullList.map( item => item.pathId );
-        const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
-        this.listData = filteredList;
-
-        this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : this.listData[0].count;
-        this.numberOfLoadedRoutes = this.listData.length;
-        this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
-
-        // emit the first id in the list and highlight that row
-        if (booAutoSelectPathId) {
-          this.onLineClick(this.listData.length === 0 ? '0' : this.listData[0].pathId);
-        }
-
-    });
-
-  }
-
 
   /**
    * Configures the component to update after the map view is changed
    */
-  dynamicUpdateOn() {
 
-    if ( !this.isDynamicUpdateOn ) {  // dont turn on twice
-      this.isDynamicUpdateOn = true;
-
-      try {
-        this.boundingBox = this.mapCreateService.getMapBounds();
-      } catch {
-        this.boundingBox = this.mapService.getMapBounds();
-      }
-
-      // update the list when the view is moved
-      this.mapUpdateSubscription = this.dataService.mapBoundsEmitter.subscribe( (bb: Array<number>) => {
-        this.boundingBox = bb;
-        this.updateListAfterMapMove(AUTO_SELECT_OFF);
-      });
-
-    }
-  }
 
 
   /**
   * Configures the component to remain static - no update after map view change
   */
-  dynamicUpdateOff() {
+  // dynamicUpdateOff() {
 
-    this.isDynamicUpdateOn = false;
-    if (this.mapUpdateSubscription) {
-      this.mapUpdateSubscription.unsubscribe();
-    }
+  //   this.isDynamicUpdateOn = false;
+  //   if (this.mapUpdateSubscription) {
+  //     this.mapUpdateSubscription.unsubscribe();
+  //   }
 
-  }
+  // }
 
 
   /**
@@ -185,16 +170,32 @@ export class PanelListComponent implements OnInit, OnDestroy {
    */
   onSelectMenuChange() {
 
-    this.listOffset = 0;
-    this.listData = [];
-    this.boundingBox = [];
+    // this.listOffset = 0;
+    // this.listData = [];
+    // this.boundingBox = [this.homeLocation.lng, this.homeLocation.lat, this.homeLocation.lng, this.homeLocation.lat];
 
-    if ( this.publicOrPrivatePaths === 'public' ) {
-      this.dynamicUpdateOn();
-      this.addPathsToList(AUTO_SELECT_OFF);
+    // if ( this.publicOrPrivatePaths === 'public' ) {
+    //   // this.dynamicUpdateOn();
+    //   this.addPathsToList(AUTO_SELECT_OFF);
+    // } else {
+    //   this.dynamicUpdateOff();
+    //   this.addPathsToList(AUTO_SELECT_ON);
+    // }
+
+  }
+
+  onOverlaySelect(idFromClick: string) {
+
+    this.dataService.pathIdEmitter.emit({
+      id: idFromClick,                          // pathId of the clicked-on list item
+      booResizeView: false,       // if view is dynamic we dont want to resize the view when path is plotted
+      isOverlay: true
+    });
+
+    if (this.activePathsArray.includes(idFromClick)) {
+      this.activePathsArray.splice(this.activePathsArray.indexOf(idFromClick), 1);
     } else {
-      this.dynamicUpdateOff();
-      this.addPathsToList(AUTO_SELECT_ON);
+      this.activePathsArray.push(idFromClick);
     }
 
   }
@@ -205,29 +206,30 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * isMultiSelect behaviour is set in onInit()
    * Display of path is handled by emitting the pathId to map service
    */
-  onLineClick(idFromClick: string) {
+  onRouteSelect(idFromClick: string) {
 
     this.dataService.pathIdEmitter.emit({
       id: idFromClick,                          // pathId of the clicked-on list item
-      booResizeView: !this.isDynamicUpdateOn       // if view is dynamic we dont want to resize the view when path is plotted
+      booResizeView: true,       // if view is dynamic we dont want to resize the view when path is plotted
+      isOverlay: false
     });
 
-    if ( this.isMultiSelectOn ) {
+    // if ( this.isMultiSelectOn ) {
 
-      if (this.activePathsArray.includes(idFromClick)) {
-        this.activePathsArray.splice(this.activePathsArray.indexOf(idFromClick), 1);
-      } else {
-        this.activePathsArray.push(idFromClick);
-      }
+      // if (this.activePathsArray.includes(idFromClick)) {
+      //   this.activePathsArray.splice(this.activePathsArray.indexOf(idFromClick), 1);
+      // } else {
+      //   this.activePathsArray.push(idFromClick);
+      // }
 
-    } else {
+    // } else {
 
       if (idFromClick !== this.pathId) {
         this.pathId = idFromClick;
         this.activePathsArray = [idFromClick];
       }
 
-    }
+    // }
   }
 
 
@@ -236,7 +238,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * @param id id of the list item being processed
    * @param i index of the list item being processed
    */
-  getCssClass(id: string, i: number) {
+  getCssClass(id: string, i: number, leftOrRight: string) {
     let cssClass = '';
     if (this.callingPage === 'create') {
       if (this.activePathsArray.includes(id)) {
@@ -248,10 +250,20 @@ export class PanelListComponent implements OnInit, OnDestroy {
       }
     }
     if (i === 0) {
-      cssClass += 'border-top mt-1 rounded-top';
+      if ( leftOrRight === 'left' ) {
+        cssClass += 'border-top mt-1 list-box-top-left';
+      } else {
+        cssClass += 'border-top mt-1 list-box-top-right';
+      }
     }
     if (i === this.numberOfLoadedRoutes - 1) {
-      cssClass += 'rounded-bottom';
+      // cssClass += 'rounded-bottom';
+      // cssClass += '';
+      if ( leftOrRight === 'left' ) {
+        cssClass += 'list-box-bottom-left';
+      } else {
+        cssClass += 'list-box-bottom-right';
+      }
     }
     return cssClass;
   }

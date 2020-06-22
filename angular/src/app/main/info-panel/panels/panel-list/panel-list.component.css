@@ -26,3 +26,23 @@
  .list-container{
   cursor: pointer;
  }
+
+ .icon {
+   opacity: 0.5;
+ }
+
+ .list-box-top-left {
+   border-top-left-radius: 5px;
+ }
+
+ .list-box-top-right {
+  border-top-right-radius: 5px;
+}
+
+.list-box-bottom-left {
+  border-bottom-left-radius: 5px;
+}
+
+.list-box-bottom-right {
+  border-bottom-right-radius: 5px;
+}

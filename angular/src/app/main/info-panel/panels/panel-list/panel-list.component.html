@@ -29,26 +29,25 @@
   <ng-template #moreThanOneRouteDiv >
 
     <!-- Loop through available data and create a list box item for each-->
-    <div *ngFor="let line of listData; let i = index" class="list-container">
+    <div *ngFor="let line of listData; let i = index" class="list-container w-100">
 
-      <!-- conditional formatting for each list item, and click event-->
-      <div id={{line.pathId}}
-        (click)="onLineClick(line.pathId)"
-        class="p-1 border-bottom border-left border-right"
-        [ngClass]="getCssClass(line.pathId, i)">
+      <!-- empty container for each row -->
+      <div id="{{line.pathId}}" class="p-0 m-0 row">
 
-        <div class="name">{{line.name}}</div>
+        <!-- main list box element -->
+        <div [ngClass]="getCssClass(line.pathId, i, 'left')" class="col-11 m-0 p-1 border-left border-bottom" (click)="onRouteSelect(line.pathId)">
+          <div class="row m-0 p-0 name">{{line.name | name: 20}}</div>
+          <div class="row m-0 p-0">
+            <div class="col-6 m-0 p-0 text-left"><i class="fas fa-ruler icon"></i> {{line.stats.distance | units: 'distance': units.distance}}</div>
+            <!-- <div class="col-6 m-0 p-0 text-left"><i class="fas fa-mountain icon"></i> {{line.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}</div> -->
 
-        <table class="table table-sm m-0 p-0">
-          <tbody>
-            <tr>
-              <td>{{line.stats.distance | units: 'distance': units.distance}}</td>
-              <td *ngIf="line.isElevations"> {{line.stats.elevations.ascent | units: 'elevation': units.elevation}} </td>
-              <td *ngIf="line.isElevations"> {{line.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}} </td>
-            </tr>
-          </tbody>
-        </table>
+          </div>
+        </div>
 
+        <!-- clickable overlay box -->
+        <div [ngClass]="getCssClass(line.pathId, i, 'right')" class="col-1 m-0 p-0 border-left border-right border-bottom" (click)="onOverlaySelect(line.pathId)">
+          <i class="fas fa-plus icon"></i>
+        </div>
       </div>
     </div>
 

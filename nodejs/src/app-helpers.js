@@ -23,6 +23,15 @@ function mongoModel(pathType) {
 
 
 
+
+function bbox2Point(bbox) {
+  return [
+    (bbox[2] * 1 + bbox[0] * 1) / 2, 
+    (bbox[3] * 1 + bbox[1] * 1) / 2
+  ]
+}
+
+
 /**
  * Converts standard bounding box to polygon for mongo geometry query
  * bbox bounding box as [minlng, minlat, maxlng, maxlat]
@@ -51,13 +60,13 @@ function getListData(docs, count) {
   return docs.map( d => ({
     name: d.info.name,
     stats: d.stats,
-    category: d.info.category,
-    direction: d.info.direction,
-    pathType: d.info.pathType,
-    startTime: d.startTime,
-    creationDate: d.creationDate,
-    isElevations: d.info.isElevations,
-    isLong: d.info.isLong,
+    // category: d.info.category,
+    // direction: d.info.direction,
+    // pathType: d.info.pathType,
+    // startTime: d.startTime,
+    // creationDate: d.creationDate,
+    // isElevations: d.info.isElevations,
+    // isLong: d.info.isLong,
     pathId: d._id,
     count
     })
@@ -71,5 +80,6 @@ function getListData(docs, count) {
 module.exports = {
   mongoModel,
   bbox2Polygon,
+  bbox2Point,
   getListData
 }

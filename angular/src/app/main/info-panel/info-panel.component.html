@@ -35,7 +35,7 @@
         <!-- TABS -->
         <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
         <ul class="nav nav-tabs mt-2 ml-2 p-0 nav-justified" id="myTab" role="tablist">
-          <li *ngFor="let tab of tabsArray" class="nav-item">
+          <li *ngFor="let tab of tabsArray" class="nav-item m-0 p-0">
             <a [ngClass]="getClass(tab)" id="{{tab.title}}" class='nav-link' data-toggle="tab" href={{tab.href}} role="tab">
               {{tab.title}}
             </a>

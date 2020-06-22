@@ -86,6 +86,7 @@ const pathSchema = mongoose.Schema({
 
 pathSchema.index({ userId: 1, creationDate: 1});
 pathSchema.index({ userId: 1, startTime: 1});
+pathSchema.index({ geometry: "2dsphere" });
 
 const Routes = mongoose.model('routes', pathSchema);
 

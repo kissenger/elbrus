@@ -43,6 +43,7 @@ import { ProfileService } from './shared/services/profile.service';
 // Pipes
 import { UnitPipe } from './shared/unit.pipe';
 import { GeoJsonPipe } from './shared/geojson.pipe';
+import { NamePipe } from './shared/name.pipe';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { GeoJsonPipe } from './shared/geojson.pipe';
     InfoPanelComponent,
     MenuBarComponent,
     UnitPipe,
+    NamePipe,
     // InfoPanelDirective,
     PanelsInjectorComponent,
     PanelDetailsComponent,
@@ -87,6 +89,7 @@ import { GeoJsonPipe } from './shared/geojson.pipe';
     RegisterService,
     ProfileService,
     GeoJsonPipe,
+    NamePipe,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
