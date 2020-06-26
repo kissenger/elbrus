@@ -238,44 +238,33 @@ app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyTok
     //   condition = {isSaved: true, isPublic: true};
     // }
 
-  //   db.paging.aggregate([
-  //     { "$geoNear": {
-  //         "near": [106.606033,29.575897 ],
-  //         "spherical": true,
-  //         "distanceField": "distance",
-  //         "distanceMuliplier": 6371,
-  //         "maxDistance": 1/6371
-  //     }},
-  //     { "$sort": { "distance": 1, "createdate": -1 } },
-  //     { "$skip": ( 2-1 ) * 2 },
-  //     { "$limit": 5 }
-  // ])
-
     const pathType = req.params.pathType;
     const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
     const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
     console.log(point);
-    console.log(req.query.bbox)
+    console.log(box.coordinates)
 
     const docs = await mongoModel(pathType).aggregate([
       {$geoNear: {
         near: point,
         spherical: false,
         distanceField: 'distance',
-        query: {userId: req.userId}
-        // query: { geometry: { $geoIntersects: { $geometry: box} } }
+        // query: {userId: req.userId}
+        query: { userId: req.userId, geometry: { $geoIntersects: { $geometry: box} } }
       }},
       {$facet: {
         count: [{ $count: "count" }],
         list: [
-          {$limit: req.params.limit * 1},
-          {$skip: (req.params.limit * 1) * req.params.offset } ]
+          {$skip: req.params.limit * req.params.offset }, 
+          {$limit: req.params.limit * 1}]
         }
       }
     ])
     
-    console.log(docs[0].list);
-    console.log(docs[0].count[0].count);
+    // console.log(req.params.offset);
+    // console.log(req.params.limit);
+    // console.log(docs[0].list);
+    // console.log(docs[0].count[0].count);
 
     res.status(201).json( getListData(docs[0].list, docs[0].count[0].count) );
 

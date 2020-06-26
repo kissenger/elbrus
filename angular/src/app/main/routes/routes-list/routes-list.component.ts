@@ -18,17 +18,17 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private pathIdSubscription: Subscription;
   private geoJSON;
   private overlaidPaths = [];
-  private plotOptions: TsPlotPathOptions = {
-    booResizeView: true,
-    booSaveToStore: true,
-    booPlotMarkers: true
-  };
+  // private plotOptions: TsPlotPathOptions = {
+  //   booResizeView: false,
+  //   booSaveToStore: true,
+  //   booPlotMarkers: true
+  // };
   private overlayPlotOptions: TsPlotPathOptions = {
     booResizeView: false,
     booSaveToStore: false,
-    booPlotMarkers: false
+    booPlotMarkers: false,
   };
-  private lineStyle: TsLineStyle = {}; // take lineStyle from geoJSON
+  // private lineStyle: TsLineStyle = {}; // take lineStyle from geoJSON
 
 
   constructor(
@@ -57,8 +57,10 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( (obj) => {
 
       const pathId = obj.id;
-      const isOverlay = obj.isOverlay;
-      this.plotOptions.booResizeView = obj.booResizeView;
+      const lineColour = obj.colour;
+      console.log(obj)
+      // const isOverlay = obj.isOverlay;
+      // this.plotOptions.booResizeView = obj.booResizeView;
 
       if (pathId === '0') {
 
@@ -69,13 +71,19 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
         // this.httpService.getPathById('route', pathId).subscribe( (result) => {
 
-          if ( isOverlay ) {
+          // if ( isOverlay ) {
             if (!this.overlaidPaths.includes(pathId)) {
+
+              console.log(this.overlaidPaths);
+              console.log(lineColour)
 
               this.httpService.getPathById('route', pathId).subscribe( (result) => {
                 this.mapService.remove(pathId);
-                this.mapService.add(result.basic, globals.overlayLineStyle, this.overlayPlotOptions);
+                const lineStyle = this.overlaidPaths.length === 0 ? {} : {lineColour: lineColour} ;
+                console.log(lineColour)
+                this.mapService.add(result.hills, lineStyle, this.overlayPlotOptions);
                 this.overlaidPaths.push(pathId);
+
               });
 
             // otherwise pathID is present, so remove from map and delete key from object
@@ -86,19 +94,19 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
             }
 
-          } else {
-            this.httpService.getPathById('route', pathId).subscribe( (result) => {
-              this.geoJSON = result.hills;
+          // } else {
+          //   this.httpService.getPathById('route', pathId).subscribe( (result) => {
+          //     this.geoJSON = result.hills;
 
-              // as initialisation will temporarily show default location, only run it if map doesnt currently exist
-              this.initialiseMapIfNeeded().then( () => {
-                this.mapService.clear();
-                this.mapService.add(this.geoJSON, this.lineStyle, this.plotOptions);
-              });
+          //     // as initialisation will temporarily show default location, only run it if map doesnt currently exist
+          //     this.initialiseMapIfNeeded().then( () => {
+          //       this.mapService.clear();
+          //       this.mapService.add(this.geoJSON, this.lineStyle, this.plotOptions);
+          //     });
 
-            });
+          //   });
 
-          }
+          // }
 
 
 

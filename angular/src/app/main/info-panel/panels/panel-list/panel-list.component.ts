@@ -32,7 +32,12 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public homeLocation: TsCoordinate = this.auth.getUser().homeLngLat;
   private boundingBox: TsBoundingBox = null;
   private pathId: string;
-  private activePathsArray: Array<string> = [];     // array of pathsIds that are displayed on the map
+  public activePaths: Array<{id: string}> = [];     // array of pathsIds that are displayed on the map
+  // public col='red';
+  private highlightColours = ['#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00'];
+  private highlightOpacity = '1E';  // HEX for 30%
+  public nPaths;
+
   public listData: TsListArray = [];                // the items in this array are displayed in the panel
   public publicOrPrivatePaths = 'private';
   public units: TsUnits = this.auth.getUser().units;
@@ -48,47 +53,18 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    console.log(this.homeLocation);
+
+
+    this.listData = [];
+    this.addPathsToList();
 
     // subscribe to change in map view
-    this.mapUpdateSubscription = this.dataService.mapBoundsEmitter.subscribe( (bb: Array<number>) => {
-      console.log('map view has changed');
+    this.mapUpdateSubscription = this.dataService.mapBoundsEmitter.subscribe( () => {
 
-      this.boundingBox = <TsBoundingBox>bb;
-      this.listOffset = 0;
-      this.listData = [];
+      // this.boundingBox = <TsBoundingBox>bb;
+      this.addPathsToList();
 
-      this.getPathsSubscription = this.httpService
-        .getPathsList('route', this.publicOrPrivatePaths === 'public', this.listOffset, this.limit, this.boundingBox)
-        .subscribe( fromBackEnd => {
-          console.log('new list from backend');
-          console.log(fromBackEnd);
-
-
-          // make sure we keep any selected items in the list, even if they are outside the current view
-          // get the full list items for each selected route, and add to the items returnd from the backend
-          const selectedListItems = this.listData.filter(listItem => this.activePathsArray.includes(listItem.pathId));
-          const fullList = [...selectedListItems, ...fromBackEnd];
-
-          // filter out duplicates
-          const fullListPathIds = fullList.map( item => item.pathId );
-          const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
-          this.listData = filteredList;
-
-          this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : this.listData[0].count;
-          this.numberOfLoadedRoutes = this.listData.length;
-          this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
-
-          // emit the first id in the list and highlight that row
-          // if (booAutoSelectPathId) {
-            // this.onRouteSelect(this.listData.length === 0 ? '0' : this.listData[0].pathId);
-          // }
-
-      });
     });
-
-    // populate the list
-    this.addPathsToList(AUTO_SELECT_ON);
 
     // in case units are changed while viewing the list
     this.dataServiceSubscription = this.dataService.unitsUpdateEmitter.subscribe( () => {
@@ -99,7 +75,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
 
   // update the list after 'more' button is pressed
-  addPathsToList(booAutoSelectPathId = false) {
+  addPathsToList() {
+
+    this.listOffset = 0;
 
     try {
       this.boundingBox = <TsBoundingBox>this.mapCreateService.getMapBounds();
@@ -107,24 +85,25 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.boundingBox = <TsBoundingBox>this.mapService.getMapBounds();
     }
 
-    console.log('add paths to list, bbox=', this.boundingBox);
-
     this.getPathsSubscription = this.httpService
       .getPathsList('route', this.publicOrPrivatePaths === 'public', this.listOffset, this.limit, this.boundingBox)
       .subscribe( fromBackEnd => {
-        console.log(fromBackEnd);
-        console.log(this.boundingBox);
 
-        this.listData = this.listData.concat(fromBackEnd);
-        this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : this.listData[0].count;
+        // make sure we keep any selected items in the list, even if they are outside the current view
+        // get the full list items for each selected route, and add to the items returnd from the backend
+        console.log('listData=', this.listData);
+        console.log('activePaths=', this.activePaths);
+        const selectedListItems = this.listData.filter(listItem => listItem.pathId in this.activePaths);
+        const fullList = [...selectedListItems, ...fromBackEnd];
+
+        // filter out duplicates
+        const fullListPathIds = fullList.map( item => item.pathId );
+        const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
+        this.listData = filteredList;
+
+        this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : fromBackEnd[0].count;
         this.numberOfLoadedRoutes = this.listData.length;
         this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
-
-        // emit the first id in the list and highlight that row
-        if (booAutoSelectPathId) {
-          this.onRouteSelect(this.listData.length === 0 ? '0' : this.listData[0].pathId);
-        }
-
 
     }, (error) => {
 
@@ -137,23 +116,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
 
 
-  /**
-   * Configures the component to update after the map view is changed
-   */
-
-
-
-  /**
-  * Configures the component to remain static - no update after map view change
-  */
-  // dynamicUpdateOff() {
-
-  //   this.isDynamicUpdateOn = false;
-  //   if (this.mapUpdateSubscription) {
-  //     this.mapUpdateSubscription.unsubscribe();
-  //   }
-
-  // }
 
 
   /**
@@ -161,7 +123,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   */
   onMoreClick() {
     this.listOffset++;
-    this.addPathsToList(AUTO_SELECT_OFF);
+    this.addPathsToList();
   }
 
 
@@ -186,17 +148,23 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   onOverlaySelect(idFromClick: string) {
 
-    this.dataService.pathIdEmitter.emit({
-      id: idFromClick,                          // pathId of the clicked-on list item
-      booResizeView: false,       // if view is dynamic we dont want to resize the view when path is plotted
-      isOverlay: true
-    });
+    if ( Object.keys(this.activePaths)[0] !== idFromClick ) {
+      // dont do anything if the first active path has the same id as the clicked path
 
-    if (this.activePathsArray.includes(idFromClick)) {
-      this.activePathsArray.splice(this.activePathsArray.indexOf(idFromClick), 1);
-    } else {
-      this.activePathsArray.push(idFromClick);
+      this.dataService.pathIdEmitter.emit({
+        id: idFromClick,                          // pathId of the clicked-on list item
+        booResizeView: false,       // if view is dynamic we dont want to resize the view when path is plotted
+        isOverlay: true
+      });
+
+      if (idFromClick in this.activePaths) {
+        this.activePaths.splice(this.activePaths.indexOf(idFromClick), 1);
+      } else {
+        this.activePaths.push(idFromClick);
+      }
     }
+
+
 
   }
 
@@ -208,28 +176,33 @@ export class PanelListComponent implements OnInit, OnDestroy {
    */
   onRouteSelect(idFromClick: string) {
 
+
+    // if ( this.activePaths[0] !== idFromClick ) {
+      if ( this.activePaths.includes(idFromClick) ) {
+
+        this.activePaths.splice(this.activePaths.indexOf(idFromClick), 1);
+
+
+      } else {
+
+
+      // if (idFromClick !== this.pathId) {
+      //   this.pathId = idFromClick;
+        // this.activePaths = [idFromClick];
+        this.activePaths.push(idFromClick);
+
+      // }
+    }
+
+
     this.dataService.pathIdEmitter.emit({
       id: idFromClick,                          // pathId of the clicked-on list item
-      booResizeView: true,       // if view is dynamic we dont want to resize the view when path is plotted
-      isOverlay: false
+      // booResizeView: false,       // if view is dynamic we dont want to resize the view when path is plotted
+      // isOverlay: false,
+      colour: this.highlightColours[this.activePaths.indexOf(idFromClick) - 1]
     });
 
-    // if ( this.isMultiSelectOn ) {
 
-      // if (this.activePathsArray.includes(idFromClick)) {
-      //   this.activePathsArray.splice(this.activePathsArray.indexOf(idFromClick), 1);
-      // } else {
-      //   this.activePathsArray.push(idFromClick);
-      // }
-
-    // } else {
-
-      if (idFromClick !== this.pathId) {
-        this.pathId = idFromClick;
-        this.activePathsArray = [idFromClick];
-      }
-
-    // }
   }
 
 
@@ -238,34 +211,32 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * @param id id of the list item being processed
    * @param i index of the list item being processed
    */
-  getCssClass(id: string, i: number, leftOrRight: string) {
+  getCssClass(id: string, i: number) {
     let cssClass = '';
-    if (this.callingPage === 'create') {
-      if (this.activePathsArray.includes(id)) {
-        cssClass += 'highlight-div ';
-      }
-    } else {
-      if (id === this.pathId) {
-        cssClass += 'highlight-div ';
-      }
+    if (this.activePaths.includes(id)) {
+      // cssClass += `highlight-div `;
     }
     if (i === 0) {
-      if ( leftOrRight === 'left' ) {
-        cssClass += 'border-top mt-1 list-box-top-left';
-      } else {
         cssClass += 'border-top mt-1 list-box-top-right';
-      }
     }
     if (i === this.numberOfLoadedRoutes - 1) {
-      // cssClass += 'rounded-bottom';
-      // cssClass += '';
-      if ( leftOrRight === 'left' ) {
-        cssClass += 'list-box-bottom-left';
-      } else {
         cssClass += 'list-box-bottom-right';
-      }
     }
     return cssClass;
+  }
+
+  getCssStyle(id: string, i: number) {
+    if (this.activePaths.includes(id)) {
+      // return '--colour: ' + this.colours[this.activePaths.indexOf(id)];
+      const highlightColour = this.activePaths.indexOf(id) === 0 ? '#123456' : this.highlightColours[this.activePaths.indexOf(id) - 1];
+      // console.log({'background-color': highlightColour.slice(highlightColour.length - 2) + ', ' + this.highlightOpacity + ')'})
+      return {
+        'background-color': highlightColour + this.highlightOpacity
+        // opacity: 0.5
+    };
+    } else {
+      return '';
+    }
   }
 
 

@@ -1,4 +1,9 @@
 
+.nav-link {
+  padding: 0px 0px;
+  /* padding-right: 0; */
+}
+
 div{
   --top-margin: 10px;
   --bottom-margin: 30px;
