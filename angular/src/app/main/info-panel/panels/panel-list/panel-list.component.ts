@@ -31,11 +31,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public isEndOfList = false;
   public homeLocation: TsCoordinate = this.auth.getUser().homeLngLat;
   private boundingBox: TsBoundingBox = null;
-  private pathId: string;
-  public activePaths: Array<{id: string}> = [];     // array of pathsIds that are displayed on the map
-  // public col='red';
-  private highlightColours = ['#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00'];
-  private highlightOpacity = '1E';  // HEX for 30%
+  public activePaths = {};     // array of pathsIds that are displayed on the map
+  private colourPallet = ['#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00'];
+  private highlightColours = [null, ...this.colourPallet];
+  private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
   public nPaths;
 
   public listData: TsListArray = [];                // the items in this array are displayed in the panel
@@ -115,9 +114,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-
-
-
   /**
   * Request additional items in list
   */
@@ -127,47 +123,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * Watches the state of the select menu and initiates actions accordingly
-   */
-  onSelectMenuChange() {
-
-    // this.listOffset = 0;
-    // this.listData = [];
-    // this.boundingBox = [this.homeLocation.lng, this.homeLocation.lat, this.homeLocation.lng, this.homeLocation.lat];
-
-    // if ( this.publicOrPrivatePaths === 'public' ) {
-    //   // this.dynamicUpdateOn();
-    //   this.addPathsToList(AUTO_SELECT_OFF);
-    // } else {
-    //   this.dynamicUpdateOff();
-    //   this.addPathsToList(AUTO_SELECT_ON);
-    // }
-
-  }
-
-  onOverlaySelect(idFromClick: string) {
-
-    if ( Object.keys(this.activePaths)[0] !== idFromClick ) {
-      // dont do anything if the first active path has the same id as the clicked path
-
-      this.dataService.pathIdEmitter.emit({
-        id: idFromClick,                          // pathId of the clicked-on list item
-        booResizeView: false,       // if view is dynamic we dont want to resize the view when path is plotted
-        isOverlay: true
-      });
-
-      if (idFromClick in this.activePaths) {
-        this.activePaths.splice(this.activePaths.indexOf(idFromClick), 1);
-      } else {
-        this.activePaths.push(idFromClick);
-      }
-    }
-
-
-
-  }
-
 
   /**
    * Handles displaying or toggling the path corresponding to the clicked-on list-item
@@ -176,31 +131,32 @@ export class PanelListComponent implements OnInit, OnDestroy {
    */
   onRouteSelect(idFromClick: string) {
 
+    let emitCommand: Object;
 
-    // if ( this.activePaths[0] !== idFromClick ) {
-      if ( this.activePaths.includes(idFromClick) ) {
+    if ( idFromClick in this.activePaths ) {
 
-        this.activePaths.splice(this.activePaths.indexOf(idFromClick), 1);
-
+      if ( this.activePaths[idFromClick] === null ) {
+        // reclicked on first route, clear it and all overlays
+        this.highlightColours = [null, ...this.colourPallet];
+        this.activePaths = {};
+        emitCommand = { command: 'clear' };
 
       } else {
+        // reclicked an overlay, just clear the overlay
+        this.highlightColours.unshift(this.activePaths[idFromClick]);
+        delete this.activePaths[idFromClick];
+        emitCommand = { command: 'rem', id: idFromClick };
+      }
 
+    } else {
 
-      // if (idFromClick !== this.pathId) {
-      //   this.pathId = idFromClick;
-        // this.activePaths = [idFromClick];
-        this.activePaths.push(idFromClick);
+      // new route so add it
+      this.activePaths[idFromClick] = this.highlightColours.shift();
+      emitCommand = { command: 'add', id: idFromClick, colour: this.activePaths[idFromClick] };
 
-      // }
     }
 
-
-    this.dataService.pathIdEmitter.emit({
-      id: idFromClick,                          // pathId of the clicked-on list item
-      // booResizeView: false,       // if view is dynamic we dont want to resize the view when path is plotted
-      // isOverlay: false,
-      colour: this.highlightColours[this.activePaths.indexOf(idFromClick) - 1]
-    });
+    this.dataService.pathIdEmitter.emit( emitCommand );
 
 
   }
@@ -211,29 +167,24 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * @param id id of the list item being processed
    * @param i index of the list item being processed
    */
-  getCssClass(id: string, i: number) {
-    let cssClass = '';
-    if (this.activePaths.includes(id)) {
-      // cssClass += `highlight-div `;
-    }
+  getCssClass(id: string, i: number, leftOrRight: string) {
+
+
     if (i === 0) {
-        cssClass += 'border-top mt-1 list-box-top-right';
+        return `border-top mt-1 list-box-top-${leftOrRight}`;
+    } else if (i === this.numberOfLoadedRoutes - 1) {
+        return `list-box-bottom-${leftOrRight}`;
     }
-    if (i === this.numberOfLoadedRoutes - 1) {
-        cssClass += 'list-box-bottom-right';
-    }
-    return cssClass;
   }
 
-  getCssStyle(id: string, i: number) {
-    if (this.activePaths.includes(id)) {
-      // return '--colour: ' + this.colours[this.activePaths.indexOf(id)];
-      const highlightColour = this.activePaths.indexOf(id) === 0 ? '#123456' : this.highlightColours[this.activePaths.indexOf(id) - 1];
-      // console.log({'background-color': highlightColour.slice(highlightColour.length - 2) + ', ' + this.highlightOpacity + ')'})
-      return {
-        'background-color': highlightColour + this.highlightOpacity
-        // opacity: 0.5
-    };
+  getCssStyle(id: string, i: number, leftOrRight: string) {
+    if ( id in this.activePaths ) {
+      if ( leftOrRight === 'left' ) {
+        return {'background-color' : 'whitesmoke'};
+      } else {
+        return { 'background-color': this.activePaths[id] === null ? 'whitesmoke' : this.activePaths[id] + this.highlightOpacity };
+      }
+
     } else {
       return '';
     }

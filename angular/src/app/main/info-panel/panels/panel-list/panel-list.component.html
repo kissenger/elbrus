@@ -5,7 +5,7 @@
   <div class="p-0 mt-0 mb-0" [ngClass]="{'flex-grow-1': numberOfRoutes === 0}">
 
     <!-- <div class="d-flex"> -->
-      <select [(ngModel)]="publicOrPrivatePaths" (change)="onSelectMenuChange()" class="custom-select custom-select-sm mt-2 mb-1">
+      <select [(ngModel)]="publicOrPrivatePaths" class="custom-select custom-select-sm mt-2 mb-1">
         <option selected value="private">My routes</option>
         <option value="public">Public routes</option>
       </select>
@@ -35,7 +35,7 @@
       <div id="{{line.pathId}}" class="p-0 m-0 row">
 
         <!-- main list box element -->
-        <div  class="col-11 m-0 px-1 py-0 border-left border-bottom" (click)="onRouteSelect(line.pathId)">
+        <div [ngClass]="getCssClass(line.pathId, i, 'left')" [ngStyle]="getCssStyle(line.pathId, i, 'left')" class="col-11 m-0 px-1 py-0 border-left border-bottom" (click)="onRouteSelect(line.pathId)">
         <!-- <div style="--colour: {{colours[activePaths.length]}}" class="test-class col-11 m-0 px-1 py-0 border-left border-bottom" (click)="onRouteSelect(line.pathId)"> -->
           <div class="row m-0 p-0 name">{{line.name | name: 20}}</div>
           <div class="row m-0 p-0">
@@ -46,7 +46,7 @@
         </div>
 
         <!-- clickable overlay box -->
-        <div [ngClass]="getCssClass(line.pathId, i)" [ngStyle]="getCssStyle(line.pathId, i)" class="col-1 m-0 p-0 border-left border-right border-bottom" (click)="onRouteSelect(line.pathId)">
+        <div [ngClass]="getCssClass(line.pathId, i, 'right')" [ngStyle]="getCssStyle(line.pathId, i, 'right')" class="col-1 m-0 p-0 border-left border-right border-bottom" (click)="onRouteSelect(line.pathId)">
 
         <!-- <div [ngClass]="getCssClass(line.pathId, i)" class="col-1 m-0 p-0 border-left border-right border-bottom" (click)="onOverlaySelect(line.pathId)"> -->
         </div>

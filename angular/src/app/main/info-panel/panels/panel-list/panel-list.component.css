@@ -15,13 +15,12 @@
   font-size: small;
 }
 
-.table thead tr th, .table tbody tr td {
+/* .table thead tr th, .table tbody tr td {
   height: 10px;
   border: none;
   padding: 0px;
   margin: 0px;
-  /* margin-top: 0px; */
- }
+ } */
 
  .list-container{
   cursor: pointer;
