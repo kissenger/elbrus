@@ -11,7 +11,7 @@ export interface TsUnits {
 export interface TsPlotPathOptions {
     booResizeView?: boolean;
     booSaveToStore?: boolean;
-    booPlotMarkers?: boolean;
+    // booPlotMarkers?: boolean;
     booPlotPoints?: boolean;
 }
 

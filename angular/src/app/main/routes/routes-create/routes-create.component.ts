@@ -22,8 +22,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   private overlaidPaths = [];
   private overlayPlotOptions: TsPlotPathOptions = {
     booResizeView: false,
-    booSaveToStore: false,
-    booPlotMarkers: false
+    booSaveToStore: false
   };
   public callingPage: string;
 

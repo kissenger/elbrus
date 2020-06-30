@@ -29,7 +29,6 @@ export class MapCreateService extends MapService {
   private plotOptions: TsPlotPathOptions = {
     booResizeView: false,
     booSaveToStore: true,
-    booPlotMarkers: true,
     booPlotPoints: true
   };
   private styleOptions: TsLineStyle = {};

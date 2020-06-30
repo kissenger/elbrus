@@ -1,3 +1,8 @@
+/**
+ * Gets list data from the backend, and listens for user click on the displayed list
+ * Emits the desired changes to the displayed map (listener is routes-list component)
+ */
+
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -8,9 +13,6 @@ import { AuthService} from 'src/app/shared/services/auth.service';
 import { MapService } from 'src/app/shared/services/map.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 
-const AUTO_SELECT_OFF = false;
-const AUTO_SELECT_ON = true;
-
 @Component({
   selector: 'app-panel-list',
   templateUrl: './panel-list.component.html',
@@ -20,24 +22,26 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   @Input() callingPage: string;
 
-  private getPathsSubscription: Subscription;
+  private getListSubscription: Subscription;
   private mapUpdateSubscription: Subscription;
   private dataServiceSubscription: Subscription;
 
-  private listOffset = 0;
-  private limit = 9;  // number of paths to display in one go - more can be pulled if needed
+  private offset = 0;               // describes the chunk of the list to request
+  private limit = 9;                    // number of paths to request at one time
   public numberOfRoutes: number;
   public numberOfLoadedRoutes: number;
   public isEndOfList = false;
+
   public homeLocation: TsCoordinate = this.auth.getUser().homeLngLat;
   private boundingBox: TsBoundingBox = null;
-  public activePaths = {};     // array of pathsIds that are displayed on the map
-  private colourPallet = ['#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00'];
+  public activePaths = {};
+  private colourPallet = [
+    '#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00', '#00FF80', '#00FFFF', '#0080FF', '#0000FF', '#8000FF', '#FF00FF', '#FF0080'
+  ];
   private highlightColours = [null, ...this.colourPallet];
   private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
-  public nPaths;
 
-  public listData: TsListArray = [];                // the items in this array are displayed in the panel
+  public listItems: TsListArray = [];
   public publicOrPrivatePaths = 'private';
   public units: TsUnits = this.auth.getUser().units;
 
@@ -52,17 +56,16 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-
-
-    this.listData = [];
+    this.offset = 0;
     this.addPathsToList();
 
     // subscribe to change in map view
     this.mapUpdateSubscription = this.dataService.mapBoundsEmitter.subscribe( () => {
-
-      // this.boundingBox = <TsBoundingBox>bb;
-      this.addPathsToList();
-
+      this.offset = 0;
+      // this.resetList();
+      const selectedPaths = this.listItems.filter(listItem => listItem.pathId in this.activePaths);
+      console.log('selectedPaths', selectedPaths);
+      this.addPathsToList(selectedPaths);
     });
 
     // in case units are changed while viewing the list
@@ -73,10 +76,14 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  // update the list after 'more' button is pressed
-  addPathsToList() {
+  // resetList() {
+  //   // const selectedListItems = this.listItems.filter(listItem => listItem.pathId in this.activePaths);
+  //   this.listItems = this.listItems.filter(item => item.pathId in this.activePaths);
+  //   this.listOffset = 0;
 
-    this.listOffset = 0;
+  // }
+
+  addPathsToList(protectedPaths: TsListArray = null) {
 
     try {
       this.boundingBox = <TsBoundingBox>this.mapCreateService.getMapBounds();
@@ -84,24 +91,23 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.boundingBox = <TsBoundingBox>this.mapService.getMapBounds();
     }
 
-    this.getPathsSubscription = this.httpService
-      .getPathsList('route', this.publicOrPrivatePaths === 'public', this.listOffset, this.limit, this.boundingBox)
-      .subscribe( fromBackEnd => {
+    this.getListSubscription = this.httpService
+      .getPathsList('route', this.publicOrPrivatePaths === 'public', this.offset, this.limit, this.boundingBox)
+      .subscribe( result => {
 
-        // make sure we keep any selected items in the list, even if they are outside the current view
-        // get the full list items for each selected route, and add to the items returnd from the backend
-        console.log('listData=', this.listData);
-        console.log('activePaths=', this.activePaths);
-        const selectedListItems = this.listData.filter(listItem => listItem.pathId in this.activePaths);
-        const fullList = [...selectedListItems, ...fromBackEnd];
+        const backendList = result.list;
+        const count = result.count;
+
+        const temp = protectedPaths ? protectedPaths : this.listItems;
+        const fullList = [...temp, ...backendList];
 
         // filter out duplicates
         const fullListPathIds = fullList.map( item => item.pathId );
         const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
-        this.listData = filteredList;
+        this.listItems = filteredList;
 
-        this.numberOfRoutes = fromBackEnd.length === 0 ? 0 : fromBackEnd[0].count;
-        this.numberOfLoadedRoutes = this.listData.length;
+        this.numberOfRoutes = count - backendList.length - (this.offset * this.limit)  + filteredList.length;
+        this.numberOfLoadedRoutes = this.listItems.length;
         this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
 
     }, (error) => {
@@ -114,22 +120,15 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-  * Request additional items in list
-  */
+
   onMoreClick() {
-    this.listOffset++;
+    this.offset++;
     this.addPathsToList();
   }
 
 
 
-  /**
-   * Handles displaying or toggling the path corresponding to the clicked-on list-item
-   * isMultiSelect behaviour is set in onInit()
-   * Display of path is handled by emitting the pathId to map service
-   */
-  onRouteSelect(idFromClick: string) {
+  onListClick(idFromClick: string) {
 
     let emitCommand: Object;
 
@@ -149,35 +148,36 @@ export class PanelListComponent implements OnInit, OnDestroy {
       }
 
     } else {
-
       // new route so add it
       this.activePaths[idFromClick] = this.highlightColours.shift();
-      emitCommand = { command: 'add', id: idFromClick, colour: this.activePaths[idFromClick] };
+      emitCommand = {
+        command: 'add',
+        id: idFromClick,
+        colour: this.activePaths[idFromClick],
+        emit: Object.keys(this.activePaths).length < 2
+      };
 
     }
 
     this.dataService.pathIdEmitter.emit( emitCommand );
 
-
   }
 
 
-  /**
-   * Used in html template to determine the css class for the list item
-   * @param id id of the list item being processed
-   * @param i index of the list item being processed
-   */
-  getCssClass(id: string, i: number, leftOrRight: string) {
 
+  getCssClass(id: string, i: number, leftOrRight: string) {
 
     if (i === 0) {
         return `border-top mt-1 list-box-top-${leftOrRight}`;
     } else if (i === this.numberOfLoadedRoutes - 1) {
         return `list-box-bottom-${leftOrRight}`;
     }
+
   }
 
+
   getCssStyle(id: string, i: number, leftOrRight: string) {
+
     if ( id in this.activePaths ) {
       if ( leftOrRight === 'left' ) {
         return {'background-color' : 'whitesmoke'};
@@ -188,6 +188,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     } else {
       return '';
     }
+
   }
 
 
@@ -197,7 +198,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * Actions to do when component is destroyed
    */
   ngOnDestroy() {
-    if (this.getPathsSubscription) { this.getPathsSubscription.unsubscribe(); }
+    if (this.getListSubscription) { this.getListSubscription.unsubscribe(); }
     if (this.mapUpdateSubscription) { this.mapUpdateSubscription.unsubscribe(); }
     if (this.dataServiceSubscription) { this.dataServiceSubscription.unsubscribe(); }
   }

@@ -1,11 +1,15 @@
+
+/**
+ * Listens for request from panel-list component, makes the backend request and uses
+ * map-service to make the desired changes to the plot
+ */
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
-import * as globals from 'src/app/shared/globals';
-import { AuthService } from 'src/app/shared/services/auth.service';
+import { TsPlotPathOptions } from 'src/app/shared/interfaces';
 
 @Component({
   selector: 'app-routes',
@@ -16,12 +20,6 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 export class RoutesListComponent implements OnInit, OnDestroy {
 
   private pathIdSubscription: Subscription;
-  private geoJSON;
-  private plotOptions: TsPlotPathOptions = {
-    booResizeView: false,
-    booSaveToStore: false,
-    booPlotMarkers: false,
-  };
 
   constructor(
     private dataService: DataService,
@@ -37,12 +35,11 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     this.mapService.newMap();
 
-    // listen for pathID emission from panel-routes-list-list, and get the path from the backend
     this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( ( request ) => {
 
         if ( request.command === 'add' ) {
           this.httpService.getPathById('route', request.id).subscribe( (result) => {
-            this.mapService.add(result.hills, {lineColour: request.colour}, this.plotOptions);
+            this.mapService.add(result.hills, {lineColour: request.colour}, {booSaveToStore: request.emit} );
           });
 
         } else if ( request.command === 'rem' ) {

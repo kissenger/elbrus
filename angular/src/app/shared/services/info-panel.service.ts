@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PanelDetailsComponent } from 'src/app/main/info-panel/panels/panel-details/panel-details.component';
 import { PanelListComponent } from 'src/app/main/info-panel/panels/panel-list/panel-list.component';
-import { PanelOptionsComponent } from 'src/app/main/info-panel/panels/panel-routes-list-options/panel-routes-list-options.component';
+import { PanelOptionsComponent } from 'src/app/main/info-panel/panels/panel-options/panel-options.component';
 import { TsTabsArray } from 'src/app/shared/interfaces';
 
 @Injectable({

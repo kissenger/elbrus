@@ -55,7 +55,7 @@ function bbox2Polygon(bbox) {
   * Returns an object expected by the front end when a list query is made
   * Called by get-paths-list()
   */
-function getListData(docs, count) {
+function getListData(docs) {
 
   return docs.map( d => ({
     name: d.info.name,
@@ -67,8 +67,7 @@ function getListData(docs, count) {
     // creationDate: d.creationDate,
     // isElevations: d.info.isElevations,
     // isLong: d.info.isLong,
-    pathId: d._id,
-    count
+    pathId: d._id
     })
   );
 

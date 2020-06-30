@@ -18,7 +18,7 @@ import { PanelsInjectorComponent } from './main/info-panel/panels-injector/panel
 import { PanelDetailsComponent } from './main/info-panel/panels/panel-details/panel-details.component';
 import { PanelDetailsMinimisedComponent } from './main/info-panel/panels/panel-details-minimised/panel-details-minimised.component';
 import { PanelListComponent } from './main/info-panel/panels/panel-list/panel-list.component';
-import { PanelOptionsComponent } from './main/info-panel/panels/panel-routes-list-options/panel-routes-list-options.component';
+import { PanelOptionsComponent } from './main/info-panel/panels/panel-options/panel-options.component';
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { AlertBoxComponent } from './shared/components/alert-box/alert-box.component';
 import { RoutesReviewComponent } from './main/routes/routes-review/routes-review.component';

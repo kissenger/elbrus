@@ -5,7 +5,7 @@
  */
 
 function debugMsg(msgString) {
-  if (process.env.DEBUG === true) {
+  if (process.env.DEBUG === 'true') {
     console.log(timeStamp() + ' >> ' + msgString);
   }
 }

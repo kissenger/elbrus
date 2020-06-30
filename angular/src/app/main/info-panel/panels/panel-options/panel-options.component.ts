@@ -9,9 +9,9 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { TsFeatureCollection } from 'src/app/shared/interfaces';
 
 @Component({
-  selector: 'app-panel-routes-list-options',
-  templateUrl: './panel-routes-list-options.component.html',
-  styleUrls: ['./panel-routes-list-options.component.css']
+  selector: 'app-panel-options',
+  templateUrl: './panel-options.component.html',
+  styleUrls: ['./panel-options.component.css']
 })
 export class PanelOptionsComponent implements OnInit, OnDestroy {
 
@@ -34,6 +34,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
       this.isPathPublic = geoJson.properties.info.isPublic;
       this.createdBy = geoJson.properties.info.createdBy;

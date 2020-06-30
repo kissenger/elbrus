@@ -48,7 +48,7 @@ app.use(bodyParser.json());
 app.use(auth.authRoute);
 app.use((req, res, next) => {
   debugMsg(`${req.method}: ${req.originalUrl}`);
-  next()
+  next();
 })
 
 
@@ -241,8 +241,6 @@ app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyTok
     const pathType = req.params.pathType;
     const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
     const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
-    console.log(point);
-    console.log(box.coordinates)
 
     const docs = await mongoModel(pathType).aggregate([
       {$geoNear: {
@@ -265,8 +263,14 @@ app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyTok
     // console.log(req.params.limit);
     // console.log(docs[0].list);
     // console.log(docs[0].count[0].count);
+    let count;
+    try {
+      count = docs[0].count[0].count;
+    } catch {
+      count = 0;
+     } 
 
-    res.status(201).json( getListData(docs[0].list, docs[0].count[0].count) );
+    res.status(201).json( {list: getListData(docs[0].list), count} );
 
     // console.log(docs);
 
