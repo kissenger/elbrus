@@ -32,7 +32,7 @@
 
   <div class="collapse navbar-collapse" id="navbarNav"> </div>
 
-  <div *ngIf='auth.isLoggedIn()' class="d-flex flex-column small align-items-end">
+  <div *ngIf='auth.isAuthorised()' class="d-flex flex-column small align-items-end">
     <div class="">
         Welcome <span class="global-make-text-look-like-link" (click)="onUserClick()">{{auth.getUser().userName}}</span>
     </div>
@@ -40,9 +40,9 @@
     <div class="global-make-text-look-like-link" (click)="onLogoutClick()">Logout</div>
   </div>
 
-  <div *ngIf='!auth.isLoggedIn()' class="d-flex flex-column small align-items-end">
-    <span *ngIf='!auth.isLoggedIn()' (click)="onLoginClick()" class="global-make-text-look-like-link">Login</span>
-    <span *ngIf='!auth.isLoggedIn()' (click)="onRegisterClick()" class="global-make-text-look-like-link">Register</span>
+  <div *ngIf='!auth.isAuthorised()' class="d-flex flex-column small align-items-end">
+    <span *ngIf='!auth.isAuthorised()' (click)="onLoginClick()" class="global-make-text-look-like-link">Login</span>
+    <span *ngIf='!auth.isAuthorised()' (click)="onRegisterClick()" class="global-make-text-look-like-link">Register</span>
   </div>
 
 

@@ -8,7 +8,7 @@ export class HttpService {
 
 
   private mapBoxAccessToken = environment.MAPBOX_TOKEN;
-  private protocol = environment.BACKEND_PROTOCOL;
+  private protocol = environment.PROTOCOL;
   private url = environment.BACKEND_URL;
   private backendURL = `${this.protocol}://${this.url}`;
 
@@ -61,7 +61,7 @@ export class HttpService {
         if (index !== bbox.length - 1) { query += '&'; }
       });
     }
-    return this.http.get<any>(`${this.backendURL}/get-paths-list/${type}/${isPublic}/${offset}/${limit}${query}`);
+    return this.http.get<any>(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}${query}`);
   }
 
   getPathById(type: string, id: string) {
@@ -86,11 +86,11 @@ export class HttpService {
     return this.http.post<any>(`${this.backendURL}/get-path-from-points/`, {coords, options});
   }
 
-  registerUser(userData) {
+  register(userData) {
     return this.http.post<any>(`${this.backendURL}/register/`, userData);
   }
 
-  loginUser(userData) {
+  login(userData) {
     return this.http.post<any>(`${this.backendURL}/login/`, userData);
   }
 

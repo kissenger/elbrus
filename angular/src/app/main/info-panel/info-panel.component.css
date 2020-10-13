@@ -7,7 +7,7 @@
 div{
   --top-margin: 10px;
   --bottom-margin: 30px;
-  --collapse-bar-height: 10px;
+  --collapse-bar-height: 20px;
   --tabs-height: 50px;
 }
 
@@ -50,18 +50,20 @@ div{
   height: var(--collapse-bar-height);
   top: 0px;
   pointer-events: auto;
-  background: rgba(255,255,255);
+  background: rgba(255,255,255, 0.5);
   border-top-left-radius: 5px;
 }
 
 .collapse-btn:hover {
   cursor: pointer;
+  background: rgba(255,255,255, 1.0);
+
 }
 
 
 .chevron {
   opacity: 0.5;
-  top: -5px;
+  top: 0px;
 }
 
 .chevron:hover {

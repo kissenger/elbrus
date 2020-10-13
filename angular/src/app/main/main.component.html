@@ -2,21 +2,12 @@
 <!-- Container for page content -->
 <div class="position-relative m-0 bg-light h-100">
 
-    <!-- <ng-container *ngIf="'auth.isLoggedIn()'; then notauthenticated; else authenticate">
-    </ng-container>
-    <router-outlet></router-outlet>
-    <app-login></app-login>  -->
+  <router-outlet></router-outlet>
 
-    <!-- <router-outlet></router-outlet> -->
 
-    <!-- <div *ngIf="auth.isLoggedIn()"> -->
-        <!-- <router-outlet name = "loggedOut"></router-outlet> -->
-        <router-outlet></router-outlet>
-    <!-- </div>
-
-    <div *ngIf="!auth.isLoggedIn()">
-        <app-welcome> </app-welcome>
-    </div> -->
+  <div *ngIf="!auth.isAuthorised()">
+    <!-- <app-welcome> </app-welcome> -->
+  </div>
 
 
 </div>

@@ -7,6 +7,7 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { TsFeatureCollection } from 'src/app/shared/interfaces';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-panel-options',
@@ -16,12 +17,12 @@ import { TsFeatureCollection } from 'src/app/shared/interfaces';
 export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   private activePathSubscription: Subscription;
-  private subscription: Subscription;
+  private httpSubscription: Subscription;
   public isPathPublic: boolean;
   public createdBy: string;
   public pathId: string;
   private pathType: string;
-  private geoJson: TsFeatureCollection;
+  // private geoJson: TsFeatureCollection;
   private nPoints: number;
 
   constructor(
@@ -77,7 +78,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
     // const pathType = 'route';
 
-    this.subscription = this.httpService.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
+    this.httpSubscription = this.httpService.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
 
       // this was the original attempt which does not work with authentication injection, so needed a new approach
       // window.location.href = 'http://localhost:3000/download';
@@ -94,54 +95,67 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   }
 
+  isLoggedIn() {
+    return !!this.auth.getUser();
+  }
+
 
   // Show option to toggle public/private its its a private path, or if its public and created by this user
   allowMakePrivate() {
-    return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
+    // return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
+    return !this.isPathPublic || this.createdBy === this.auth.getUser();
   }
 
 
   allowDelete() {
-    return this.createdBy === this.auth.getUser().userName;
+    // return this.createdBy === this.auth.getUser().userName;
+    return this.createdBy === this.auth.getUser();
   }
 
 
   allowEdit() {
-    return this.createdBy === this.auth.getUser().userName && this.nPoints < 3500;
+    // return this.createdBy === this.auth.getUser().userName && this.nPoints < 3500;
+    return this.createdBy === this.auth.getUser() && this.nPoints < 3500;
+  }
+
+  onShareClick() {
+
+    const link = `${environment.PROTOCOL}://${environment.FRONTEND_URL}/route/list/${this.pathId}`;
+    navigator.clipboard.writeText(link)
+      .then( () => {
+        this.alert
+          .showAsElement('Success', `Link copied to clipboard\r\n${link}`, false, true)
+          .subscribe( () => {} );
+      })
+      .catch( (err) => {
+        this.alert
+          .showAsElement('Something went wrong :(', `Couldn't copy link to clipboard\r\n${link}`, false, true)
+          .subscribe( () => {} );
+      });
+
   }
 
 
   onMakePublicClick() {
-    // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
-    // const pathType = 'route';
-    this.subscription = this.httpService.makePathPublic(this.pathType, this.pathId).subscribe( (result) => {
-      // this.isPathPublic = !this.isPathPublic;
+    this.httpSubscription = this.httpService.makePathPublic(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
       this.router.navigate(['route/list']);
-      // this.alert
-        // .showAsElement('Success', `Path is now ${result.isPathPublic}`, false, true)
-        // .subscribe( () => {} );
     });
   }
 
 
   onMakeCopyClick() {
-    // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
-    // const pathType = 'route';
-    this.subscription = this.httpService.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
-      // this.isPathPublic = !this.isPathPublic;
+    this.httpSubscription = this.httpService.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
       this.router.navigate(['route/list']);
-      // this.alert
-        // .showAsElement('Success', `Path is now ${result.isPathPublic}`, false, true)
-        // .subscribe( () => {} );
     });
   }
 
+
   onReverseClick() {
-    this.subscription = this.httpService.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
+    this.httpSubscription = this.httpService.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
       this.dataService.saveToStore('activePath', {source: 'created', pathAsGeoJSON});
       this.spinner.removeElement();
@@ -173,7 +187,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     const fileData = new FormData();
     fileData.append('filename', files[0], files[0].name);
 
-    this.subscription = this.httpService.importRoute(fileData).subscribe( (result) => {
+    this.httpSubscription = this.httpService.importRoute(fileData).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
       this.dataService.saveToStore('activePath', {source: 'imported', pathAsGeoJSON});
       this.spinner.removeElement();
@@ -197,7 +211,8 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.subscription) { this.subscription.unsubscribe(); }
+    if (this.httpSubscription) { this.httpSubscription.unsubscribe(); }
+    if (this.activePathSubscription) { this.activePathSubscription.unsubscribe(); }
   }
 
 }

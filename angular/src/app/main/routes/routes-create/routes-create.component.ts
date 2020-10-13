@@ -38,24 +38,27 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     // this.router.navigate(['/route/list']);
     // centre map on the currently loading route if it exists, otherwise take users home location
     // mapview is set by map.service
-    const mapView = this.dataService.getFromStore('mapView', true);
-    let startPosition: TsCoordinate;
-    let startZoom: number;
 
-    if ( !mapView ) {
-      this.mapCreateService.clear();
-      this.router.navigate(['/route/list']);
-    } else {
-      startPosition = mapView ? mapView.centre : <TsCoordinate>{lat: -999, lng: -999};
-      startZoom = mapView ? mapView.zoom : 5;
-    }
+    console.log('create');
+    // const mapView = this.dataService.getFromStore('mapView', true);
+    // let startPosition: TsCoordinate;
+    // let startZoom: number;
+
+    // if ( !mapView ) {
+    //   this.mapCreateService.clear();
+    //   this.router.navigate(['/route/list']);
+    // } else {
+    //   startPosition = mapView ? mapView.centre : <TsCoordinate>{lat: -999, lng: -999};
+    //   startZoom = mapView ? mapView.zoom : globals.defaultMapView.zoom;
+    // }
 
     this.callingPageSubscription = this.activatedRoute.data.subscribe( data => {
       this.callingPage = data.callingPage;
     });
 
     // initialise the map and launch createroute
-    this.mapCreateService.newMap(startPosition, startZoom).then( () => {
+    // this.mapCreateService.newMap(startPosition, startZoom).then( () => {
+    this.mapCreateService.newMap().then( () => {
       this.mapCreateService.createRoute();
     });
 

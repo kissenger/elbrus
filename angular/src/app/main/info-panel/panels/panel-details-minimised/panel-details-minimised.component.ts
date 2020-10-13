@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input, ViewChild, TemplateRef } from '@an
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsPathStats } from 'src/app/shared/interfaces';
+import { TsUnits, TsPathStats, TsUser } from 'src/app/shared/interfaces';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
@@ -17,7 +17,7 @@ export class PanelDetailsMinimisedComponent implements OnInit, OnDestroy {
   private activePathSubscription: Subscription;
   public pathStats: TsPathStats = globals.emptyStats;
   public isData = false;
-  public units: TsUnits = this.auth.getUser().units;
+  public units: TsUnits;
 
   constructor(
     private dataService: DataService,
@@ -25,6 +25,8 @@ export class PanelDetailsMinimisedComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+
+    this.units = this.auth.isAuthorised() ? this.auth.getUser().units : globals.defaultUnits;
 
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
 

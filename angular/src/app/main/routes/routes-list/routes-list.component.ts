@@ -9,7 +9,7 @@ import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { TsPlotPathOptions } from 'src/app/shared/interfaces';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-routes',
@@ -24,16 +24,30 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   constructor(
     private dataService: DataService,
     private mapService: MapService,
-    private httpService: HttpService
+    private httpService: HttpService,
+    private router: Router
     ) { }
 
 
-  ngOnInit() {
+  async ngOnInit() {
 
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.mapService.isMap()) { this.mapService.kill(); }
+    // console.log(this.router.url.split('/').slice(-1)[0]);
 
-    this.mapService.newMap();
+    const urlParam = this.router.url.split('/').slice(-1)[0];
+    if ( urlParam.length > 10 ) {
+      // looks like we were passed a pathId
+      this.httpService.getPathById('route', urlParam).subscribe( async (result) => {
+        const bbox = result.hills.properties.stats.bbox;
+        const centrePoint = {lng: (bbox.maxLng + bbox.minLng) / 2, lat: (bbox.maxLat + bbox.minLat) / 2};
+        await this.mapService.newMap(centrePoint);
+        this.mapService.add(result.hills, {}, {booSaveToStore: true, booResizeView: true} );
+      });
+    } else {
+      this.mapService.newMap();
+    }
+
 
     this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( ( request ) => {
 

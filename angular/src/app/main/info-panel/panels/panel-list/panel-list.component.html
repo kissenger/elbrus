@@ -5,9 +5,15 @@
   <div class="p-0 mt-0 mb-0" [ngClass]="{'flex-grow-1': numberOfRoutes === 0}">
 
     <!-- <div class="d-flex"> -->
-      <select [(ngModel)]="publicOrPrivatePaths" class="custom-select custom-select-sm mt-2 mb-1">
-        <option selected value="private">My routes</option>
-        <option value="public">Public routes</option>
+      <select [(ngModel)]="isPublicOrPrivate" (change)="onSelectMenuChange()" class="custom-select custom-select-sm mt-2 mb-1">
+
+        <option *ngIf="!isAuthorised" disabled value=false>My routes</option>
+        <option *ngIf="isAuthorised" value=false>My routes</option>
+        <!-- <option value="private">My balls</option> -->
+
+        <option value=true>Public routes</option>
+        <!-- <option selected value="public">Public routes</option> -->
+
       </select>
     <!-- </div> -->
 

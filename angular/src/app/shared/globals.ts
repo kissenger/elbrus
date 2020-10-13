@@ -1,5 +1,5 @@
 'use strict';
-import { TsLineStyle, TsFeatureCollection, TsPathStats, TsGeoJsonProperties } from 'src/app/shared/interfaces';
+import { TsLineStyle, TsFeatureCollection, TsPathStats, TsGeoJsonProperties, TsUnits, TsCoordinate, TsMapView } from 'src/app/shared/interfaces';
 
 export const KM_TO_MILE = 0.6213711922;
 export const M_TO_FT = 3.28084;
@@ -28,6 +28,20 @@ export const overlayLineStyle: TsLineStyle = {lineWidth: 3, lineColour: 'red', l
 export const createRouteLineStyle: TsLineStyle = {lineWidth: 2, lineColour: 'red', lineOpacity: 1.0};
 // export const routeReviewLineStyle: TsLineStyle = {lineWidth: 2, lineColour: 'red', lineOpacity: 1.0};
 
+export const defaultUnits: TsUnits = {
+  distance: 'mi',
+  elevation: 'm'
+};
+
+export const defaultMapView: TsMapView = {
+    centre: {lat: 51.47685, lng: -0.00000},
+    zoom: 8
+};
+
+
+export const lineColours = [
+  '#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00', '#00FF80', '#00FFFF', '#0080FF', '#0000FF', '#8000FF', '#FF00FF', '#FF0080'
+];
 
 // used by props below, but also called in by panel details
 export const emptyStats: TsPathStats = {

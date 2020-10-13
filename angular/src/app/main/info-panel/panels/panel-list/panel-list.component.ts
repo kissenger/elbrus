@@ -5,22 +5,28 @@
 
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
+import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate } from 'src/app/shared/interfaces';
+import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate, TsUser } from 'src/app/shared/interfaces';
 import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { MapService } from 'src/app/shared/services/map.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
+import { Router } from '@angular/router';
+
+const PRIVATE = false;
+const PUBLIC = true;
 
 @Component({
   selector: 'app-panel-list',
   templateUrl: './panel-list.component.html',
   styleUrls: ['./panel-list.component.css']
 })
+
 export class PanelListComponent implements OnInit, OnDestroy {
 
-  @Input() callingPage: string;
+  // @Input() callingPage: string;
 
   private getListSubscription: Subscription;
   private mapUpdateSubscription: Subscription;
@@ -31,73 +37,70 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public numberOfRoutes: number;
   public numberOfLoadedRoutes: number;
   public isEndOfList = false;
+  public isPublicOrPrivate = PUBLIC;
 
-  public homeLocation: TsCoordinate = this.auth.getUser().homeLngLat;
+  public isAuthorised = this.auth.isAuthorised();
+  public units: TsUnits;
+  public home: TsCoordinate;
+
   private boundingBox: TsBoundingBox = null;
   public activePaths = {};
-  private colourPallet = [
-    '#FF0000', '#FF8000', '#FFFF00', '#80FF00', '#00FF00', '#00FF80', '#00FFFF', '#0080FF', '#0000FF', '#8000FF', '#FF00FF', '#FF0080'
-  ];
-  private highlightColours = [null, ...this.colourPallet];
+  public listItems: TsListArray = [];
+
+  private highlightColours = [null, ...globals.lineColours];
   private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
 
-  public listItems: TsListArray = [];
-  public publicOrPrivatePaths = 'private';
-  public units: TsUnits = this.auth.getUser().units;
-
   constructor(
-    private httpService: HttpService,
-    private dataService: DataService,
-    private mapCreateService: MapCreateService,
-    private mapService: MapService,
+    private http: HttpService,
+    private data: DataService,
     private auth: AuthService,
     private alert: AlertService,
+    private router: Router
   ) {}
+
+
 
   ngOnInit() {
 
-    this.offset = 0;
-    this.addPathsToList();
+    // check url for pathId - if supplied we'll show that path
+    const pathId = this.router.url.split('/').slice(-1)[0];
+    const isPathId = pathId.length > 10;
+    if ( isPathId ) {
+      this.activePaths[pathId] = this.highlightColours.shift();
+    }
+
+    // do some set up
+    this.units = this.isAuthorised ? this.auth.getUser().units : globals.defaultUnits;
+    if ( this.isAuthorised && !isPathId ) {
+      this.isPublicOrPrivate = PRIVATE;
+    }
 
     // subscribe to change in map view
-    this.mapUpdateSubscription = this.dataService.mapBoundsEmitter.subscribe( () => {
+    this.mapUpdateSubscription = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
+      this.boundingBox = bounds;
       this.offset = 0;
-      // this.resetList();
       const selectedPaths = this.listItems.filter(listItem => listItem.pathId in this.activePaths);
-      console.log('selectedPaths', selectedPaths);
       this.addPathsToList(selectedPaths);
     });
 
     // in case units are changed while viewing the list
-    this.dataServiceSubscription = this.dataService.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.auth.getUser().units;
+    this.dataServiceSubscription = this.data.unitsUpdateEmitter.subscribe( () => {
+      this.units = this.isAuthorised ? this.auth.getUser().units : globals.defaultUnits;
     });
 
   }
 
 
-  // resetList() {
-  //   // const selectedListItems = this.listItems.filter(listItem => listItem.pathId in this.activePaths);
-  //   this.listItems = this.listItems.filter(item => item.pathId in this.activePaths);
-  //   this.listOffset = 0;
-
-  // }
 
   addPathsToList(protectedPaths: TsListArray = null) {
 
-    try {
-      this.boundingBox = <TsBoundingBox>this.mapCreateService.getMapBounds();
-    } catch {
-      this.boundingBox = <TsBoundingBox>this.mapService.getMapBounds();
-    }
+    this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
 
-    this.getListSubscription = this.httpService
-      .getPathsList('route', this.publicOrPrivatePaths === 'public', this.offset, this.limit, this.boundingBox)
       .subscribe( result => {
 
+        // get a full list of existing and backend results
         const backendList = result.list;
         const count = result.count;
-
         const temp = protectedPaths ? protectedPaths : this.listItems;
         const fullList = [...temp, ...backendList];
 
@@ -106,6 +109,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
         const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
         this.listItems = filteredList;
 
+        // work out the numbers
         this.numberOfRoutes = count - backendList.length - (this.offset * this.limit)  + filteredList.length;
         this.numberOfLoadedRoutes = this.listItems.length;
         this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
@@ -127,6 +131,12 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
+  onSelectMenuChange() {
+    this.offset = 0;
+    // this.listItems = [];
+    this.addPathsToList();
+  }
+
 
   onListClick(idFromClick: string) {
 
@@ -135,12 +145,14 @@ export class PanelListComponent implements OnInit, OnDestroy {
     if ( idFromClick in this.activePaths ) {
 
       if ( this.activePaths[idFromClick] === null ) {
+
         // reclicked on first route, clear it and all overlays
-        this.highlightColours = [null, ...this.colourPallet];
+        this.highlightColours = [null, ...globals.lineColours];
         this.activePaths = {};
         emitCommand = { command: 'clear' };
 
       } else {
+
         // reclicked an overlay, just clear the overlay
         this.highlightColours.unshift(this.activePaths[idFromClick]);
         delete this.activePaths[idFromClick];
@@ -148,6 +160,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
       }
 
     } else {
+
       // new route so add it
       this.activePaths[idFromClick] = this.highlightColours.shift();
       emitCommand = {
@@ -159,7 +172,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     }
 
-    this.dataService.pathIdEmitter.emit( emitCommand );
+    this.data.pathIdEmitter.emit( emitCommand );
 
   }
 

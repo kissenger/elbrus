@@ -5,7 +5,8 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { Router } from '@angular/router';
-import { TsUser, TsUnits } from '../../interfaces';
+import { TsUser } from '../../interfaces';
+import * as globals from '../../globals';
 
 @Component({
   selector: 'app-register',
@@ -37,7 +38,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   }
 
-  onRegisterClick() {
+  async onRegisterClick() {
 
     // get form data
     const userName = document.forms['register-form']['userName'].value;
@@ -60,28 +61,21 @@ export class RegisterComponent implements OnInit, OnDestroy {
         email,
         password,
         isHomeLocSet: false,
-        units: <TsUnits>{
-          distance: 'mi',
-          elevation: 'm'
-        }
+        homeLngLat: globals.defaultMapView.centre,
+        units: globals.defaultUnits
       };
-      this.http.registerUser(user).subscribe( (res) => {
 
-        // success
+
+      try {
+        await this.auth.register(user);
         this.close.next();
-        this.auth.setToken(res.token);
-        this.auth.setUser(res.user);
         this.router.navigate(['route/list']);
-
-      }, (error) => {
-
-        // failure
+      } catch (error) {
         this.close.next();
-        console.log(error);
-        this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false).subscribe( () => {
+        this.alert.showAsElement('Something went wrong :(', error + ': ' + error, true, false).subscribe( () => {
         });
+      }
 
-      });
     }
 
 

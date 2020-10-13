@@ -1,16 +1,28 @@
 import { Injectable } from '@angular/core';
 import { TsUser } from 'src/app/shared/interfaces';
+import { HttpService } from './http.service';
 
 @Injectable()
 
 export class AuthService {
 
-  constructor() {
+  constructor(
+    private http: HttpService
+  ) {
 
   }
 
-  isLoggedIn() {
-    return !!sessionStorage.getItem('tsToken');   // double ! casts result to boolean
+  isToken() {
+    // if there is a token then we are logged in as user or guest
+    return !!sessionStorage.getItem('tsToken');
+  }
+
+  isGuest() {
+    return JSON.parse(sessionStorage.getItem('user')).userName === 'guest';
+  }
+
+  isAuthorised() {
+    return this.isToken() && !this.isGuest();
   }
 
   getToken() {
@@ -29,10 +41,62 @@ export class AuthService {
     return JSON.parse(sessionStorage.getItem('user'));
   }
 
-
   deleteToken() {
     sessionStorage.removeItem('tsToken');
     sessionStorage.removeItem('user');
   }
+
+  logout() {
+    // actually just re-login as guest - unles sthat fails, in which case delete the token
+    try {
+      this.login( 'guest', null );
+    } catch {
+      this.deleteToken();
+    }
+  }
+
+  login( userName: string, password: string ) {
+
+    return new Promise( (res, rej) => {
+
+      this.http.login( {userName, password} ).subscribe( (result) => {
+
+        this.setToken(result.token);
+        this.setUser(result.user);
+        res();
+
+      }, (error) => {
+
+        // throw new Error(error);
+        rej(error);
+
+      });
+    });
+
+  }
+
+
+  register(user) {
+
+    return new Promise( (res, rej) => {
+
+
+      this.http.register(user).subscribe( (result) => {
+
+        this.setToken(result.token);
+        this.setUser(result.user);
+        res();
+
+      }, (error) => {
+
+        rej(error);
+
+      });
+
+    });
+
+  }
+
+
 
 }

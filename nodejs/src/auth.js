@@ -9,7 +9,8 @@ const express = require('express');
 const authRoute = express.Router();
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const KEY = process.env.AUTH_KEY;
+const KEY = process.env.AUTH_KEY;    // authkey is the know part of the jwt
+const TOKEN = process.env.TS_TOKEN;  // js_token is used to ensure that 
 
 const debugMsg = require('./debug').debugMsg;
 const Users = require('./schema/user-models').Users;
@@ -40,6 +41,7 @@ function verifyToken(req, res, next) {
     
     req.userId = payload.userId;
     req.userName = payload.userName;
+    req.role = payload.role;
 
     next();
 
@@ -106,17 +108,32 @@ authRoute.post('/api/login', async (req, res) => {
 
   try {
 
-    const user = await Users.findOne( {userName: req.body.userName}, {} );
-    if (!user) {
-      throw new AuthenticationError('User name not found.');
-    };
+    const userName = req.body.userName;
+    let subject;
+    let user;
 
-    const passwordOK = await bcrypt.compare(req.body.password, user.hash);
-    if (!passwordOK) {
-      throw new AuthenticationError('Password did not match');
+    if ( userName === 'guest' ) {
+
+      subject = {userId: '0000', userName: 'guest', role: 'guest'};
+      user = { userName };
+
+
+    } else {
+
+      user = await Users.findOne( {userName: userName}, {} );
+      if (!user) {
+        throw new AuthenticationError('User name not found.');
+      };
+
+      const passwordOK = await bcrypt.compare(req.body.password, user.hash);
+      if (!passwordOK) {
+        throw new AuthenticationError('Password did not match');
+      }
+
+      subject = {userId: user._id, userName: user.userName, role: 'user'};
+
     }
 
-    const subject = {userId: user._id, userName: user.userName};
     const token = jsonwebtoken.sign( subject, KEY );
     res.status(200).send({token, user});
 

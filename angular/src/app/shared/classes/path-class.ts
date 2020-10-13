@@ -22,7 +22,6 @@ export class Path {
   }
 
 
-
   get boundingBox() {
 
     const bb = this.coords.reduce( (bbox, point) => ({

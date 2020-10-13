@@ -15,6 +15,7 @@ const app = express();
 const fs = require('fs');
 
 const auth = require('./auth');
+const { runInNewContext } = require('vm');
 const GeoJSON = require('./geojson').GeoJSON;
 const gpxRead = require('./gpx').gpxRead;  
 const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
@@ -226,76 +227,57 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
  * v2 change - return all routes regardless of window, and add 
  * boolean to identify those that are within the window
  *****************************************************************/
-app.get('/api/get-paths-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
 
-  // try {
 
-    // let condition;
+app.get('/api/get-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
 
-    // if (req.params.isPublic === 'false') { 
-    //   condition = {isSaved: true, userId: req.userId};
-    // } else {
-    //   condition = {isSaved: true, isPublic: true};
-    // }
+
+    if ( req.role === 'guest' && req.params.isPublic === 'false' ) {
+      // console.log('Unauthorised request from guest')
+      // res.status(401).send('Unauthorised request from guest');
+      throw new Error('Unauthorised request from guest');
+    }
 
     const pathType = req.params.pathType;
     const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
     const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
+    const query = { geometry: { $geoIntersects: { $geometry: box} } };
+
+    if ( req.params.isPublic === 'true') {
+      query.isPublic = true;
+    } else {
+      query.userId = req.userId;
+    }
 
     const docs = await mongoModel(pathType).aggregate([
-      {$geoNear: {
-        near: point,
-        spherical: false,
-        distanceField: 'distance',
-        // query: {userId: req.userId}
-        query: { userId: req.userId, geometry: { $geoIntersects: { $geometry: box} } }
-      }},
-      {$facet: {
-        count: [{ $count: "count" }],
-        list: [
-          {$skip: req.params.limit * req.params.offset }, 
-          {$limit: req.params.limit * 1}]
+      {
+        $geoNear: {
+          near: point,
+          spherical: false,
+          distanceField: 'distance',
+          query: query 
+        }
+      },
+      {
+        $facet: {
+          count: [{ $count: "count" }],
+          list: [
+            {$skip: req.params.limit * req.params.offset }, 
+            {$limit: req.params.limit * 1}
+          ]
         }
       }
-    ])
+    ]);
     
-    // console.log(req.params.offset);
-    // console.log(req.params.limit);
-    // console.log(docs[0].list);
-    // console.log(docs[0].count[0].count);
     let count;
     try {
       count = docs[0].count[0].count;
     } catch {
       count = 0;
-     } 
+    }   
 
+    // console.log(getListData(docs[0].list), count, req.params.limit * req.params.offset);
     res.status(201).json( {list: getListData(docs[0].list), count} );
-
-    // console.log(docs);
-
-    // // if a boundingbox was supplied construct the geo query
-    // if (req.query.bbox !== '0') {
-    //   const geometry = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
-    //   condition = {...condition, geometry: { $geoIntersects: { $geometry: geometry} } }
-    // }
-    // const filter = {stats: 1, info: 1, startTime: 1, creationDate: 1};
-    // const sort = req.params.pathType === 'track' ? {startTime: -1} : {creationDate: -1};
-    // const limit = req.params.limit;
-    // const offset = req.params.offset
-    // const pathType = req.params.pathType;
-
-    // const count = await mongoModel(pathType).countDocuments(condition);
-    // // const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));
-    // const docs = await mongoModel(pathType).find(condition, filter).sort(sort).limit(parseInt(limit)).skip(limit*(offset));
-    // res.status(201).json( getListData(docs, count) );
-
-  // } catch (error) {
-
-    // debugMsg('ERROR: ' + error);
-    // res.status(500).send(error.message);
-
-  // }
 
 })
 

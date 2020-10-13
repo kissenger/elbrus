@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
+import * as globals from 'src/app/shared/globals';
 import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsPosition, TsBoundingBox } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
@@ -29,24 +30,56 @@ export class MapService {
   }
 
 
-  newMap(location?: TsCoordinate, zoom?: number) {
+  newMap(startPosition?: TsCoordinate, startZoom?: number) {
+  // newMap(location?: TsCoordinate, zoom?: number) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
     return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
 
+      let mapCentre: TsCoordinate;
+      let mapZoom: number;
+
+      if ( startPosition ) {
+        // if location is provided, use that (zoom not needed as map will resize when path is added)
+        mapCentre = startPosition;
+        mapZoom = startZoom ? startZoom : globals.defaultMapView.zoom;
+      } else if ( this.dataService.getFromStore('mapView', false) ) {
+        // otherwise look for stored mapview
+        mapCentre = this.dataService.getFromStore('mapView', false).centre;
+        mapZoom = this.dataService.getFromStore('mapView', false).zoom;
+      } else if ( this.auth.isAuthorised() ) {
+        // if that doesnt work, try to find the default location of the logged-in user
+        mapCentre = this.auth.getUser().homeLngLat;
+        mapZoom = globals.defaultMapView.zoom;
+      } else {
+        // otherwise fall back to default values
+        mapCentre = globals.defaultMapView.centre;
+        mapZoom = globals.defaultMapView.zoom;
+
+      }
+
+      console.log(mapCentre, mapZoom);
       this.tsMap = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/kissenger/ckapl476e00p61iqeivumz4ey',
-        center: location ? location : this.auth.getUser().homeLngLat,
-        zoom: zoom ? zoom : 13
+        center: mapCentre,
+        zoom: mapZoom
       });
 
       this.layers = new ActiveLayers();
 
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
-      this.tsMap.on('moveend', this.onMoveEnd);
-      this.tsMap.on('load', () => {
+
+      this.tsMap.on('moveend', () => {
+        console.log('map finished moving');
         this.dataService.saveToStore('mapView', this.getMapView());
+        this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
+      });
+
+      this.tsMap.on('load', () => {
+        console.log('map finished loading');
+        this.dataService.saveToStore('mapView', this.getMapView());
+        this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
         resolve();
       });
 
@@ -55,21 +88,9 @@ export class MapService {
   }
 
 
-  private onMoveEnd = (e) => {
-    this.dataService.saveToStore('mapView', this.getMapView());
-    try {
-      this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
-    } catch (error) {
-      // do nothing with the error - silently let it fail
-    }
-  }
-
-
   public getMapView() {
     // Used by other services to determine what is being shown so, for example, same view can be established after map change
-    const centre = this.tsMap.getCenter();
-    const zoom = this.tsMap.getZoom();
-    return {centre, zoom};
+    return {centre: this.tsMap.getCenter(), zoom: this.tsMap.getZoom()};
   }
 
 

@@ -37,30 +37,29 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit() {}
 
-  onLoginClick() {
+  async onLoginClick() {
 
     const userName = document.forms['login-form']['userName'].value;
     const password = document.forms['login-form']['password'].value;
 
-    this.http.loginUser( {userName, password}).subscribe( (res) => {
+    try {
 
-      // success
+      await this.auth.login(userName, password);
       this.close.next();
-      this.auth.setToken(res.token);
-      this.auth.setUser(res.user);
-      // console.log(res.user);
-      // this.auth.setUser(res.user);
-      // this.dataService.loginUserEmitter.emit(res.user);
-      this.router.navigate(['route/list']);
-
-    }, (error) => {
-
-      // failure
-      this.close.next();
-      this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false).subscribe( () => {
+      // reload to ensure that all components recognise login
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['route/list']);
       });
 
-    });
+    } catch (error) {
+
+      this.close.next();
+      this.alert.showAsElement('Something went wrong :(', error + ': ' + error, true, false).subscribe( () => {
+      });
+
+    }
+
+
   }
 
   onRegisterClick() {

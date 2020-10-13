@@ -12,7 +12,8 @@ declare var google: any;
 })
 export class ChartsService {
 
-  private units: TsUnits = this.auth.getUser().units;
+  private units: TsUnits;
+
 
   constructor(
     public httpService: HttpService,
@@ -22,6 +23,10 @@ export class ChartsService {
   }
 
   plotChart(htmlElement, chartData, colourArray) {
+
+    // this.units = this.auth.getUser() ? this.auth.getUser().units : globals.defaultUnits;
+    this.units = this.auth.isAuthorised() ? this.auth.getUser().units : globals.defaultUnits;
+
 
     if (chartData[0].length === 0) {
       chartData = [[0.1], [0.1]];

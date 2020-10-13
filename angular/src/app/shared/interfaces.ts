@@ -21,6 +21,11 @@ export interface TsLineStyle {
     lineOpacity?: number;
 }
 
+export interface TsMapView {
+  centre: TsCoordinate;
+  zoom: number;
+}
+
 /**
  * Used to populate list of paths
  */

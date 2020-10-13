@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { ChartsService } from 'src/app/shared/services/charts-service';
-import { TsUnits, TsPathStats } from 'src/app/shared/interfaces';
+import { TsUnits, TsPathStats, TsUser } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 
@@ -33,7 +33,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   public isElevations: boolean;
   public isHills: boolean;
   public isData = false;
-  public units: TsUnits = this.auth.getUser().units;
+  // public units: TsUnits = this.auth.getUser().units;
+  // private user: TsUser = this.auth.getUser();
+  public units: TsUnits;
   // public wikiLink: string = globals.links.wiki.elevations;
   public pathCategory: string;
   public pathType: string;
@@ -55,6 +57,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // show form inputs and buttons only for review or create pages, not for list
     // this.isListPage = this.callingPage === 'list';
     // console.log(this.callingPage)
+    // this.units = this.auth.getUser() ? this.auth.getUser().units : globals.defaultUnits;
+    this.units = this.auth.isAuthorised() ? this.auth.getUser().units : globals.defaultUnits;
+
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {

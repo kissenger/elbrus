@@ -21,17 +21,17 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     // private route: ActivatedRoute,
     public router: Router,
     public login: LoginService,
-    public httpService: HttpService,
+    public http: HttpService,
     // private alert: AlertService,
-    private auth: AuthService
+    private auth: AuthService,
+
   ) { }
 
   ngOnInit() {
 
     // if user is logged in then we dont want the welcome page so redirect
-    if (this.auth.isLoggedIn()) {
-      this.router.navigate(['route/list']);
-    }
+
+
 
     /** provision for account verification */
     // this.paramsSubscription = this.route.params.subscribe( params => {
@@ -60,8 +60,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
    * Actions to do when component is destroyed
    */
   ngOnDestroy() {
-    if (this.httpSubscription) { this.httpSubscription.unsubscribe(); }
-    if (this.paramsSubscription) { this.paramsSubscription.unsubscribe(); }
+    if (this.http) { this.httpSubscription.unsubscribe(); }
   }
 
 
