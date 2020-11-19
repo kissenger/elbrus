@@ -1,0 +1,80 @@
+/*
+div {
+  border: 1px blue solid;
+} */
+
+.name {
+  font-size: small;
+  font-weight: bold;
+}
+
+.stats {
+  font-size: small;
+}
+
+.css-tick::before {
+  /* top: 0px;
+  left: 0px; */
+  position: absolute;
+  height: 33%;
+  width: 100%;
+  background-color: red;
+  content:  " ";
+}
+
+.css-tick::after {
+  /* position: absolute; */
+  transform: translate(66%);
+  height: 33%;
+  width: 100%;
+  content:  " ";
+  background-color: blue;
+}
+
+.css-tick {
+  background-color: green;
+}
+
+ .custom-select {
+  border: 1px var(--ts-bootstrap-border) solid;
+  font-size: small;
+
+  /* border-radius: 0px; */
+}
+
+.custom-select:focus {
+  box-shadow: none;
+}
+
+@media only screen and (min-width: 900px) {
+  .list-item:hover {
+    /* background-color: var(--ts-grey-background); */
+    /* box-shadow: 5px 10px; */
+  box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.2);
+
+}
+}
+
+.list-container{
+  cursor: pointer;
+}
+
+.icon {
+  opacity: 0.5;
+}
+
+.list-box-top-left {
+  border-top-left-radius: 5px;
+}
+
+.list-box-top-right {
+  border-top-right-radius: 5px;
+}
+
+.list-box-bottom-left {
+  border-bottom-left-radius: 5px;
+}
+
+.list-box-bottom-right {
+  border-bottom-right-radius: 5px;
+}
