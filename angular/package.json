@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
-  },angular
+  },
   "resolutions": {
     "@babel/preset-env": "7.5.5"
   },
