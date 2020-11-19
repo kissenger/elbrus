@@ -35,9 +35,9 @@
     "jquery": "^3.4.1",
     "mapbox-gl": "^1.12.0",
     "popper": "^1.0.1",
-    "rxjs": "~6.5.3",
-    "tslib": "^1.14.1",
-    "typescript": "~3.7.5",
+    "rxjs": "^6.6.3",
+    "tslib": "^1.10.0",
+    "typescript": "^3.9.7",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
@@ -48,16 +48,16 @@
     "@types/jasmine": "^3.6.2",
     "@types/jasminewd2": "~2.0.8",
     "@types/node": "^14.14.8",
-    "codelyzer": "^5.1.2",
-    "jasmine-core": "~3.5.0",
-    "jasmine-spec-reporter": "^5.0.2",
+    "codelyzer": "^6.0.1",
+    "jasmine-core": "^3.6.0",
+    "jasmine-spec-reporter": "^6.0.0",
     "karma": "^5.2.3",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "^3.0.3",
-    "karma-jasmine": "^3.3.1",
+    "karma-jasmine": "^4.0.1",
     "karma-jasmine-html-reporter": "^1.5.4",
     "protractor": "~7.0.0",
-    "ts-node": "^8.10.2",
+    "ts-node": "^9.0.0",
     "tslint": "^6.1.3"
   }
 }
