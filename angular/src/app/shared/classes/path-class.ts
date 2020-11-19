@@ -1,5 +1,5 @@
 import { TsFeatureCollection, TsCoordinate, TsPosition, TsFeature, TsPoint, TsBoundingBox } from '../interfaces';
-import { GeoJsonPipe } from '../geojson.pipe';
+import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import { Injector } from '@angular/core';
 
 

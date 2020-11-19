@@ -95,7 +95,9 @@ const emptyProps: TsGeoJsonProperties = {
     description: '',
     pathType: '',
     startTime: '',
-    isLong: false
+    isLong: false,
+    isPublic: false,
+    createdBy: ''
   },
   params: {
     elev: [],

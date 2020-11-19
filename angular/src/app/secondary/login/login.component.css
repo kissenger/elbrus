@@ -1,0 +1,37 @@
+
+/* div {
+  border: 0px red dashed;
+} */
+
+.outer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color:white;
+}
+
+/* position only, more done by bootstrap, and indeed this could now be done that way too */
+.login-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 320px;
+  transform: translate(-50%, -50%);
+  background: var(--ts-grey-background);
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+
+}
+
+.input-group-text {
+  width : 32px;
+}
+
+.form-control-danger {
+  border-color: #e06c6c;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(224, 108, 108, 0.5);
+}
+
+.image {
+  width: 200px;
+}

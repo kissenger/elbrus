@@ -1,90 +1,136 @@
 
-.nav-link {
-  padding: 0px 0px;
-  /* padding-right: 0; */
-}
+/*
+
+z-index:
+
+.nav-tabs .nav-link: 1
+.tab-content-container: 50
+.nav-tabs .nav-link.active: 100
+tabs-border-fix: 200
+
+
+*/
 
 div{
   --top-margin: 10px;
   --bottom-margin: 30px;
   --collapse-bar-height: 20px;
-  --tabs-height: 50px;
+  --tabs-height: 35px;
 }
 
 
-.hide {
+.hidden-view {
   display: none;
   pointer-events: none;
-}
-
-
-.info-panel {
-
-    top: var(--top-margin);
-    right: 0px;
-    width: 225px;
-    font-size: smaller;
-    height: calc(100% - var(--bottom-margin));
-    pointer-events: none;
-    /* border: orange 1px solid; */
+  /* below is apparently better for 'screen readers' ...
+  position: absolute !important;
+  top: 50px !important;
+  left: -50px !important; */
 }
 
 .outer-container {
-    /* top: 5px; */
-    background: rgba(255,255,255,0.5); /* newer browsers */
-    height: calc(100% - var(--collapse-bar-height));
-    border-bottom-left-radius: 5px;
-    pointer-events: auto;
+  top: var(--top-margin);
+  right: 0px;
+  width: 225px;
+  font-size: smaller;
+  height: calc(100% - var(--bottom-margin) - var(--top-margin));
+  pointer-events: none;
+  /* float: right; */
+  /* display: inline-block; */
+
+}
+.inner-container {
+  border: 1px red solid;
 }
 
-.minimised-panel {
-  /* top: 5px; */
-  background: rgba(255,255,255,0.5); /* newer browsers */
-  border-bottom-left-radius: 5px;
-  pointer-events: auto;
-
-  /* border: purple 1px dashed; */
-}
+/* COLLAPSE BAR */
 
 .collapse-btn {
   height: var(--collapse-bar-height);
   top: 0px;
   pointer-events: auto;
-  background: rgba(255,255,255, 0.5);
-  border-top-left-radius: 5px;
-}
-
-.collapse-btn:hover {
-  cursor: pointer;
-  background: rgba(255,255,255, 1.0);
+  background: var(--ts-grey-background);
+  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
+  z-index: 30;
 
 }
 
+@media only screen and (min-width: 900px) {
+  .collapse-btn:hover {
+    cursor: pointer;
+    background: rgba(255,255,255, 1.0);
+  }
+}
 
 .chevron {
-  opacity: 0.5;
   top: 0px;
 }
 
-.chevron:hover {
-  opacity: 1;
+
+/* COLLAPSE BAR */
+
+.min-view-container {
+  background: var(--ts-grey-background);
+  /* box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2); */
+  pointer-events: auto;
+  z-index: 200;
+}
+
+.minimised-shadow-fix {
+  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
+  z-index: 20;
+
+}
+
+.max-view-container {
+  pointer-events: auto;
+  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
+  /* -1px corrects for margin shift on tab-content-container */
+  /* height: calc(100% - var(--collapse-bar-height) - 1px); */
+  height: 100vh - 100px;
+  height: 100vh;
+  border: 1px blue dashed;
+}
+
+.tabs-border-fix {
+  z-index: 200;
+  pointer-events: none;
 }
 
 
-/* .inner-container { */
-  /* background: rgba(255,255,255,0.5); */
-  /* border: purple 1px dashed; */
-/* } */
+/* use z-index to control tab border behaviour */
+.nav-tabs .nav-link {
+  height: var(--tabs-height);
+  background-color: var(--ts-grey-background);
+  border-top: none;
+  z-index: 40;
+}
+
+/* use z-index to control tab border behaviour */
+.nav-tabs .nav-link.active {
+  background-color: white;
+  border-top: none;
+  border-bottom: 1px white solid;
+  z-index: 100;
+}
+
+.nav-tabs {
+  border-bottom: none;
+  margin-right: -1px;
+
+}
 
 /* this is needed to ensure that the tabs which are hidden and overlay
 the active tab, do not interfere with the active tab inputs */
 .tab-panel:not(.active) {
-    display: none;
+  display: none;
 }
 
-.panel-size-calc {
-    width: calc(100% - 10px);
-    height: calc(100% - var(--collapse-bar-height) - var(--tabs-height));
-    border-bottom-left-radius: 5px;
+/* use z-index to control tab border behaviour */
+.tab-content-container {
+  height: calc(100% - var(--collapse-bar-height) - var(--tabs-height));
+  margin-top: -1px;
+  z-index: 50;
 }
+
 

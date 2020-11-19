@@ -1,22 +1,25 @@
+
 /**
  * Gets list data from the backend, and listens for user click on the displayed list
  * Emits the desired changes to the displayed map (listener is routes-list component)
  */
 
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, HostListener } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate, TsUser } from 'src/app/shared/interfaces';
-import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { AuthService} from 'src/app/shared/services/auth.service';
-import { MapService } from 'src/app/shared/services/map.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
+import { __classPrivateFieldSet } from 'tslib';
 
 const PRIVATE = false;
 const PUBLIC = true;
+const LIST_ITEM_HEIGHT = 37;
+const LIST_HEIGHT_CORRECTION = 300;
 
 @Component({
   selector: 'app-panel-list',
@@ -26,26 +29,27 @@ const PUBLIC = true;
 
 export class PanelListComponent implements OnInit, OnDestroy {
 
-  // @Input() callingPage: string;
-
   private getListSubscription: Subscription;
   private mapUpdateSubscription: Subscription;
   private dataServiceSubscription: Subscription;
 
   private offset = 0;               // describes the chunk of the list to request
-  private limit = 9;                    // number of paths to request at one time
+  private limit: number;
+
+  public nActiveRoutes = 0;
   public numberOfRoutes: number;
   public numberOfLoadedRoutes: number;
   public isEndOfList = false;
   public isPublicOrPrivate = PUBLIC;
 
-  public isAuthorised = this.auth.isAuthorised();
+  public isRegisteredUser = this.auth.isRegisteredUser();
   public units: TsUnits;
   public home: TsCoordinate;
 
   private boundingBox: TsBoundingBox = null;
   public activePaths = {};
   public listItems: TsListArray = [];
+
 
   private highlightColours = [null, ...globals.lineColours];
   private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
@@ -55,12 +59,16 @@ export class PanelListComponent implements OnInit, OnDestroy {
     private data: DataService,
     private auth: AuthService,
     private alert: AlertService,
-    private router: Router
+    private router: Router,
+    private spinner: SpinnerService
   ) {}
 
 
 
   ngOnInit() {
+
+    // determine the number of list items we can fit in the current view height
+    this.limit = Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT));
 
     // check url for pathId - if supplied we'll show that path
     const pathId = this.router.url.split('/').slice(-1)[0];
@@ -70,8 +78,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
     }
 
     // do some set up
-    this.units = this.isAuthorised ? this.auth.getUser().units : globals.defaultUnits;
-    if ( this.isAuthorised && !isPathId ) {
+    this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
+    if ( this.isRegisteredUser && !isPathId ) {
       this.isPublicOrPrivate = PRIVATE;
     }
 
@@ -85,7 +93,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // in case units are changed while viewing the list
     this.dataServiceSubscription = this.data.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.isAuthorised ? this.auth.getUser().units : globals.defaultUnits;
+      this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
   }
@@ -94,32 +102,40 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList(protectedPaths: TsListArray = null) {
 
-    this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
+    // return new Promise( (resolve, reject) => {
+      this.spinner.showAsElement();
 
-      .subscribe( result => {
+      this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
 
-        // get a full list of existing and backend results
-        const backendList = result.list;
-        const count = result.count;
-        const temp = protectedPaths ? protectedPaths : this.listItems;
-        const fullList = [...temp, ...backendList];
+        .subscribe( result => {
 
-        // filter out duplicates
-        const fullListPathIds = fullList.map( item => item.pathId );
-        const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
-        this.listItems = filteredList;
+          // get a full list of existing and backend results
+          const backendList = result.list;
+          const count = result.count;
+          const temp = protectedPaths ? protectedPaths : this.listItems;
+          const fullList = [...temp, ...backendList];
 
-        // work out the numbers
-        this.numberOfRoutes = count - backendList.length - (this.offset * this.limit)  + filteredList.length;
-        this.numberOfLoadedRoutes = this.listItems.length;
-        this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
+          // filter out duplicates
+          const fullListPathIds = fullList.map( item => item.pathId );
+          const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
+          this.listItems = filteredList;
 
-    }, (error) => {
+          // work out the numbers
+          this.numberOfRoutes = count - backendList.length - (this.offset * this.limit)  + filteredList.length;
+          this.numberOfLoadedRoutes = this.listItems.length;
+          this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
+          this.spinner.removeElement();
 
-      this.alert.showAsElement('Something went wrong :(', error, true, false)
-        .subscribe( () => {});
+          // resolve();
 
-    });
+      }, (error) => {
+
+        this.spinner.removeElement();
+        this.alert.showAsElement('Something went wrong :(', error, true, false)
+          .subscribe( () => {});
+
+      });
+    // });
 
   }
 
@@ -149,30 +165,43 @@ export class PanelListComponent implements OnInit, OnDestroy {
         // reclicked on first route, clear it and all overlays
         this.highlightColours = [null, ...globals.lineColours];
         this.activePaths = {};
-        emitCommand = { command: 'clear' };
+        emitCommand = {
+          command: 'clear'
+        };
 
       } else {
 
         // reclicked an overlay, just clear the overlay
         this.highlightColours.unshift(this.activePaths[idFromClick]);
         delete this.activePaths[idFromClick];
-        emitCommand = { command: 'rem', id: idFromClick };
+        emitCommand = {
+          command: 'rem',
+          id: idFromClick
+        };
       }
 
     } else {
 
-      // new route so add it
+      // new route so add it - only emit pathId from map-service if its the first path selected
       this.activePaths[idFromClick] = this.highlightColours.shift();
+      this.nActiveRoutes = Object.keys(this.activePaths).length;
+
       emitCommand = {
         command: 'add',
         id: idFromClick,
         colour: this.activePaths[idFromClick],
-        emit: Object.keys(this.activePaths).length < 2
+        emit: this.nActiveRoutes === 1
       };
+
+      // this.listItems.splice(this.listItems.indexOf(idFromClick))
+      const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
+      // console.log(this.listItems.splice(indx, 1));
+      this.listItems.splice(this.nActiveRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
+
 
     }
 
-    this.data.pathIdEmitter.emit( emitCommand );
+    this.data.pathCommandEmitter.emit( emitCommand );
 
   }
 
@@ -180,11 +209,19 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   getCssClass(id: string, i: number, leftOrRight: string) {
 
+    let classList = '';
+
     if (i === 0) {
-        return `border-top mt-1 list-box-top-${leftOrRight}`;
+        classList += `border-top list-box-top-${leftOrRight}`;
     } else if (i === this.numberOfLoadedRoutes - 1) {
-        return `list-box-bottom-${leftOrRight}`;
+      classList += `list-box-bottom-${leftOrRight}`;
     }
+
+    // if (this.activePaths[id] === null && leftOrRight === 'right') {
+    //   classList += ' red-blue-green';
+    // }
+
+    return classList;
 
   }
 
@@ -193,9 +230,26 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     if ( id in this.activePaths ) {
       if ( leftOrRight === 'left' ) {
-        return {'background-color' : 'whitesmoke'};
+        return {
+          'background-color' : 'whitesmoke',
+          // 'border-left': this.activePaths[id] === null ? 'none' : '1px #DEE2E6 solid'
+
+          // 'background-color': this.activePaths[id] === null ? 'whitesmoke' : this.activePaths[id] + this.highlightOpacity
+        };
       } else {
-        return { 'background-color': this.activePaths[id] === null ? 'whitesmoke' : this.activePaths[id] + this.highlightOpacity };
+        if (this.activePaths[id] === null) {
+          switch (leftOrRight) {
+            case 'right-top': return {'background-color': 'rgb(255, 127, 127)', 'border-left': '1px #DEE2E6 solid'};
+            case 'right-mid': return {'background-color': 'rgb(127, 255, 127)', 'border-left': '1px #DEE2E6 solid'};
+            case 'right-bot': return {'background-color': 'rgb(127, 127, 255)', 'border-left': '1px #DEE2E6 solid'};
+          }
+        } else {
+          return {
+            'background-color': this.activePaths[id] + this.highlightOpacity,
+            'border-left': '1px #DEE2E6 solid'
+          };
+        }
+
       }
 
     } else {

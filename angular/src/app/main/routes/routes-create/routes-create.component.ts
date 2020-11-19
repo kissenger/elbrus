@@ -22,7 +22,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   private overlaidPaths = [];
   private overlayPlotOptions: TsPlotPathOptions = {
     booResizeView: false,
-    booSaveToStore: false
+    booEmit: false
   };
   public callingPage: string;
 
@@ -30,7 +30,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     private dataService: DataService,
     private mapCreateService: MapCreateService,
     private httpService: HttpService,
-    private router: Router,
+    // private router: Router,
     private activatedRoute: ActivatedRoute
     ) { }
 
@@ -39,7 +39,6 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     // centre map on the currently loading route if it exists, otherwise take users home location
     // mapview is set by map.service
 
-    console.log('create');
     // const mapView = this.dataService.getFromStore('mapView', true);
     // let startPosition: TsCoordinate;
     // let startZoom: number;
@@ -82,7 +81,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     // TODO: I **think** this can be refactored to remove needing to search through the overlaidPaths,
     // or even to keep track of them because the subscribed to seervice now sends whether a resizze of the
     // view is required --> but works for now
-    this.overlaySubscription = this.dataService.pathIdEmitter.subscribe( (obj) => {
+    this.overlaySubscription = this.dataService.pathCommandEmitter.subscribe( (obj) => {
 
       const pathId = obj.id;
 

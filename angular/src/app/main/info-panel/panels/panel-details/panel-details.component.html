@@ -1,66 +1,107 @@
 <div class="d-flex flex-column h-100">
 
-  <!-- Inner container contains scrollabel content -->
 
-  <div  class="inner h-100">
 
-    <div *ngIf="!isData; else weHaveDataToShowDiv" class="mt-3 text-center">
-      No details to show.
+
+
+  <!-- MINIMISED VIEW -->
+
+  <div *ngIf="isMinimised">
+
+    <!-- NO ROUTE SELECTED -->
+    <div *ngIf="!isData" class="my-2 text-center">
+      Expand panel to select a route.
     </div>
 
-    <ng-template #weHaveDataToShowDiv>
+    <!-- ROUTE SELECTED -->
+    <div *ngIf="isData" class="row no-gutters text-center">
+      <div class="col-6 m-0 p-1 text-left">
+        {{geoJson.properties.info.name | shortName: 16}}
+      </div>
+      <div class="col-3 m-0 px-0 py-1 text-center">
+        {{geoJson.properties.stats.distance | units: 'distance': units.distance}}
+      </div>
+      <div class="col-3 m-0 p-1 text-center">
+        {{geoJson.properties.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}
+      </div>
+    </div>
 
-      <!-- Name and Description Block -->
+  </div>
 
-      <!-- If we are listing data only, then we dont need form inputs-->
+
+
+
+  <!-- MAXIMISED VIEW -->
+
+  <div *ngIf="!isMinimised" class="maximised-container h-100 d-flex flex-column ">
+
+    <div *ngIf="!isData" class="w-100 text-center d-flex flex-column flex-grow-1 ">
+
+      <div class="text-center m-3">
+        No routes selected.
+      </div>
+
+      <div class="small mt-auto text-center">
+        Use the 'List' tab find and select routes.
+      </div>
+
+    </div>
+
+    <div *ngIf="isData">
+
+      <!-- NAME & DESCRIPTION only for list page -->
       <div *ngIf="callingPage==='list'; else showForm">
 
-        <div class="h6 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{pathName}}</div>
-        <div *ngIf="pathDescription" class="mt-1 mb-1 pt-1 pb-1 border-bottom">{{pathDescription}}</div>
+        <div class="h6 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{geoJson.properties.info.name}}</div>
+        <div *ngIf="pathDescription" class="mt-1 mb-1 pt-1 pb-1 border-bottom">{{geoJson.properties.info.description}}</div>
 
       </div>
 
 
-      <!-- Form type -->
+      <!-- FORM INPUTS only if create page -->
       <ng-template #showForm>
 
         <div class="input-group input-group-sm my-1">
-            <input class='form-control' type='text' placeholder="{{pathName}}" [(ngModel)]="givenPathName" name="first">
+            <input class='form-control' type='text'
+            placeholder="{{geoJson.properties.info.name | autoName: geoJson.properties.info.category: geoJson.properties.info.pathType}}"
+            [(ngModel)]="givenPathName" name="first">
         </div>
 
         <div class="input-group input-group-sm my-1">
-            <textarea class='form-control' placeholder='Give your route a description' [(ngModel)]="pathDescription"></textarea>
+            <textarea class='form-control' placeholder='Give your route a description' [(ngModel)]="geoJson.properties.info.description"></textarea>
         </div>
 
       </ng-template>
-      <!-- End of Name and Description Block -->
+
+
+      <!-- PATH DATA -->
 
       <div class="mt-1 mb-1 pt-1 pb-1 border-bottom">
         <table class="table table-sm m-0 p-0">
           <tbody>
             <tr>
               <td>Distance</td>
-              <td>{{pathStats.distance | units: 'distance': units.distance}}</td>
+              <td>{{geoJson.properties.stats.distance | units: 'distance': units.distance}}</td>
             </tr>
             <tr>
               <td>Points</td>
-              <td>{{pathStats.nPoints | number: '1.0-0'}}</td>
+              <td>{{geoJson.properties.stats.nPoints | number: '1.0-0'}}</td>
             </tr>
             <tr>
               <td>Category</td>
-              <td>{{pathCategory}}</td>
+              <td>{{geoJson.properties.info.category}}</td>
             </tr>
             <tr>
               <td>Direction</td>
-              <td>{{pathDirection}}</td>
+              <td>{{geoJson.properties.info.direction}}</td>
             </tr>
             <tr>
               <td>Public</td>
-              <td>{{isPublic}}</td>
+              <td>{{geoJson.properties.info.isPublic}}</td>
             </tr>
             <tr *ngIf="isPublic">
               <td>Created by</td>
-              <td>{{createdBy}}</td>
+              <td>{{geoJson.properties.info.createdBy}}</td>
             </tr>
 
             <!-- Elevations shown only if isElevations is true -->
@@ -68,78 +109,68 @@
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Ascent</td>
-              <td>{{pathStats.elevations.ascent | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.ascent | units: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Descent</td>
-              <td>{{pathStats.elevations.descent | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.descent | units: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Max Elev</td>
-              <td>{{pathStats.elevations.maxElev | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.maxElev | units: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Min Elev</td>
-              <td>{{pathStats.elevations.minElev | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.minElev | units: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Lumpiness</td>
-              <td>{{pathStats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}</td>
+              <td>{{geoJson.properties.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-  </ng-template>
+    </div>
 
-      <!-- Plot elevations -->
-      <div class="w-100 small">
-          <div [hidden]="!isElevations" class="w-100" id="chart_div"></div>
-      </div>
-      <!-- End of plot elevations-->
-
-      <!-- Hills table -->
-      <div *ngIf="isHills" class="pt-2 w-100 mx-auto text-center small border-top">
-
-          <table class='table thead-dark table-bordered table-striped table-sm'>
-              <thead>
-                  <tr>
-                      <th>Height Gain<br>[m]</th>
-                      <th>Grad Ave<br>[%]</th>
-                      <th>Grad Max<br>[%]</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr *ngFor="let row of pathStats.hills">
-                      <td>{{row.dHeight | number: '1.0-0'}}</td>
-                      <td>{{row.aveGrad| number: '1.0-1'}}</td>
-                      <td>{{row.maxGrad | number: '1.0-1'}}</td>
-                  </tr>
-              </tbody>
-          </table>
-          <!-- End of hills table -->
-
-      </div>
-      <!-- End of elevations block -->
-
-      <div *ngIf="isLong">
-          <div class="name">Elevation data are not stored for 'long' routes. <br></div>
-          <!-- <div class="text-center">Find out why <a href={{wikiLink}}>here.</a></div> -->
-      </div>
-
-    </div> <!-- close "inner"  div-->
-
-    <!-- buttons stay at the bottom regarldess of amount of content -->
-    <!-- String Type -->
-    <div *ngIf="callingPage !== 'list'" class="buttons d-flex mb-2 mt-2 justify-content-center" >
-        <button (click)="onSave()" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
-        <button (click)="onCancel()" type="button" class="btn btn-secondary btn-sm ml-1 mt-1" type="cancel">Cancel</button>
+    <!-- ELEVATIONS CHART -->
+    <div class="w-100 small">
+        <div [hidden]="!isElevations" class="w-100" id="chart_div"></div>
     </div>
 
 
+    <!-- HILLS TABLE -->
+    <div *ngIf="isHills" class="pt-2 w-100 mx-auto text-center small border-top">
+
+        <table class='table thead-dark table-bordered table-striped table-sm'>
+            <thead>
+                <tr>
+                    <th>Height Gain<br>[m]</th>
+                    <th>Grad Ave<br>[%]</th>
+                    <th>Grad Max<br>[%]</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of pathStats.hills">
+                    <td>{{row.dHeight | number: '1.0-0'}}</td>
+                    <td>{{row.aveGrad| number: '1.0-1'}}</td>
+                    <td>{{row.maxGrad | number: '1.0-1'}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- BUTTONS -->
+    <div *ngIf="callingPage !== 'list'" class="buttons d-flex mb-2 mt-2 justify-content-center" >
+      <button (click)="onSave()" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
+      <button (click)="onCancel()" type="button" class="btn btn-secondary btn-sm ml-1 mt-1" type="cancel">Cancel</button>
+    </div>
+
+  </div>
 
 </div>

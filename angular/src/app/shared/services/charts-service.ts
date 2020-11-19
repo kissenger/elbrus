@@ -25,7 +25,7 @@ export class ChartsService {
   plotChart(htmlElement, chartData, colourArray) {
 
     // this.units = this.auth.getUser() ? this.auth.getUser().units : globals.defaultUnits;
-    this.units = this.auth.isAuthorised() ? this.auth.getUser().units : globals.defaultUnits;
+    this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
 
 
     if (chartData[0].length === 0) {

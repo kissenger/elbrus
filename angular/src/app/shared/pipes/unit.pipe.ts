@@ -24,9 +24,9 @@ export class UnitPipe implements PipeTransform {
       value /= 1000.0;
 
       if (unitA === 'km') {
-        return (value).toFixed(2) + 'km';
+        return (value).toPrecision(3) + 'km';
       } else if (unitA === 'mi') {
-        return (value * KM_2_MI).toFixed(2) + 'mi';
+        return (value * KM_2_MI).toPrecision(3) + 'mi';
       }
 
     // if value is an elevation, baseline is meters

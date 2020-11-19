@@ -1,0 +1,17 @@
+/*
+div {
+  border: 1px blue solid;
+} */
+
+.list-item {
+  cursor: pointer;
+}
+
+.name {
+  font-size: small;
+  font-weight: bold;
+}
+
+.stats {
+  font-size: small;
+}

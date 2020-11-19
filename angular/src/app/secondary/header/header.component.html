@@ -1,0 +1,20 @@
+
+<div class="d-flex flex-row w-100 my-1 py-1 border-bottom">
+
+  <div class="flex-grow-1 m-0">
+    <a href="/">
+      <img class="image" src="../../assets/images/ts_header.svg" alt="">
+    </a>
+  </div>
+
+  <div *ngIf='showMenu' class="dropdown align-self-end mx-1 h-100 position-relative">
+    <div class="dropbtn dropdown-toggle m-0 px-2 py-1">Menu</div>
+    <div class="dropdown-content">
+      <li *ngIf="auth.isRegisteredUser()" (click)="onProfileClick()" class="p-2">View Profile</li>
+      <li *ngIf="auth.isRegisteredUser()" (click)="onLogoutClick()" class="p-2">Logout</li>
+      <li *ngIf="auth.isGuestUser()" (click)="onLoginClick()" class="p-2">Login/Register</li>
+      <li *ngIf="auth.isGuestUser()" (click)="onLogoutClick()" class="p-2">Welcome page</li>
+    </div>
+  </div>
+
+</div>

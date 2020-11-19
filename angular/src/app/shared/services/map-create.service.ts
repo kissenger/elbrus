@@ -8,7 +8,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared/classes/path-history';
 import { AlertService } from './alert.service';
 import { Path } from '../classes/path-class';
-import { GeoJsonPipe } from '../geojson.pipe';
+import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import * as mapboxgl from 'mapbox-gl';
 // import { mapboxgl } from ''
 

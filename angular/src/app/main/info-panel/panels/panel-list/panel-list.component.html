@@ -1,68 +1,90 @@
 
 
-<div class="p-0 h-100 position-static h-100 d-flex flex-column border-white">
+<div class="p-0 h-100  d-flex flex-column">
 
-  <div class="p-0 mt-0 mb-0" [ngClass]="{'flex-grow-1': numberOfRoutes === 0}">
 
-    <!-- <div class="d-flex"> -->
-      <select [(ngModel)]="isPublicOrPrivate" (change)="onSelectMenuChange()" class="custom-select custom-select-sm mt-2 mb-1">
+  <!-- PUBLIC/PRIVATE DROPDOWN -->
+  <form>
 
-        <option *ngIf="!isAuthorised" disabled value=false>My routes</option>
-        <option *ngIf="isAuthorised" value=false>My routes</option>
-        <!-- <option value="private">My balls</option> -->
-
+    <div class="form-group m-0 p-0">
+      <select [(ngModel)]="isPublicOrPrivate" [ngModelOptions]="{standalone: true}"
+        (change)="onSelectMenuChange()" class="custom-select custom-select-sm mt-2 mb-2">
+        <option *ngIf="!isRegisteredUser" disabled value=false>My routes</option>
+        <option *ngIf="isRegisteredUser" value=false>My routes</option>
         <option value=true>Public routes</option>
-        <!-- <option selected value="public">Public routes</option> -->
-
       </select>
-    <!-- </div> -->
+    <!-- </div>
 
-    <div *ngIf="numberOfRoutes === 0" class="m-3 text-center">
-      No routes to show.
+    <div class="form-group"> -->
+      <!-- <div class="form-check my-0">
+        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+        <label class="form-check-label" for="defaultCheck1">Multi-select</label>
+      </div> -->
+    </div>
+
+  </form>
+
+
+  <!-- EMPTY ROUTE LIST -->
+  <div *ngIf="numberOfRoutes === 0" class="w-100 text-center flex-grow-1">
+
+    <div class="text-center m-3">
+      No routes found.
+    </div>
+
+    <div *ngIf="!isPublicOrPrivate" class="small mt-3 text-center mt-auto">
+      Use the 'Options' tab to load or create a route, or use the dropdown above to view shared routes.
+    </div>
+
+    <div *ngIf="isPublicOrPrivate" class="small mt-3 text-center mt-auto">
+      Only routes in the current map view are listed.  Try moving the map to find routes.
     </div>
 
   </div>
 
-  <div *ngIf="numberOfRoutes === 0; else moreThanOneRouteDiv" class="p-0 mt-2 mb-2">
 
-      <p class="small text-left m-0">
-        Tip: Click on the 'options' tab to load or create a route, or select 'Public'
-        above to view shared routes in the current field of view.
-      </p>
+  <!-- ROUTE LIST -->
 
-  </div>
+  <div *ngIf="numberOfRoutes > 0" class="m-1  p-0 h-100 overflow-auto">
 
-  <ng-template #moreThanOneRouteDiv >
+    <div class="m-0 p-0 d-flex flex-column active-route-holder">
+      Active Route:
+      <app-panel-list-item *ngIf="nActiveRoutes > 0" [item]="listItems[0]" class="my-auto list-item"
+        (click)="onListClick(listItems[0].pathId)" [ngStyle]="getCssStyle(listItems[0].pathId, 0, 'active')">
+      </app-panel-list-item>
 
-    <!-- Loop through available data and create a list box item for each-->
-    <div *ngFor="let item of listItems; let i = index" class="list-container w-100">
+      <div *ngIf="nActiveRoutes === 0" class="w-100 text-center my-auto">No route selected.</div>
+    </div>
 
-      <!-- empty container for each row -->
-      <div id="{{item.pathId}}" class="p-0 m-0 row">
 
-        <!-- main list box element -->
-        <div [ngClass]="getCssClass(item.pathId, i, 'left')" [ngStyle]="getCssStyle(item.pathId, i, 'left')" class="col-11 m-0 px-1 py-0 border-left border-bottom" (click)="onListClick(item.pathId)">
-        <!-- <div style="--colour: {{colours[activePaths.length]}}" class="test-class col-11 m-0 px-1 py-0 border-left border-bottom" (click)="onRouteSelect(line.pathId)"> -->
-          <div class="row m-0 p-0 name">{{item.name | name: 20}}</div>
-          <div class="row m-0 p-0">
-            <div class="col-6 m-0 p-0 text-left"><i class="fas fa-ruler icon"></i> {{item.stats.distance | units: 'distance': units.distance}}</div>
-            <!-- <div class="col-6 m-0 p-0 text-left"><i class="fas fa-mountain icon"></i> {{line.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}</div> -->
 
-          </div>
+    <div *ngIf="nActiveRoutes === 0" class="m-1 p-0">Select a route to view:</div>
+    <div *ngIf="nActiveRoutes > 0 && numberOfRoutes <= 1" class="m-1 p-0">No more routes to show.</div>
+    <div *ngIf="nActiveRoutes > 0 && numberOfRoutes > 1" class="m-1 p-0">Select routes to overlay:</div>
+
+
+      <div *ngFor="let item of listItems; let i = index" class="list-item" >
+
+        <div *ngIf="nActiveRoutes === 0 || i > 0" (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i, 'inactive')">
+          <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
         </div>
 
-        <!-- clickable overlay box -->
-        <div [ngClass]="getCssClass(item.pathId, i, 'right')" [ngStyle]="getCssStyle(item.pathId, i, 'right')" class="col-1 m-0 p-0 border-left border-right border-bottom" (click)="onListClick(item.pathId)">
 
-        <!-- <div [ngClass]="getCssClass(line.pathId, i)" class="col-1 m-0 p-0 border-left border-right border-bottom" (click)="onOverlaySelect(line.pathId)"> -->
-        </div>
       </div>
     </div>
 
-    <div class="more p-0 text-center">
-      showing {{numberOfLoadedRoutes}} of {{numberOfRoutes}} routes <br>
-      <span *ngIf="!isEndOfList" class="global-make-text-look-like-link" (click)="onMoreClick()"> Load more </span> <br>
-    </div>
-  </ng-template>
+    <!-- Loop through available data and create a list box item for each-->
+    <!-- <div *ngFor="let item of listItems; let i = index"  (click)="onListClick(item.pathId)"
+      [ngClass]="getCssClass(item.pathId, i)" [ngStyle]="getCssStyle(item.pathId, i)">
+      <app-panel-list-item [item]="item"></app-panel-list-item>
+    </div> -->
+
+
+
+  <!-- MORE -->
+  <div *ngIf="numberOfRoutes > 0" class="text-center small">
+    showing {{numberOfLoadedRoutes}} of {{numberOfRoutes}} routes <br>
+    <span *ngIf="!isEndOfList" class="global-make-text-look-like-link" (click)="onMoreClick()"> Load more </span> <br>
+  </div>
 
 </div>

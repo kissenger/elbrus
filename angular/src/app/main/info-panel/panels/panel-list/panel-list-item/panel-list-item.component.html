@@ -1,0 +1,26 @@
+
+
+    <div id="{{item.pathId}}" class="list-item px-1 py-0 m-0 w-100">
+
+        <div class="row m-0 p-0">
+          <div class="col m-0 p-0 name">
+            {{item.name | shortName: 24}}
+          </div>
+        </div>
+
+        <!-- route stats -->
+        <div class="row m-0 p-0 stats">
+
+          <div class="col-4 m-0 p-0 text-left">
+            {{item.stats.distance | units: 'distance': units.distance}}
+          </div>
+
+          <div *ngIf="!!item.stats.elevations" class="col-4 m-0 p-0 text-left">
+            {{item.stats.elevations.ascent | units: 'elevation': units.elevation}}
+          </div>
+          <div *ngIf="!!item.stats.elevations" class="col-4 m-0 p-0 text-left">
+            {{item.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}
+          </div>
+
+        </div>
+      </div>

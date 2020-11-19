@@ -42,18 +42,18 @@ export class RoutesListComponent implements OnInit, OnDestroy {
         const bbox = result.hills.properties.stats.bbox;
         const centrePoint = {lng: (bbox.maxLng + bbox.minLng) / 2, lat: (bbox.maxLat + bbox.minLat) / 2};
         await this.mapService.newMap(centrePoint);
-        this.mapService.add(result.hills, {}, {booSaveToStore: true, booResizeView: true} );
+        this.mapService.add(result.hills, {}, {booEmit: true, booResizeView: true} );
       });
     } else {
       this.mapService.newMap();
     }
 
 
-    this.pathIdSubscription = this.dataService.pathIdEmitter.subscribe( ( request ) => {
+    this.pathIdSubscription = this.dataService.pathCommandEmitter.subscribe( ( request ) => {
 
         if ( request.command === 'add' ) {
           this.httpService.getPathById('route', request.id).subscribe( (result) => {
-            this.mapService.add(result.hills, {lineColour: request.colour}, {booSaveToStore: request.emit} );
+            this.mapService.add(result.hills, {lineColour: request.colour}, {booEmit: request.emit} );
           });
 
         } else if ( request.command === 'rem' ) {

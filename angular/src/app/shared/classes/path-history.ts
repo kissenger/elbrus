@@ -2,7 +2,7 @@
   import { TsCoordinate, TsFeatureCollection, TsFeature, TsPosition, TsPoint } from 'src/app/shared/interfaces';
   import { emptyGeoJson } from '../globals';
   import { Path } from './path-class';
-  import { GeoJsonPipe } from '../geojson.pipe';
+  import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
   import { Injector } from '@angular/core';
 
   export class PathHistory {

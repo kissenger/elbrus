@@ -1,0 +1,51 @@
+div {
+  border: 1px red dashed;
+}
+
+.welcome-container {
+  top: 0px;
+  left: 0px;
+  /* position: absolute; */
+  /* note that opacity does not work because the child panel inherits it*/
+  background-color: rgba(255,255,255,1.0);
+  pointer-events: visible;
+  border: 1px red solid;
+}
+
+.welcome-panel {
+  background-color: rgba(255,255,255,1.0);
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.welcome-header {
+  font-family: verdana;
+  font-size: xx-large;
+}
+
+.welcome-main {
+  background-color: rgba(255,255,255,1.0);
+}
+
+.welcome-footer {
+  background-color: rgba(255,255,255,1.0);
+}
+
+img {
+  width: 400px;
+  height: auto;
+}
+
+.welcome-text-box {
+  font-family: verdana;
+}
+
+.welcome-heading {
+  font-size: 20px;
+}
+
+.welcome-text {
+  font-size: 14px;
+}
+
+

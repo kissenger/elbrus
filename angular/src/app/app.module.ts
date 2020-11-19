@@ -7,25 +7,24 @@ import { FormsModule } from '@angular/forms';
 
 // Components
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './header/header.component';
+import { HeaderComponent } from './secondary/header/header.component';
 import { RoutesCreateComponent } from './main/routes/routes-create/routes-create.component';
 import { RoutesListComponent } from './main/routes/routes-list/routes-list.component';
-import { FooterComponent } from './footer/footer.component';
-import { MainComponent } from './main/main.component';
+import { FooterComponent } from './secondary/footer/footer.component';
 import { InfoPanelComponent } from './main/info-panel/info-panel.component';
 import { MenuBarComponent } from './main/menu-bar/menu-bar.component';
 import { PanelsInjectorComponent } from './main/info-panel/panels-injector/panels-injector.component';
 import { PanelDetailsComponent } from './main/info-panel/panels/panel-details/panel-details.component';
-import { PanelDetailsMinimisedComponent } from './main/info-panel/panels/panel-details-minimised/panel-details-minimised.component';
 import { PanelListComponent } from './main/info-panel/panels/panel-list/panel-list.component';
+import { PanelListItemComponent } from './main/info-panel/panels/panel-list/panel-list-item/panel-list-item.component';
 import { PanelOptionsComponent } from './main/info-panel/panels/panel-options/panel-options.component';
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { AlertBoxComponent } from './shared/components/alert-box/alert-box.component';
 import { RoutesReviewComponent } from './main/routes/routes-review/routes-review.component';
-import { LoginComponent } from 'src/app/shared/components/login/login.component';
-import { WelcomeComponent } from './welcome/welcome.component';
-import { RegisterComponent } from 'src/app/shared/components/register/register.component';
-import { ProfileComponent } from './shared/components/profile/profile.component';
+import { WelcomeComponent } from './secondary/welcome/welcome.component';
+import { LoginComponent } from './secondary/login/login.component';
+import { MapSelectLocationComponent } from './secondary/map-select-location/map-select-location.component';
+import { ProfileComponent } from './secondary/profile/profile.component';
 
 // Services
 import { HttpService } from './shared/services/http.service';
@@ -34,16 +33,17 @@ import { MapCreateService } from './shared/services/map-create.service';
 import { AlertService } from './shared/services/alert.service';
 import { SpinnerService } from './shared/services/spinner.service';
 import { AuthService } from './shared/services/auth.service';
-import { LoginService } from './shared/services/login.service';
-import { RegisterService } from './shared/services/register.service';
 import { TokenInterceptorService } from './shared/services/token-interceptor.service';
 import { AuthGuard } from './auth.guard';
-import { ProfileService } from './shared/services/profile.service';
 
 // Pipes
-import { UnitPipe } from './shared/unit.pipe';
-import { GeoJsonPipe } from './shared/geojson.pipe';
-import { NamePipe } from './shared/name.pipe';
+import { UnitPipe } from './shared/pipes/unit.pipe';
+import { UnitNamePipe } from './shared/pipes/unit-name.pipe';
+import { GeoJsonPipe } from './shared/pipes/geojson.pipe';
+import { NamePipe } from './shared/pipes/name.pipe';
+import { AutoNamePipe } from './shared/pipes/auto-name.pipe';
+import { ShortNamePipe } from './shared/pipes/short-name.pipe';
+import { CoordsPipe } from './shared/pipes/coords.pipe';
 
 @NgModule({
   declarations: [
@@ -52,24 +52,27 @@ import { NamePipe } from './shared/name.pipe';
     RoutesCreateComponent,
     RoutesListComponent,
     FooterComponent,
-    MainComponent,
     InfoPanelComponent,
     MenuBarComponent,
     UnitPipe,
+    GeoJsonPipe,
     NamePipe,
-    // InfoPanelDirective,
+    UnitNamePipe,
+    AutoNamePipe,
+    ShortNamePipe,
+    CoordsPipe,
     PanelsInjectorComponent,
     PanelDetailsComponent,
-    PanelDetailsMinimisedComponent,
     PanelListComponent,
+    PanelListItemComponent,
     PanelOptionsComponent,
     RoutesReviewComponent,
     SpinnerComponent,
     AlertBoxComponent,
     LoginComponent,
     WelcomeComponent,
-    RegisterComponent,
-    ProfileComponent
+    ProfileComponent,
+    MapSelectLocationComponent
   ],
   imports: [
     BrowserModule,
@@ -85,11 +88,13 @@ import { NamePipe } from './shared/name.pipe';
     SpinnerService,
     AuthService,
     AuthGuard,
-    LoginService,
-    RegisterService,
-    ProfileService,
+    UnitPipe,
     GeoJsonPipe,
     NamePipe,
+    UnitNamePipe,
+    AutoNamePipe,
+    ShortNamePipe,
+    CoordsPipe,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
@@ -99,14 +104,10 @@ import { NamePipe } from './shared/name.pipe';
   bootstrap: [AppComponent],
   entryComponents: [
     PanelDetailsComponent,
-    // PanelDetailsMinimisedComponent,
     PanelListComponent,
     PanelOptionsComponent,
     AlertBoxComponent,
-    SpinnerComponent,
-    LoginComponent,
-    RegisterComponent,
-    ProfileComponent
+    SpinnerComponent
     ]
 })
 export class AppModule { }

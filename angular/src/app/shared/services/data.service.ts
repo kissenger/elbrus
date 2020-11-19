@@ -1,16 +1,14 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { TsUnits } from '../interfaces';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class DataService {
 
-  constructor(
-    private router: Router
-  ) {
-  }
+  // used by header component to show different elements when welcome page is shown
+  public locationEmitter = new EventEmitter();
+
 
 
 
@@ -21,10 +19,20 @@ export class DataService {
    * Collection of variables and methods to enable emission, storage and retrieval of the
    * CREATED OR IMPORTED PATHS BEFORE RECALL FROM DB
    */
-  public menuClickEmitter = new EventEmitter();          // from map service to info panel
-  public pathStatsEmitter = new EventEmitter();   // from map-create to panel-create-detail
-  public activeTabEmitter = new EventEmitter();          // from map service to info panel
-  public loginUserEmitter = new EventEmitter();   // from login to header
+  public menuClickEmitter = new EventEmitter();           // from map service to info panel
+  public pathStatsEmitter = new EventEmitter();           // from map-create to panel-create-detail
+  public activeTabEmitter = new EventEmitter();           // from map service to info panel
+  public loginUserEmitter = new EventEmitter();           // from login to header
+  public pathCommandEmitter = new EventEmitter();         // from panel-list to routes-list
+
+  // public selectedPathsEmitter = new EventEmitter();       // from panel-list to panel-details-minimised
+
+  // from map-service & map-create-service to panel-details & panel-deails minimsied
+  // ensures the details panel has required information about the route being plotted
+  public activePathEmitter = new EventEmitter();
+  public minimisePanelEmitter = new EventEmitter();
+
+  public mapBoundsEmitter = new EventEmitter();
   // stored by map-create-service, accessed by panel-routes-create-details
   // public createdPathData: {coords: Array<TsCoordinate>, elevations: {elevs: Array<number>, elevationStatus: string}};
   // stored by panel-routes-list-options, accessed by panel-routes-create-details
@@ -35,9 +43,9 @@ export class DataService {
    * CURRENTLY ACTIVE PATH RECALLED FROM DATABASE
    */
   // public desiredPathEmitter = new EventEmitter();   // emits from panel-routes-list-list and subscribed to in routes-list
-  public activePathEmitter = new EventEmitter();
-  public pathIdEmitter = new EventEmitter();
-  public mapBoundsEmitter = new EventEmitter();
+  // public activePathEmitter = new EventEmitter();
+
+  // emitter: panel-list, subscriber: routes-list
   /**
    * Data store
    * @param dataStore is a key/value object to store all shared dat in one place

@@ -17,12 +17,16 @@ export class AuthService {
     return !!sessionStorage.getItem('tsToken');
   }
 
-  isGuest() {
-    return JSON.parse(sessionStorage.getItem('user')).userName === 'guest';
+  isGuestUser() {
+    try {
+      return JSON.parse(sessionStorage.getItem('user')).userName === 'guest';
+    } catch {
+      return false;
+    }
   }
 
-  isAuthorised() {
-    return this.isToken() && !this.isGuest();
+  isRegisteredUser() {
+    return this.isToken() && !this.isGuestUser();
   }
 
   getToken() {
@@ -47,12 +51,12 @@ export class AuthService {
   }
 
   logout() {
-    // actually just re-login as guest - unles sthat fails, in which case delete the token
-    try {
-      this.login( 'guest', null );
-    } catch {
+    // actually just re-login as guest - unless sthat fails, in which case delete the token
+    // try {
+    //   this.login( 'guest', null );
+    // } catch {
       this.deleteToken();
-    }
+    // }
   }
 
   login( userName: string, password: string ) {

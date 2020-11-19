@@ -13,6 +13,7 @@ export interface TsPlotPathOptions {
     booSaveToStore?: boolean;
     // booPlotMarkers?: boolean;
     booPlotPoints?: boolean;
+    booEmit?: boolean;
 }
 
 export interface TsLineStyle {
@@ -29,7 +30,7 @@ export interface TsMapView {
 /**
  * Used to populate list of paths
  */
-interface TsListItem {
+export interface TsListItem {
   name: string;
   stats: TsPathStats;
   category: string;
@@ -165,6 +166,8 @@ export interface TsInfo {
     pathType: string;           // 'route' or 'track'
     startTime: string;
     isLong: boolean;
+    isPublic: boolean;
+    createdBy: string;
 }
 
 export interface TsParams {

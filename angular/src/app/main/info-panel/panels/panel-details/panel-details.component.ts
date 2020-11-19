@@ -1,11 +1,13 @@
-import { Component, OnInit, OnDestroy, Input, ViewChild, TemplateRef } from '@angular/core';
+
+import { TsFeatureCollection } from './../../../../shared/interfaces';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { ChartsService } from 'src/app/shared/services/charts-service';
-import { TsUnits, TsPathStats, TsUser } from 'src/app/shared/interfaces';
+import { TsUnits, TsPathStats } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 
@@ -17,31 +19,31 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   // local variables
-  @Input() callingPage: string;
+  @Input() callingPage = 'list';
   private activePathSubscription: Subscription;
+
+  /* panel is minimised for thinner screens; also happens in info-panel component so changes need to be reflected there also */
+  public isMinimised = window.innerWidth < 900 ? true : false;
+  private minimisePanelSubscription: Subscription;
+
   private chartData: Array<Array<number>>;
   private colourArray: Array<string>;
+  public geoJson: TsFeatureCollection;
 
   public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
-  public givenPathName: string;     // name given to the path in the details form; overrides the default name
-
+  public givenPathName: string;     // name given to the path in the details form; overrides the default nam
   public pathDescription = '';
-  // public isListPage: boolean;
   public isLong: boolean;
   public isPublic: boolean;
   public createdBy: string;
   public isElevations: boolean;
   public isHills: boolean;
   public isData = false;
-  // public units: TsUnits = this.auth.getUser().units;
-  // private user: TsUser = this.auth.getUser();
   public units: TsUnits;
-  // public wikiLink: string = globals.links.wiki.elevations;
   public pathCategory: string;
   public pathType: string;
   public pathStats: TsPathStats = globals.emptyStats;
   public pathDirection: string;
-
 
   constructor(
     private dataService: DataService,
@@ -54,36 +56,20 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // show form inputs and buttons only for review or create pages, not for list
-    // this.isListPage = this.callingPage === 'list';
-    // console.log(this.callingPage)
-    // this.units = this.auth.getUser() ? this.auth.getUser().units : globals.defaultUnits;
-    this.units = this.auth.isAuthorised() ? this.auth.getUser().units : globals.defaultUnits;
+    this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
+
+    // subscribe to any changes in the minimised status of the panel
+    this.minimisePanelSubscription = this.dataService.minimisePanelEmitter.subscribe( (minimise: boolean) => {
+      this.isMinimised = minimise;
+    });
 
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
+      this.geoJson = geoJson;
 
-      // used by html to say 'nothing to show' if the geojson only has a single point or fewer
-      if (geoJson.features[0].geometry.coordinates.length <= 1) {
-        this.isData = false;
-      } else {
-        this.isData = true;
-      }
-
-      this.pathStats = geoJson.properties.stats;
-      this.pathDescription = geoJson.properties.info.description;
-      this.pathCategory = geoJson.properties.info.category;
-      this.pathDirection = geoJson.properties.info.direction;
-      this.pathType = geoJson.properties.info.pathType;
-
-      // if this is a create-route action, then path will not have a name until one is entered in the form; create a default one
-      if (!geoJson.properties.info.name) {
-        this.pathName = (this.pathCategory === 'None' ? 'Uncategorised' : this.pathCategory) + ' ' + this.pathType;
-
-      } else {
-        this.pathName = geoJson.properties.info.name;
-      }
+      // note this is a boolean to tell tempplate whether there is data to display or not
+      this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
 
       this.isLong = geoJson.properties.info.isLong;
       this.isElevations = geoJson.properties.info.isElevations && !this.isLong;
@@ -92,8 +78,6 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       } else {
         this.isHills = false;
       }
-      this.isPublic = geoJson.properties.info.isPublic;
-      this.createdBy = geoJson.properties.info.createdBy;
 
       /**
        * TODO: This should be in a subroutine
@@ -213,6 +197,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.activePathSubscription.unsubscribe();
+    this.minimisePanelSubscription.unsubscribe();
 
     // this.httpService.flushDatabase().subscribe( () => {
     //   console.log('db flushed');

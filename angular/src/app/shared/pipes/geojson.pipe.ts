@@ -1,12 +1,16 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { TsCoordinate, TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString } from './interfaces';
+import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString } from 'src/app/shared/interfaces';
 
 @Pipe({
   name: 'geojson'
 })
 
-export class GeoJsonPipe implements PipeTransform {
 
+/**
+ * Converts an array of points into a geoJson object
+ */
+
+export class GeoJsonPipe implements PipeTransform {
 
   transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', labels?: Array<string>): TsFeatureCollection {
 

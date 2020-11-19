@@ -1,0 +1,55 @@
+
+
+<div class="h-100 w-100 d-flex flex-column welcome-container">
+
+  <div class=" w-75 h-100 d-flex flex-column align-self-center welcome-panel ">
+
+    <!-- <div class="text-center my-3 welcome-header"> -->
+        <!-- Find your adventure -->
+    <!-- </div> -->
+
+    <div class="row flex-grow-1 welcome-main">
+
+      <!-- use of media class helps vertical alignment of image //  justify-content-center achieves the horz alignment-->
+      <div class="col-lg p-0 m-0 media justify-content-center">
+        <img class="img-fluid align-self-center" src="../../assets/images/welcome-page-image.svg" alt="">
+      </div>
+
+      <div class="col-lg d-flex align-items-center justify-content-center">
+
+        <div class="text-center text-lg-left">
+
+          <div class="mb-3 welcome-text-box">
+            <span class="welcome-heading">Create</span> <br>
+            <span class="welcome-text">Unique route planning tools to plan your next adventure</span>
+          </div>
+
+          <div class="my-3 welcome-text-box">
+            <span class="welcome-heading">Discover</span> <br>
+            <span class="welcome-text">Search for new routes on your favourite trails</span>
+          </div>
+
+          <div class="my-3 welcome-text-box">
+            <span class="welcome-heading">Share</span> <br>
+            <span class="welcome-text">Quickly share routes with other trail lovers </span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="welcome-footer h-25 mb-3 " >
+      <div class="d-flex justify-content-center">
+        <button class="btn btn mr-2 btn-outline-secondary" type="button" (click)="onGuestClick()">Continue as Guest</button>
+        <button class="btn btn ml-2 btn-primary" type="button" (click)="onLoginClick()">Login or Register</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+

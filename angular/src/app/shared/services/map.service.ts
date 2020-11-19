@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
-import { GeoJsonPipe } from '../geojson.pipe';
+import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,7 @@ export class MapService {
   private accessToken: string = environment.MAPBOX_TOKEN;
   public tsMap: mapboxgl.Map;
   public layers: ActiveLayers;
+  private marker: mapboxgl.Marker;
 
   constructor(
     public httpService: HttpService,
@@ -47,7 +48,7 @@ export class MapService {
         // otherwise look for stored mapview
         mapCentre = this.dataService.getFromStore('mapView', false).centre;
         mapZoom = this.dataService.getFromStore('mapView', false).zoom;
-      } else if ( this.auth.isAuthorised() ) {
+      } else if ( this.auth.isRegisteredUser() ) {
         // if that doesnt work, try to find the default location of the logged-in user
         mapCentre = this.auth.getUser().homeLngLat;
         mapZoom = globals.defaultMapView.zoom;
@@ -58,7 +59,6 @@ export class MapService {
 
       }
 
-      console.log(mapCentre, mapZoom);
       this.tsMap = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/kissenger/ckapl476e00p61iqeivumz4ey',
@@ -87,6 +87,15 @@ export class MapService {
 
   }
 
+
+  public plotMarker(location: TsCoordinate) {
+    if (this.marker) {
+      this.marker.remove();
+    }
+    this.marker = new mapboxgl.Marker()
+      .setLngLat(location)
+      .addTo(this.tsMap);
+  }
 
   public getMapView() {
     // Used by other services to determine what is being shown so, for example, same view can be established after map change
@@ -118,7 +127,7 @@ export class MapService {
       this.bounds = pathAsGeoJSON.bbox;
     }
 
-    if (plotOptions.booSaveToStore) {
+    if (plotOptions.booEmit) {
       this.dataService.activePathEmitter.emit(pathAsGeoJSON);
       this.dataService.saveToStore('activePath', pathAsGeoJSON);
     }
@@ -229,6 +238,11 @@ export class MapService {
       });
     }
 
+    // send an empty linestring
+    // const tempGeo = this.geoJsonPipe.transform([], 'LineString');
+    this.dataService.activePathEmitter.emit(globals.emptyGeoJson);
+    this.dataService.saveToStore('activePath', globals.emptyGeoJson);
+
   }
 
 
@@ -258,12 +272,17 @@ export class MapService {
   public getLocationOnClick() {
 
     this.tsMap.getCanvas().style.cursor = 'crosshair';
-    return new Promise<TsCoordinate>( (resolve, reject) => {
+
+    // return new Promise<TsCoordinate>( (resolve, reject) => {
       this.tsMap.on('click', (e) => {
-        this.tsMap.getCanvas().style.cursor = 'pointer';
-        resolve({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+        const location = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+        this.plotMarker({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+        this.dataService.locationEmitter.emit(location);
+
+        // this.tsMap.getCanvas().style.cursor = 'pointer';
+        // resolve({ lat: e.lngLat.lat, lng: e.lngLat.lng });
       });
-    });
+    // });
 
   }
 
