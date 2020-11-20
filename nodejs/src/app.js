@@ -10,25 +10,29 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-require('dotenv').config();
-const app = express();
+
+const dotenv = require('dotenv').config();
+if (dotenv.error) {
+  console.log(`ERROR from app.js: ${dotenv.error}`);
+  process.exit(0);
+}
+
+const app = express(); 
 const fs = require('fs');
 
 const auth = require('./auth');
-const { runInNewContext } = require('vm');
 const GeoJSON = require('./geojson').GeoJSON;
 const gpxRead = require('./gpx').gpxRead;  
 const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
 const debugMsg = require('./debug').debugMsg;
 const mongoModel = require('./app-helpers.js').mongoModel;
 const bbox2Polygon = require('./app-helpers.js').bbox2Polygon;
-const bbox2Point = require('./app-helpers.js').bbox2Point;
+const bbox2Point = require('./app-helpers.js').bbox2Point; 
 const getListData = require('./app-helpers.js').getListData;
 const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 const getMongoObject = require('./path-helpers.js').getMongoObject;
 const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
 const geoFunctions = require('geo-points-and-paths').geoFunctions;
-
 
 let threadPool;
 if (process.env.USE_THREADS) {
