@@ -15,7 +15,7 @@ div{
   --top-margin: 10px;
   --bottom-margin: 30px;
   --collapse-bar-height: 20px;
-  --tabs-height: 35px;
+  --tabs-height: 37px;
 }
 
 
@@ -30,18 +30,31 @@ div{
 
 .outer-container {
   top: var(--top-margin);
+  bottom: var(--bottom-margin);
   right: 0px;
   width: 225px;
+  overflow: hidden;
   font-size: smaller;
-  height: calc(100% - var(--bottom-margin) - var(--top-margin));
-  pointer-events: none;
-  /* float: right; */
-  /* display: inline-block; */
 
+
+  /* box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
+  font-size: smaller;
+  pointer-events: none; */
+  /* max-height: calc(100% - var(--top-margin) - var(--bottom-margin)); */
 }
+
 .inner-container {
+  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.4);
   border: 1px red solid;
 }
+/* .inner-container { */
+  /* font-size: smaller;
+  pointer-events: none;
+  border: 1px orange dotted; */
+  /* box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
+  font-size: smaller;
+  pointer-events: none;
+} */
 
 /* COLLAPSE BAR */
 
@@ -49,9 +62,7 @@ div{
   height: var(--collapse-bar-height);
   top: 0px;
   pointer-events: auto;
-  background: var(--ts-grey-background);
-  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
-  z-index: 30;
+  background: white;
 
 }
 
@@ -70,26 +81,16 @@ div{
 /* COLLAPSE BAR */
 
 .min-view-container {
-  background: var(--ts-grey-background);
-  /* box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2); */
+  background: white;
   pointer-events: auto;
-  z-index: 200;
 }
 
-.minimised-shadow-fix {
-  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
-  z-index: 20;
-
-}
 
 .max-view-container {
+  background: white;
   pointer-events: auto;
-  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
-  /* -1px corrects for margin shift on tab-content-container */
-  /* height: calc(100% - var(--collapse-bar-height) - 1px); */
-  height: 100vh - 100px;
-  height: 100vh;
-  border: 1px blue dashed;
+  overflow: hidden;
+  height: 100%
 }
 
 .tabs-border-fix {
@@ -117,7 +118,7 @@ div{
 .nav-tabs {
   border-bottom: none;
   margin-right: -1px;
-
+  background-color: white;
 }
 
 /* this is needed to ensure that the tabs which are hidden and overlay

@@ -2,63 +2,61 @@
 
 <div class="h-100 w-100 bg-white d-flex flex-column">
 
-  <div class="col-lg-6 offset-lg-3 small bg-white d-flex flex-column my-auto p-0">
+  <div class="col-lg-6 offset-lg-3 small h-75 bg-white d-flex flex-column my-auto p-0">
 
     <!-- INFO BLOCK -->
 
-    <div class="h6 text-left border-bottom m-0 p-2">Info</div>
+    <!-- <div class="row"> -->
+      <div class="h6 text-left border-bottom m-0 p-2">Info</div>
+    <!-- </div> -->
 
     <div class="row">
-      <div class="col-1 p-2 m-0"></div>
+      <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Username</div>
       <div class="col-6 p-2 m-0 text-left"> {{user.userName}} </div>
     </div>
 
     <div class="row align-items-center">
-      <div class="col-1 p-2 m-0"></div>
+      <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Home Location</div>
       <div class="col-4 p-2 m-0 text-left"> {{user.homeLngLat | coords}}</div>
-      <div class="col-2 p-2 m-0 text-right">
+      <div class="col-2 p-2 m-0 text-center">
         <span class="global-make-text-look-like-link" (click)="onChangeLocation()">change</span>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-1 p-2 m-0"></div>
+      <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">email</div>
       <div class="col-6 p-2 m-0 text-left"> {{user.email}} </div>
     </div>
 
-    <div class="row">&nbsp;</div>
-
     <!-- PREFERENCES BLOCK -->
+    <!-- <div class="row"> -->
+      <div class="h6 text-left border-bottom m-0 p-2">Preferences</div>
+    <!-- </div> -->
 
-
-    <div class="h6 text-left border-bottom m-0 p-2">Preferences</div>
-
-    <div class="row">
-      <div class="col-1 p-2 m-0"></div>
+    <div class="row justify-content-center">
+      <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Distance</div>
       <div class="col-4 p-2 m-0 text-left"> {{ user.units.distance | unitName }}</div>
-      <div class="col-2 p-2 m-0 text-right">
+      <div class="col-2 p-2 m-0 pr-3text-center">
         <span class="global-make-text-look-like-link" (click)="onChangeDistanceUnits()">change</span>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-1 p-2 m-0"></div>
+    <div class="row justify-content-center">
+      <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Elevation</div>
       <div class="col-4 p-2 m-0 text-left"> {{ user.units.elevation | unitName }}</div>
-      <div class="col-2 p-2 m-0 text-right">
+      <div class="col-2 p-2 m-0 text-center">
         <span class="global-make-text-look-like-link" (click)="onChangeElevationUnits()">change</span>
       </div>
     </div>
 
-    <div class="row">&nbsp;</div>
-
     <!-- BUTTONS -->
 
-    <div class="row flex-grow-1 justify-content-center p-3 m-3 align-items-center">
+    <div class="row flex-grow-1 justify-content-center p-3 mt-3 align-items-center">
       <div class="col-4 ">
         <button class="btn btn-sm btn-primary btn-block" type="submit" (click)="onClose()">Close</button>
       </div>

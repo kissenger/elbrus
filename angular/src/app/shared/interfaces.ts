@@ -62,7 +62,7 @@ export interface TsCoordinate {
 /**
  * Used for definition of tab names on side-panel
  */
-interface TsTab {
+export interface TsTab {
   active: boolean;
   name: string;
   component: any;

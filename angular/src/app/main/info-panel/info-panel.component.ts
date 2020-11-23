@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { InfoPanelService } from 'src/app/shared/services/info-panel.service';
 import { DataService } from 'src/app/shared/services/data.service';
-import { TsTabsArray } from 'src/app/shared/interfaces';
+import { TsTabsArray, TsTab } from 'src/app/shared/interfaces';
 
 @Component({
   selector: 'app-info-panel',
@@ -26,21 +26,16 @@ export class InfoPanelComponent implements OnInit {
     this.tabsArray = this.infoPanelService.getTabs(this.callingPage);
   }
 
-  // onTabClick(e) {
-  //   // this.dataService.activeTabEmitter.emit(e.target.id);/
-  // }
-
   onMinimiseClick() {
     this.isMinimised = !this.isMinimised;
-    this.icon = this.isMinimised ? '+' : '-';
   }
 
-  getClass(tab) {
-    if ( tab.active ) {
-      return 'active show';
-    } else {
-      return '';
-    }
+  getHeightClass() {
+    return this.isMinimised ? 'min-height' : 'max-height';
+  }
+
+  getTabsClass(tab: TsTab) {
+    return tab.active ? 'active show' : '';
   }
 
 }
