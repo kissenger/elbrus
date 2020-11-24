@@ -3,7 +3,7 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsPosition, TsBoundingBox } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
@@ -16,7 +16,9 @@ import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 
 export class MapService {
 
-  private accessToken: string = environment.MAPBOX_TOKEN;
+  private mapboxToken: string = environment.MAPBOX_TOKEN;
+  private mapboxStyle: string = environment.MAPBOX_STYLE;
+
   public tsMap: mapboxgl.Map;
   public layers: ActiveLayers;
   private marker: mapboxgl.Marker;
@@ -27,7 +29,8 @@ export class MapService {
     private auth: AuthService,
     private geoJsonPipe: GeoJsonPipe
   ) {
-    Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.accessToken);
+    Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.mapboxToken);
+
   }
 
 
@@ -44,14 +47,17 @@ export class MapService {
         // if location is provided, use that (zoom not needed as map will resize when path is added)
         mapCentre = startPosition;
         mapZoom = startZoom ? startZoom : globals.defaultMapView.zoom;
+
       } else if ( this.dataService.getFromStore('mapView', false) ) {
         // otherwise look for stored mapview
         mapCentre = this.dataService.getFromStore('mapView', false).centre;
         mapZoom = this.dataService.getFromStore('mapView', false).zoom;
+
       } else if ( this.auth.isRegisteredUser() ) {
         // if that doesnt work, try to find the default location of the logged-in user
         mapCentre = this.auth.getUser().homeLngLat;
         mapZoom = globals.defaultMapView.zoom;
+
       } else {
         // otherwise fall back to default values
         mapCentre = globals.defaultMapView.centre;
@@ -61,7 +67,7 @@ export class MapService {
 
       this.tsMap = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/kissenger/ckapl476e00p61iqeivumz4ey',
+        style: this.mapboxStyle,
         center: mapCentre,
         zoom: mapZoom
       });

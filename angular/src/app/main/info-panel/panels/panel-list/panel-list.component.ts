@@ -4,7 +4,7 @@
  * Emits the desired changes to the displayed map (listener is routes-list component)
  */
 
-import { Component, OnInit, OnDestroy, Input, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -19,7 +19,7 @@ import { __classPrivateFieldSet } from 'tslib';
 const PRIVATE = false;
 const PUBLIC = true;
 const LIST_ITEM_HEIGHT = 37;
-const LIST_HEIGHT_CORRECTION = 300;
+const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes loaded
 
 @Component({
   selector: 'app-panel-list',
@@ -33,26 +33,28 @@ export class PanelListComponent implements OnInit, OnDestroy {
   private mapUpdateSubscription: Subscription;
   private dataServiceSubscription: Subscription;
 
-  private offset = 0;               // describes the chunk of the list to request
-  private limit: number;
+  // keep track of the routes user has selected
+  public nSelectedRoutes = 0;
+  public selectedPaths = {};
 
-  public nActiveRoutes = 0;
-  public numberOfRoutes: number;
-  public numberOfLoadedRoutes: number;
-  public isEndOfList = false;
-  public isPublicOrPrivate = PUBLIC;
+  // define the colours to highlight overlays
+  private highlightColours = [null, ...globals.lineColours];
+  private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
 
+  // keep track of the number of routes available compared to the number loades
+  public nRoutesInView: number;
+  public nLoadedRoutes: number;
+  private nRoutesToLoad: number;
+  private offset = 0;
+  public isAllRoutesLoaded = false;
+  public isPublicOrPrivate = PUBLIC;   // state of the dropdown box
+  private boundingBox: TsBoundingBox = null;    // current view
+  public listItems: TsListArray = [];
+
+  // keep track of user and preferences
   public isRegisteredUser = this.auth.isRegisteredUser();
   public units: TsUnits;
   public home: TsCoordinate;
-
-  private boundingBox: TsBoundingBox = null;
-  public activePaths = {};
-  public listItems: TsListArray = [];
-
-
-  private highlightColours = [null, ...globals.lineColours];
-  private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
 
   constructor(
     private http: HttpService,
@@ -63,18 +65,16 @@ export class PanelListComponent implements OnInit, OnDestroy {
     private spinner: SpinnerService
   ) {}
 
-
-
   ngOnInit() {
 
     // determine the number of list items we can fit in the current view height
-    this.limit = Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT));
+    this.nRoutesToLoad = Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT));
 
     // check url for pathId - if supplied we'll show that path
     const pathId = this.router.url.split('/').slice(-1)[0];
     const isPathId = pathId.length > 10;
     if ( isPathId ) {
-      this.activePaths[pathId] = this.highlightColours.shift();
+      this.selectedPaths[pathId] = this.highlightColours.shift();
     }
 
     // do some set up
@@ -87,7 +87,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     this.mapUpdateSubscription = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
       this.boundingBox = bounds;
       this.offset = 0;
-      const selectedPaths = this.listItems.filter(listItem => listItem.pathId in this.activePaths);
+      const selectedPaths = this.listItems.filter(listItem => listItem.pathId in this.selectedPaths);
       this.addPathsToList(selectedPaths);
     });
 
@@ -105,7 +105,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // return new Promise( (resolve, reject) => {
       this.spinner.showAsElement();
 
-      this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
+      this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
 
         .subscribe( result => {
 
@@ -121,9 +121,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.listItems = filteredList;
 
           // work out the numbers
-          this.numberOfRoutes = count - backendList.length - (this.offset * this.limit)  + filteredList.length;
-          this.numberOfLoadedRoutes = this.listItems.length;
-          this.isEndOfList = this.numberOfLoadedRoutes === this.numberOfRoutes;
+          this.nRoutesInView = count - backendList.length - (this.offset * this.nRoutesToLoad)  + filteredList.length;
+          this.nLoadedRoutes = this.listItems.length;
+          this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
           this.spinner.removeElement();
 
           // resolve();
@@ -133,9 +133,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
         this.spinner.removeElement();
         this.alert.showAsElement('Something went wrong :(', error, true, false)
           .subscribe( () => {});
-
       });
-    // });
 
   }
 
@@ -149,7 +147,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   onSelectMenuChange() {
     this.offset = 0;
-    // this.listItems = [];
     this.addPathsToList();
   }
 
@@ -158,13 +155,16 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     let emitCommand: Object;
 
-    if ( idFromClick in this.activePaths ) {
+    if ( idFromClick in this.selectedPaths) {
 
-      if ( this.activePaths[idFromClick] === null ) {
+      if ( this.selectedPaths[idFromClick] === null ) {
 
         // reclicked on first route, clear it and all overlays
         this.highlightColours = [null, ...globals.lineColours];
-        this.activePaths = {};
+        this.selectedPaths = {};
+        this.nSelectedRoutes = 0;
+
+        // make changes to map
         emitCommand = {
           command: 'clear'
         };
@@ -172,8 +172,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
       } else {
 
         // reclicked an overlay, just clear the overlay
-        this.highlightColours.unshift(this.activePaths[idFromClick]);
-        delete this.activePaths[idFromClick];
+        this.highlightColours.unshift(this.selectedPaths[idFromClick]);
+        delete this.selectedPaths[idFromClick];
+        this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
+
+        // make changes to map
         emitCommand = {
           command: 'rem',
           id: idFromClick
@@ -183,21 +186,22 @@ export class PanelListComponent implements OnInit, OnDestroy {
     } else {
 
       // new route so add it - only emit pathId from map-service if its the first path selected
-      this.activePaths[idFromClick] = this.highlightColours.shift();
-      this.nActiveRoutes = Object.keys(this.activePaths).length;
+      this.selectedPaths[idFromClick] = this.highlightColours.shift();
+      this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
 
+      // make changes to map
       emitCommand = {
         command: 'add',
         id: idFromClick,
-        colour: this.activePaths[idFromClick],
-        emit: this.nActiveRoutes === 1
+        colour: this.selectedPaths[idFromClick],
+        emit: this.nSelectedRoutes === 1
       };
 
-      // this.listItems.splice(this.listItems.indexOf(idFromClick))
-      const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
-      // console.log(this.listItems.splice(indx, 1));
-      this.listItems.splice(this.nActiveRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
-
+      // bump selected item to the top of the list
+      if ( this.nSelectedRoutes === 1 ) {
+        const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
+        this.listItems.splice(this.nSelectedRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
+      }
 
     }
 
@@ -206,55 +210,32 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
+  /** Set syles for list items based on position in list, and whether route is selected. */
+  getCssStyle(id: string, i: number) {
 
-  getCssClass(id: string, i: number, leftOrRight: string) {
+    const styles = {};
 
-    let classList = '';
+    styles['border-left'] = '1px #DEE2E6 solid';
+    styles['border-right'] = '1px #DEE2E6 solid';
+    styles['border-bottom'] = '1px #DEE2E6 solid';
+    styles['border-top'] = i === 0 ? '1px #DEE2E6 solid' : 'none';
 
-    if (i === 0) {
-        classList += `border-top list-box-top-${leftOrRight}`;
-    } else if (i === this.numberOfLoadedRoutes - 1) {
-      classList += `list-box-bottom-${leftOrRight}`;
-    }
-
-    // if (this.activePaths[id] === null && leftOrRight === 'right') {
-    //   classList += ' red-blue-green';
+    // if ( i === 0 ) {
+    //   styles['border-top'] = '1px #DEE2E6 solid';
     // }
 
-    return classList;
 
-  }
+    // if ( this.nSelectedRoutes > 0 ) {
+    //   styles['border-top'] = i === 1 ? '1px #DEE2E6 solid' : 'none';
+    //   styles['background-color'] = i === 0 ? 'whitesmoke' : 'none';
 
+    // }
 
-  getCssStyle(id: string, i: number, leftOrRight: string) {
-
-    if ( id in this.activePaths ) {
-      if ( leftOrRight === 'left' ) {
-        return {
-          'background-color' : 'whitesmoke',
-          // 'border-left': this.activePaths[id] === null ? 'none' : '1px #DEE2E6 solid'
-
-          // 'background-color': this.activePaths[id] === null ? 'whitesmoke' : this.activePaths[id] + this.highlightOpacity
-        };
-      } else {
-        if (this.activePaths[id] === null) {
-          switch (leftOrRight) {
-            case 'right-top': return {'background-color': 'rgb(255, 127, 127)', 'border-left': '1px #DEE2E6 solid'};
-            case 'right-mid': return {'background-color': 'rgb(127, 255, 127)', 'border-left': '1px #DEE2E6 solid'};
-            case 'right-bot': return {'background-color': 'rgb(127, 127, 255)', 'border-left': '1px #DEE2E6 solid'};
-          }
-        } else {
-          return {
-            'background-color': this.activePaths[id] + this.highlightOpacity,
-            'border-left': '1px #DEE2E6 solid'
-          };
-        }
-
-      }
-
-    } else {
-      return '';
+    if ( id in this.selectedPaths) {
+      styles['background-color'] = this.selectedPaths[id] + this.highlightOpacity;
     }
+
+    return styles;
 
   }
 

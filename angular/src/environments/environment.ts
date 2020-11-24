@@ -7,7 +7,8 @@ export const environment = {
   PROTOCOL: 'http',
   FRONTEND_URL: 'localhost:4200',
   BACKEND_URL: 'localhost:3000/api',
-  MAPBOX_TOKEN: 'pk.eyJ1Ijoia2lzc2VuZ2VyIiwiYSI6ImNrMWYyaWZldjBtNXYzaHFtb3djaDJobmUifQ.ATRTeTi2mygBXAoXd42KSw'
+  MAPBOX_TOKEN: 'pk.eyJ1Ijoia2lzc2VuZ2VyIiwiYSI6ImNrMWYyaWZldjBtNXYzaHFtb3djaDJobmUifQ.ATRTeTi2mygBXAoXd42KSw',
+  MAPBOX_STYLE: 'mapbox://styles/kissenger/ckhnuh97p166719qqvqcdih0c'
 };
 
 /*

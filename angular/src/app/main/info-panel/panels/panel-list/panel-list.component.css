@@ -12,34 +12,13 @@ div {
   font-size: small;
 }
 
-.css-tick::before {
-  /* top: 0px;
-  left: 0px; */
-  position: absolute;
-  height: 33%;
-  width: 100%;
-  background-color: red;
-  content:  " ";
+.active-route-holder {
+  font-size: small;
+  height: 70px;
 }
-
-.css-tick::after {
-  /* position: absolute; */
-  transform: translate(66%);
-  height: 33%;
-  width: 100%;
-  content:  " ";
-  background-color: blue;
-}
-
-.css-tick {
-  background-color: green;
-}
-
- .custom-select {
+.custom-select {
   border: 1px var(--ts-bootstrap-border) solid;
   font-size: small;
-
-  /* border-radius: 0px; */
 }
 
 .custom-select:focus {
@@ -63,18 +42,3 @@ div {
   opacity: 0.5;
 }
 
-.list-box-top-left {
-  border-top-left-radius: 5px;
-}
-
-.list-box-top-right {
-  border-top-right-radius: 5px;
-}
-
-.list-box-bottom-left {
-  border-bottom-left-radius: 5px;
-}
-
-.list-box-bottom-right {
-  border-bottom-right-radius: 5px;
-}

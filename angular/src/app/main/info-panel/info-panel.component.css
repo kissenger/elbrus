@@ -11,17 +11,17 @@ div{
   right: 0px;
   left: 0px;
   font-size: smaller;
+  pointer-events: none;
 }
 
 .inner-container {
-  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.4);
+  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
   right: 0px;
   width: 225px;
   background: white;
   pointer-events: auto;
   /* border: 1px red solid; */
   overflow: hidden;
-
 }
 
 .hidden-view {
