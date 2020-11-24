@@ -1,12 +1,28 @@
 
-
+/* VARIABLES */
 div{
   --top-margin: 10px;
   --bottom-margin: 30px;
-  --collapse-bar-height: 20px;
-  --tabs-height: 37px;
 }
 
+.outer-container {
+  top: 10px;
+  bottom: 30px;
+  right: 0px;
+  left: 0px;
+  font-size: smaller;
+}
+
+.inner-container {
+  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.4);
+  right: 0px;
+  width: 225px;
+  background: white;
+  pointer-events: auto;
+  /* border: 1px red solid; */
+  overflow: hidden;
+
+}
 
 .hidden-view {
   display: none;
@@ -17,47 +33,22 @@ div{
   left: -50px !important; */
 }
 
-.border-fix {
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  pointer-events: none;
-  border: 1px red solid;
-}
-
-
-.outer-container {
-  top: var(--top-margin);
-  bottom: var(--bottom-margin);
-  right: 0px;
-  width: 225px;
-  overflow: hidden;
-  font-size: smaller;
-}
-
-.inner-container {
-  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.4);
-  background: white;
-  pointer-events: auto;
-  z-index: 10;
-}
-
-
 /* COLLAPSE BAR */
 
 .collapse-btn {
-  height: var(--collapse-bar-height);
-  top: 0px;
   pointer-events: auto;
   background-color: var(--ts-grey-background);
-
+  cursor: pointer;
+  /* height: 15px; */
+  vertical-align: middle
 }
 
+
+/* remove hover effect on small screens */
 @media only screen and (min-width: 900px) {
   .collapse-btn:hover {
     cursor: pointer;
-    background: rgba(255,255,255, 1.0);
+    background: white;
   }
 }
 
@@ -70,10 +61,22 @@ div{
   background-color: var(--ts-grey-background);
 }
 
-
 /* this is needed to ensure that the tabs which are hidden and overlay
 the active tab, do not interfere with the active tab inputs */
 .tab-panel:not(.active) {
   display: none;
 }
+
+
+/* FIX BORDER AROUND TABS */
+
+.border-fix {
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  pointer-events: none;
+  /* border: 1px red solid; */
+}
+
 
