@@ -1,15 +1,4 @@
 
-/*
-
-z-index:
-
-.nav-tabs .nav-link: 1
-.tab-content-container: 50
-.nav-tabs .nav-link.active: 100
-tabs-border-fix: 200
-
-
-*/
 
 div{
   --top-margin: 10px;
@@ -28,6 +17,16 @@ div{
   left: -50px !important; */
 }
 
+.border-fix {
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  pointer-events: none;
+  border: 1px red solid;
+}
+
+
 .outer-container {
   top: var(--top-margin);
   bottom: var(--bottom-margin);
@@ -35,26 +34,15 @@ div{
   width: 225px;
   overflow: hidden;
   font-size: smaller;
-
-
-  /* box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
-  font-size: smaller;
-  pointer-events: none; */
-  /* max-height: calc(100% - var(--top-margin) - var(--bottom-margin)); */
 }
 
 .inner-container {
   box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.4);
-  border: 1px red solid;
+  background: white;
+  pointer-events: auto;
+  z-index: 10;
 }
-/* .inner-container { */
-  /* font-size: smaller;
-  pointer-events: none;
-  border: 1px orange dotted; */
-  /* box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
-  font-size: smaller;
-  pointer-events: none;
-} */
+
 
 /* COLLAPSE BAR */
 
@@ -62,7 +50,7 @@ div{
   height: var(--collapse-bar-height);
   top: 0px;
   pointer-events: auto;
-  background: white;
+  background-color: var(--ts-grey-background);
 
 }
 
@@ -73,65 +61,19 @@ div{
   }
 }
 
-.chevron {
-  top: 0px;
-}
 
-
-/* COLLAPSE BAR */
-
-.min-view-container {
-  background: white;
-  pointer-events: auto;
-}
-
-
-.max-view-container {
-  background: white;
-  pointer-events: auto;
-  overflow: hidden;
-  height: 100%
-}
-
-.tabs-border-fix {
-  z-index: 200;
-  pointer-events: none;
-}
-
-
-/* use z-index to control tab border behaviour */
-.nav-tabs .nav-link {
-  height: var(--tabs-height);
-  background-color: var(--ts-grey-background);
-  border-top: none;
-  z-index: 40;
-}
-
-/* use z-index to control tab border behaviour */
-.nav-tabs .nav-link.active {
-  background-color: white;
-  border-top: none;
-  border-bottom: 1px white solid;
-  z-index: 100;
-}
+/* NAV TABS */
 
 .nav-tabs {
-  border-bottom: none;
+  margin-left: -1px;
   margin-right: -1px;
-  background-color: white;
+  background-color: var(--ts-grey-background);
 }
+
 
 /* this is needed to ensure that the tabs which are hidden and overlay
 the active tab, do not interfere with the active tab inputs */
 .tab-panel:not(.active) {
   display: none;
 }
-
-/* use z-index to control tab border behaviour */
-.tab-content-container {
-  height: calc(100% - var(--collapse-bar-height) - var(--tabs-height));
-  margin-top: -1px;
-  z-index: 50;
-}
-
 

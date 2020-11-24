@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { InfoPanelService } from 'src/app/shared/services/info-panel.service';
-import { DataService } from 'src/app/shared/services/data.service';
 import { TsTabsArray, TsTab } from 'src/app/shared/interfaces';
 
 @Component({
@@ -13,14 +12,14 @@ export class InfoPanelComponent implements OnInit {
 
   // bind to property in parent to determine which page called the info panel
   @Input() callingPage: string;
+
   public tabsArray: TsTabsArray;
   public icon = '-';
   public isMinimised = false;
 
   constructor(
-    private infoPanelService: InfoPanelService,
-    private dataService: DataService
-   ) { }
+    private infoPanelService: InfoPanelService
+  ) { }
 
   ngOnInit() {
     this.tabsArray = this.infoPanelService.getTabs(this.callingPage);
@@ -28,10 +27,6 @@ export class InfoPanelComponent implements OnInit {
 
   onMinimiseClick() {
     this.isMinimised = !this.isMinimised;
-  }
-
-  getHeightClass() {
-    return this.isMinimised ? 'min-height' : 'max-height';
   }
 
   getTabsClass(tab: TsTab) {

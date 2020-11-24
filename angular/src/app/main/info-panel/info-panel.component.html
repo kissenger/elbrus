@@ -1,52 +1,49 @@
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 
-<div class="outer-container position-absolute">
-  <div [ngClass]="isMinimised ? '' : 'h-100'"  class="inner-container w-100">
+<div class="outer-container position-absolute ">
+  <div [ngClass]="isMinimised ? '' : 'h-100'"  class="inner-container border w-100">
 
+    <div class="border-fix position-absolute h-100 w-100"></div>
 
-  <!-- MINIMISE BUTTON -->
-  <div  (click)="onMinimiseClick()" class="collapse-btn position-relative text-center m-0 p-0 border border-right-0 chevron">
-    <i [ngClass]="isMinimised ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" class="position-relative"></i>
-  </div>
-
-
-  <!-- MINIMISED VIEW -->
-  <div [ngClass]="isMinimised ? '' : 'hidden-view'" class="position-relative border-left border-bottom bg-white min-view-container">
-    <app-panel-details></app-panel-details>
-
-  </div>
-  <!-- <div class="position-relative minimised-shadow-fix">
-
-  </div> -->
-
-  <!-- MAXIMISED VIEW -->
-  <!-- <div class="max-view-container m-0 p-0"> -->
-  <div [ngClass]="isMinimised ? 'hidden-view' : 'max-view-container'" class="position-relative w-100 m-0 p-0">
-
-    <!-- TABS -->
-    <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
-    <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
-      <li *ngFor="let tab of tabsArray" class="nav-item p-0 m-0">
-        <a [ngClass]="getTabsClass(tab)" id="{{tab.title}}" class='position-relative nav-link m-0 px-0 py-2 rounded-0'
-          data-toggle="tab" href={{tab.href}} role="tab">
-          {{tab.title}}
-        </a>
-      </li>
-      <!-- Ensures there is a border on left side of left most tab what other tab is selected -->
-      <div class="position-absolute h-100 w-100 border-left border-right tabs-border-fix"></div>
-    </ul>
-
-
-    <!-- TAB CONTENT -->
-    <!-- Inject panels depending on the type of page -->
-    <div #div *ngFor="let tab of tabsArray" [ngClass]="getTabsClass(tab)" id={{tab.name}} role="tabpanel"
-      class="h-100 w-100 tab-panel border-left border-bottom border-top bg-white tab-content-container">
-      <div class="m-2 p-0 h-100 overflow-auto">
-        <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
-      </div>
+    <!-- MINIMISE BUTTON -->
+    <div  (click)="onMinimiseClick()" class="collapse-btn position-relative text-center m-0 p-0">
+      <i [ngClass]="isMinimised ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" class="position-relative"></i>
     </div>
 
+
+    <!-- MINIMISED VIEW -->
+    <div [ngClass]="isMinimised ? '' : 'hidden-view'" class="bg-white">
+      <app-panel-details></app-panel-details>
+    </div>
+
+
+    <!-- MAXIMISED VIEW -->
+    <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100">
+
+      <!-- TABS -->
+      <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
+      <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+        <li *ngFor="let tab of tabsArray" class="nav-item">
+          <a [ngClass]="getTabsClass(tab)" id="{{tab.title}}" class='nav-link m-0 px-0 py-2 rounded-0'
+            data-toggle="tab" href={{tab.href}} role="tab">
+            {{tab.title}}
+          </a>
+        </li>
+      </ul>
+
+
+
+
+      <!-- TAB CONTENT -->
+      <!-- Inject panels depending on the type of page -->
+      <div #div *ngFor="let tab of tabsArray" [ngClass]="getTabsClass(tab)" id={{tab.name}}
+        role="tabpanel" class="h-100 w-100 tab-panel bg-white">
+        <div class="m-2 p-0 h-100 overflow-auto">
+          <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>
 </div>

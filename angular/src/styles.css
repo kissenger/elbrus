@@ -12,6 +12,7 @@ body {
   --ts-dark-border: #DDD2AD;
   --ts-light-border: #EEEBDB;
   --ts-background: #E9E2CB;
+  --ts-grey-background: whitesmoke;
 }
 
 .global-make-text-look-like-link{
@@ -19,7 +20,7 @@ body {
   color: #007BFF;
 }
 .global-make-text-look-like-link:hover{
-  text-decoration: underline; 
+  text-decoration: underline;
   color: #0056B3;
   cursor: pointer;
 }
