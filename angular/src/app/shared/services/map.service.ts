@@ -89,6 +89,15 @@ export class MapService {
         resolve();
       });
 
+      this.tsMap.on('sourcedata', (e) => {
+        // console.log(e.sourceId);
+
+        // if (e.isSourceLoaded && e.sourceId.endsWith('sym')) {
+        if (e.isSourceLoaded) {
+            console.log(e);
+        }
+      });
+
     });
 
   }
@@ -116,9 +125,13 @@ export class MapService {
   }
 
 
+
   public add(pathAsGeoJSON: TsFeatureCollection, styleOptions?: TsLineStyle, plotOptions?: TsPlotPathOptions ) {
 
     console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
+
+    // set up a listener to confirm when data is loaded
+
 
     const path = new Path( pathAsGeoJSON );
     const pathId = pathAsGeoJSON.properties.pathId;
@@ -127,6 +140,7 @@ export class MapService {
     this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
     // this.addPointsLayer(pathId + 'pts', path.pointsGeoJson);
     this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
+    console.log('done1');
 
 
     if (plotOptions.booResizeView) {
@@ -137,7 +151,6 @@ export class MapService {
       this.dataService.activePathEmitter.emit(pathAsGeoJSON);
       this.dataService.saveToStore('activePath', pathAsGeoJSON);
     }
-
   }
 
 
@@ -156,7 +169,7 @@ export class MapService {
         'line-opacity': styleOptions.lineOpacity ? styleOptions.lineOpacity : ['get', 'lineOpacity']
       }
     });
-
+    console.log('done2');
   }
 
 

@@ -9,7 +9,9 @@ import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { SpinnerService } from 'src/app/shared/services/spinner.service';
+import { AlertService } from 'src/app/shared/services/alert.service';
 
 @Component({
   selector: 'app-routes',
@@ -25,7 +27,9 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     private dataService: DataService,
     private mapService: MapService,
     private httpService: HttpService,
-    private router: Router
+    private router: Router,
+    private spinner: SpinnerService,
+    private alert: AlertService
     ) { }
 
 
@@ -52,9 +56,16 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     this.pathIdSubscription = this.dataService.pathCommandEmitter.subscribe( ( request ) => {
 
         if ( request.command === 'add' ) {
+          this.spinner.showAsElement();
           this.httpService.getPathById('route', request.id).subscribe( (result) => {
             this.mapService.add(result.hills, {lineColour: request.colour}, {booEmit: request.emit} );
+            this.spinner.removeElement();
           });
+          // }, (error) => {
+          //   this.spinner.removeElement();
+          //   this.alert.showAsElement('Something went wrong :(', error, true, false)
+          //     .subscribe( () => {} );
+          // });
 
         } else if ( request.command === 'rem' ) {
           this.mapService.remove(request.id);

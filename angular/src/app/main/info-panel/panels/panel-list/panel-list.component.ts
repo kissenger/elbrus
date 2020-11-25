@@ -9,12 +9,11 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate, TsUser } from 'src/app/shared/interfaces';
+import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
-import { __classPrivateFieldSet } from 'tslib';
 
 const PRIVATE = false;
 const PUBLIC = true;
@@ -102,11 +101,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList(protectedPaths: TsListArray = null) {
 
-    // return new Promise( (resolve, reject) => {
       this.spinner.showAsElement();
 
       this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
-
         .subscribe( result => {
 
           // get a full list of existing and backend results
