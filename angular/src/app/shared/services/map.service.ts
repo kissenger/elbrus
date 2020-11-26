@@ -1,5 +1,5 @@
+import { HttpService } from './http.service';
 import { Injectable } from '@angular/core';
-import { HttpService } from 'src/app/shared/services/http.service';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
@@ -24,13 +24,12 @@ export class MapService {
   private marker: mapboxgl.Marker;
 
   constructor(
-    public httpService: HttpService,
-    public dataService: DataService,
+    public http: HttpService,
+    public data: DataService,
     private auth: AuthService,
     private geoJsonPipe: GeoJsonPipe
   ) {
     Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.mapboxToken);
-
   }
 
 
@@ -48,10 +47,11 @@ export class MapService {
         mapCentre = startPosition;
         mapZoom = startZoom ? startZoom : globals.defaultMapView.zoom;
 
-      } else if ( this.dataService.getFromStore('mapView', false) ) {
+      } else if ( this.data.get('mapView', false) ) {
+
         // otherwise look for stored mapview
-        mapCentre = this.dataService.getFromStore('mapView', false).centre;
-        mapZoom = this.dataService.getFromStore('mapView', false).zoom;
+        mapCentre = this.data.get('mapView', false).centre;
+        mapZoom = this.data.get('mapView', false).zoom;
 
       } else if ( this.auth.isRegisteredUser() ) {
         // if that doesnt work, try to find the default location of the logged-in user
@@ -78,24 +78,15 @@ export class MapService {
 
       this.tsMap.on('moveend', () => {
         console.log('map finished moving');
-        this.dataService.saveToStore('mapView', this.getMapView());
-        this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
+        this.data.set('mapView', this.getMapView());
+        this.data.mapBoundsEmitter.emit(this.getMapBounds());
       });
 
       this.tsMap.on('load', () => {
         console.log('map finished loading');
-        this.dataService.saveToStore('mapView', this.getMapView());
-        this.dataService.mapBoundsEmitter.emit(this.getMapBounds());
+        this.data.set('mapView', this.getMapView());
+        this.data.mapBoundsEmitter.emit(this.getMapBounds());
         resolve();
-      });
-
-      this.tsMap.on('sourcedata', (e) => {
-        // console.log(e.sourceId);
-
-        // if (e.isSourceLoaded && e.sourceId.endsWith('sym')) {
-        if (e.isSourceLoaded) {
-            console.log(e);
-        }
       });
 
     });
@@ -130,27 +121,33 @@ export class MapService {
 
     console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
 
-    // set up a listener to confirm when data is loaded
+    return new Promise( (resolve, reject) => {
 
+      // map listener will fire only once when the data has finished loading
+      this.tsMap.once('idle', (e) => {
 
-    const path = new Path( pathAsGeoJSON );
-    const pathId = pathAsGeoJSON.properties.pathId;
+        if (plotOptions.booResizeView) {
+          this.bounds = pathAsGeoJSON.bbox;
+        }
 
-    this.layers.add(pathId);
-    this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
-    // this.addPointsLayer(pathId + 'pts', path.pointsGeoJson);
-    this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
-    console.log('done1');
+        if (plotOptions.booEmit) {
+          this.data.pathIdEmitter.emit(pathAsGeoJSON);
+          this.data.set('activePath', pathAsGeoJSON);
+        }
 
+        resolve();
 
-    if (plotOptions.booResizeView) {
-      this.bounds = pathAsGeoJSON.bbox;
-    }
+      });
 
-    if (plotOptions.booEmit) {
-      this.dataService.activePathEmitter.emit(pathAsGeoJSON);
-      this.dataService.saveToStore('activePath', pathAsGeoJSON);
-    }
+      const path = new Path( pathAsGeoJSON );
+      const pathId = pathAsGeoJSON.properties.pathId;
+
+      this.layers.add(pathId);
+      this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
+      this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
+
+    });
+
   }
 
 
@@ -169,7 +166,7 @@ export class MapService {
         'line-opacity': styleOptions.lineOpacity ? styleOptions.lineOpacity : ['get', 'lineOpacity']
       }
     });
-    console.log('done2');
+
   }
 
 
@@ -259,8 +256,8 @@ export class MapService {
 
     // send an empty linestring
     // const tempGeo = this.geoJsonPipe.transform([], 'LineString');
-    this.dataService.activePathEmitter.emit(globals.emptyGeoJson);
-    this.dataService.saveToStore('activePath', globals.emptyGeoJson);
+    this.data.pathIdEmitter.emit(globals.emptyGeoJson);
+    this.data.set('activePath', globals.emptyGeoJson);
 
   }
 
@@ -296,7 +293,7 @@ export class MapService {
       this.tsMap.on('click', (e) => {
         const location = { lat: e.lngLat.lat, lng: e.lngLat.lng };
         this.plotMarker({ lat: e.lngLat.lat, lng: e.lngLat.lng });
-        this.dataService.locationEmitter.emit(location);
+        this.data.locationEmitter.emit(location);
 
         // this.tsMap.getCanvas().style.cursor = 'pointer';
         // resolve({ lat: e.lngLat.lat, lng: e.lngLat.lng });

@@ -97,7 +97,8 @@ const emptyProps: TsGeoJsonProperties = {
     startTime: '',
     isLong: false,
     isPublic: false,
-    createdBy: ''
+    createdBy: '',
+    isElevations: false
   },
   params: {
     elev: [],

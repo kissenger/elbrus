@@ -168,6 +168,7 @@ export interface TsInfo {
     isLong: boolean;
     isPublic: boolean;
     createdBy: string;
+    isElevations: boolean;
 }
 
 export interface TsParams {

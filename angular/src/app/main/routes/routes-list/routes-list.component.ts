@@ -1,17 +1,17 @@
-
 /**
  * Listens for request from panel-list component, makes the backend request and uses
  * map-service to make the desired changes to the plot
  */
 
+import { HttpService } from './../../../shared/services/http.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
-import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
+import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
 
 @Component({
   selector: 'app-routes',
@@ -21,12 +21,13 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 
 export class RoutesListComponent implements OnInit, OnDestroy {
 
-  private pathIdSubscription: Subscription;
+  private pathIdListener: Subscription;
+  private httpListener: Subscription;
 
   constructor(
-    private dataService: DataService,
-    private mapService: MapService,
-    private httpService: HttpService,
+    private data: DataService,
+    private map: MapService,
+    private http: HttpService,
     private router: Router,
     private spinner: SpinnerService,
     private alert: AlertService
@@ -36,77 +37,61 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   async ngOnInit() {
 
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
-    if (this.mapService.isMap()) { this.mapService.kill(); }
-    // console.log(this.router.url.split('/').slice(-1)[0]);
+    if (this.map.isMap()) { this.map.kill(); }
 
+    // look for a path id in the url
     const urlParam = this.router.url.split('/').slice(-1)[0];
     if ( urlParam.length > 10 ) {
-      // looks like we were passed a pathId
-      this.httpService.getPathById('route', urlParam).subscribe( async (result) => {
-        const bbox = result.hills.properties.stats.bbox;
-        const centrePoint = {lng: (bbox.maxLng + bbox.minLng) / 2, lat: (bbox.maxLat + bbox.minLat) / 2};
-        await this.mapService.newMap(centrePoint);
-        this.mapService.add(result.hills, {}, {booEmit: true, booResizeView: true} );
-      });
+
+      await this.map.newMap();
+      await this.plotPath(urlParam, {}, {booEmit: true, booResizeView: true});
+
     } else {
-      this.mapService.newMap();
+      this.map.newMap();
     }
 
 
-    this.pathIdSubscription = this.dataService.pathCommandEmitter.subscribe( ( request ) => {
+    this.pathIdListener = this.data.pathCommandEmitter.subscribe( async ( request ) => {
 
         if ( request.command === 'add' ) {
-          this.spinner.showAsElement();
-          this.httpService.getPathById('route', request.id).subscribe( (result) => {
-            this.mapService.add(result.hills, {lineColour: request.colour}, {booEmit: request.emit} );
-            this.spinner.removeElement();
-          });
-          // }, (error) => {
-          //   this.spinner.removeElement();
-          //   this.alert.showAsElement('Something went wrong :(', error, true, false)
-          //     .subscribe( () => {} );
-          // });
+          await this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit} );
 
         } else if ( request.command === 'rem' ) {
-          this.mapService.remove(request.id);
+          this.map.remove(request.id);
 
         } else if ( request.command === 'clear' ) {
-          this.mapService.clear();
+          this.map.clear();
 
         }
 
     });
   }
 
-  /**
-   * checks if map already exists, and if not then create it and wait for it to load
-   */
-  // initialiseMapIfNeeded() {
+  /** get a path id from the backend and get it plotted on the map */
+  plotPath(pathId: string, style: TsLineStyle, options: TsPlotPathOptions) {
 
-  //   return new Promise( (resolve, reject) => {
+    return new Promise( (resolve, reject) => {
 
-  //     if ( !this.mapService.isMap() ) {
+      this.spinner.showAsElement();
+      this.httpListener = this.http.getPathById('route', pathId).subscribe( async (result) => {
 
-  //       const cog = {
-  //         lng: ( this.geoJSON.bbox[0] + this.geoJSON.bbox[2] ) / 2,
-  //         lat: ( this.geoJSON.bbox[1] + this.geoJSON.bbox[3] ) / 2 };
+        await this.map.add(result.hills, style, options );
+        this.spinner.removeElement();
+        resolve();
 
-  //       this.mapService.newMap(cog, 10)
-  //         .then( () => resolve() )
-  //         .catch( e => reject(e) );
+      }, (error) => {
+        this.spinner.removeElement();
+        this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {
+          reject();
+        } );
+      });
 
-  //     } else {
-
-  //       resolve();
-
-  //     }
-
-  //   });
-
-  // }
+    });
+  }
 
   ngOnDestroy() {
-    this.pathIdSubscription.unsubscribe();
+    if (this.pathIdListener) { this.pathIdListener.unsubscribe(); }
+    if (this.httpListener) { this.httpListener.unsubscribe(); }
   }
 
 }

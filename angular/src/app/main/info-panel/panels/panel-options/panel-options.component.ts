@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { TsFeatureCollection } from 'src/app/shared/interfaces';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -27,8 +26,8 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private httpService: HttpService,
-    private dataService: DataService,
+    private http: HttpService,
+    private data: DataService,
     private alert: AlertService,
     private spinner: SpinnerService,
     private auth: AuthService
@@ -36,7 +35,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
+    this.activePathSubscription = this.data.pathIdEmitter.subscribe( (geoJson) => {
       this.isPathPublic = geoJson.properties.info.isPublic;
       this.createdBy = geoJson.properties.info.createdBy;
       this.pathId = geoJson.properties.pathId;
@@ -57,7 +56,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
     this.alert.showAsElement('Are you sure?', 'Cannot undo delete!', true, true).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
-        this.httpService.deletePath(this.pathId).subscribe( () => {
+        this.http.deletePath(this.pathId).subscribe( () => {
           this.reloadListComponent();
         });
       }
@@ -75,17 +74,17 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
    */
   onExportGpxClick() {
 
-    // const pathId = this.dataService.getFromStore('activePath', false).properties.pathId;
+    // const pathId = this.data.getFromStore('activePath', false).properties.pathId;
     // const pathType = 'route';
 
-    this.httpSubscription = this.httpService.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
+    this.httpSubscription = this.http.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
 
       // this was the original attempt which does not work with authentication injection, so needed a new approach
       // window.location.href = 'http://localhost:3000/download';
       // using the angular httpClient, authentication works, but the browser attempts to read the response rather than download it
       // solution here is from https://stackoverflow.com/questions/52154874/angular-6-downloading-file-from-rest-api
 
-      this.httpService.downloadFile(fname.fileName).subscribe( (response) => {
+      this.http.downloadFile(fname.fileName).subscribe( (response) => {
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(response);
         link.download = fname.fileName;
@@ -137,7 +136,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onMakePublicClick() {
-    this.httpSubscription = this.httpService.makePathPublic(this.pathType, this.pathId).subscribe( (result) => {
+    this.httpSubscription = this.http.makePathPublic(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
       this.router.navigate(['route/list']);
@@ -146,7 +145,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onMakeCopyClick() {
-    this.httpSubscription = this.httpService.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
+    this.httpSubscription = this.http.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
       this.router.navigate(['route/list']);
@@ -155,9 +154,9 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onReverseClick() {
-    this.httpSubscription = this.httpService.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
+    this.httpSubscription = this.http.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
-      this.dataService.saveToStore('activePath', {source: 'created', pathAsGeoJSON});
+      this.data.set('activePath', {source: 'created', pathAsGeoJSON});
       this.spinner.removeElement();
       this.router.navigate(['route/review/']);
     });
@@ -165,7 +164,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onCreateClick() {
-    this.dataService.saveToStore('activePath', null);
+    this.data.set('activePath', null);
     this.router.navigate(['/route/create']);
   }
 
@@ -187,9 +186,9 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     const fileData = new FormData();
     fileData.append('filename', files[0], files[0].name);
 
-    this.httpSubscription = this.httpService.importRoute(fileData).subscribe( (result) => {
+    this.httpSubscription = this.http.importRoute(fileData).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
-      this.dataService.saveToStore('activePath', {source: 'imported', pathAsGeoJSON});
+      this.data.set('activePath', {source: 'imported', pathAsGeoJSON});
       this.spinner.removeElement();
       this.router.navigate(['route/review/']);
 

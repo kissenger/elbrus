@@ -20,7 +20,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   // local variables
   @Input() callingPage = 'list';
-  private activePathSubscription: Subscription;
+  private pathListener: Subscription;
 
   /* panel is minimised for thinner screens; also happens in info-panel component so changes need to be reflected there also */
   public isMinimised = window.innerWidth < 900 ? true : false;
@@ -46,7 +46,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   public pathDirection: string;
 
   constructor(
-    private dataService: DataService,
+    private data: DataService,
     private httpService: HttpService,
     private router: Router,
     private chartsService: ChartsService,
@@ -59,20 +59,21 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
 
     // subscribe to any changes in the minimised status of the panel
-    this.minimisePanelSubscription = this.dataService.minimisePanelEmitter.subscribe( (minimise: boolean) => {
+    this.minimisePanelSubscription = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
       this.isMinimised = minimise;
     });
 
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
-    this.activePathSubscription = this.dataService.activePathEmitter.subscribe( (geoJson) => {
-      this.geoJson = geoJson;
+    this.pathListener = this.data.pathIdEmitter.subscribe( (pathId) => {
+
+      this.geoJson = this.data.get('activePath', false);
 
       // note this is a boolean to tell tempplate whether there is data to display or not
       this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
 
-      this.isLong = geoJson.properties.info.isLong;
-      this.isElevations = geoJson.properties.info.isElevations && !this.isLong;
+      this.isLong = this.geoJson.properties.info.isLong;
+      this.isElevations = this.geoJson.properties.info.isElevations && !this.isLong;
       if (this.pathStats.hills) {
         this.isHills = this.pathStats.hills.length > 0;
       } else {
@@ -88,21 +89,21 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
        *     [  ,   , e3, e4, e5, ....]]
        * where x is cumDist, e is elevation point, and spaces are null points
        */
-      this.chartData = [geoJson.properties.params.cumDistance];
-      this.colourArray = [];
-      let x = 0;
-      geoJson.features.forEach( feature => {
-        const y = geoJson.properties.params.cumDistance.length - feature.properties.params.elev.length - x;
-        this.chartData.push( Array(x).fill(null).concat(feature.properties.params.elev).concat(Array(y).fill(null)) );
-        x += feature.properties.params.elev.length - 1;
-        this.colourArray.push(feature.properties.lineColour);
-      });
+      // this.chartData = [this.geoJson.properties.params.cumDistance];
+      // this.colourArray = [];
+      // let x = 0;
+      // this.geoJson.features.forEach( feature => {
+      //   const y = this.geoJson.properties.params.cumDistance.length - feature.properties.params.elev.length - x;
+      //   this.chartData.push( Array(x).fill(null).concat(feature.properties.params.elev).concat(Array(y).fill(null)) );
+      //   x += feature.properties.params.elev.length - 1;
+      //   this.colourArray.push(feature.properties.lineColour);
+      // });
 
-      this.chartsService.plotChart(document.getElementById('chart_div'), this.chartData, this.colourArray);
+      // this.chartsService.plotChart(document.getElementById('chart_div'), this.chartData, this.colourArray);
 
     });
 
-    this.dataService.unitsUpdateEmitter.subscribe( () => {
+    this.data.unitsUpdateEmitter.subscribe( () => {
       this.units = this.auth.getUser().units;
     });
 
@@ -114,7 +115,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // activePath is stored from two locations - both are full geoJSON descriptions of the path:
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
-    const newPath = this.dataService.getFromStore('activePath', false);
+    const newPath = this.data.get('activePath', false);
     const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
 
 
@@ -196,7 +197,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
-    this.activePathSubscription.unsubscribe();
+    this.pathListener.unsubscribe();
     this.minimisePanelSubscription.unsubscribe();
 
     // this.httpService.flushDatabase().subscribe( () => {

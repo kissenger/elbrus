@@ -29,7 +29,7 @@ export class DataService {
 
   // from map-service & map-create-service to panel-details & panel-deails minimsied
   // ensures the details panel has required information about the route being plotted
-  public activePathEmitter = new EventEmitter();
+  public pathIdEmitter = new EventEmitter();
   public minimisePanelEmitter = new EventEmitter();
 
   public mapBoundsEmitter = new EventEmitter();
@@ -50,21 +50,23 @@ export class DataService {
    * Data store
    * @param dataStore is a key/value object to store all shared dat in one place
    */
+
+
   private dataStore: Object = {};
 
   // saves a key/value pair to the data store, also emitting the same data if {{emit}} is true
-  public saveToStore(keyName: string, value: any) {
+  public set(keyName: string, value: any) {
     this.dataStore[keyName] = value;
   }
 
   // returns the current value of a named key, setting the value to null if {{clearKey}} is true
-  public getFromStore(keyName: string, clearKey: boolean) {
+  public get(keyName: string, clearKey: boolean) {
     const returnData = this.dataStore[keyName];
     if (clearKey) { delete this.dataStore[keyName]; }
     return returnData;
   }
 
-  public showStore() {
+  public show() {
     console.log(this.dataStore);
   }
 

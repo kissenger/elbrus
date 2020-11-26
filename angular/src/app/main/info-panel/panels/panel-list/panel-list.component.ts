@@ -28,9 +28,9 @@ const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes lo
 
 export class PanelListComponent implements OnInit, OnDestroy {
 
-  private getListSubscription: Subscription;
-  private mapUpdateSubscription: Subscription;
-  private dataServiceSubscription: Subscription;
+  private getListListener: Subscription;
+  private mapUpdateListener: Subscription;
+  private dataListener: Subscription;
 
   // keep track of the routes user has selected
   public nSelectedRoutes = 0;
@@ -83,7 +83,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     }
 
     // subscribe to change in map view
-    this.mapUpdateSubscription = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
+    this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
       this.boundingBox = bounds;
       this.offset = 0;
       const selectedPaths = this.listItems.filter(listItem => listItem.pathId in this.selectedPaths);
@@ -91,7 +91,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     });
 
     // in case units are changed while viewing the list
-    this.dataServiceSubscription = this.data.unitsUpdateEmitter.subscribe( () => {
+    this.dataListener = this.data.unitsUpdateEmitter.subscribe( () => {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
@@ -103,7 +103,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       this.spinner.showAsElement();
 
-      this.getListSubscription = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
+      this.getListListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
         .subscribe( result => {
 
           // get a full list of existing and backend results
@@ -122,8 +122,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.nLoadedRoutes = this.listItems.length;
           this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
           this.spinner.removeElement();
-
-          // resolve();
 
       }, (error) => {
 
@@ -243,9 +241,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * Actions to do when component is destroyed
    */
   ngOnDestroy() {
-    if (this.getListSubscription) { this.getListSubscription.unsubscribe(); }
-    if (this.mapUpdateSubscription) { this.mapUpdateSubscription.unsubscribe(); }
-    if (this.dataServiceSubscription) { this.dataServiceSubscription.unsubscribe(); }
+    if (this.getListListener) { this.getListListener.unsubscribe(); }
+    if (this.mapUpdateListener) { this.mapUpdateListener.unsubscribe(); }
+    if (this.dataListener) { this.dataListener.unsubscribe(); }
   }
 
 
