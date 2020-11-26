@@ -154,52 +154,56 @@ export class PanelListComponent implements OnInit, OnDestroy {
       if ( this.selectedPaths[idFromClick] === null ) {
 
         // reclicked on first route, clear it and all overlays
-        this.highlightColours = [null, ...globals.lineColours];
-        this.selectedPaths = {};
-        this.nSelectedRoutes = 0;
+
 
         // make changes to map
         await this.updateMap({
           command: 'clear'
         }) ;
 
+        this.highlightColours = [null, ...globals.lineColours];
+        this.selectedPaths = {};
+        this.nSelectedRoutes = 0;
+
       } else {
 
         // reclicked an overlay, just clear the overlay
-        this.highlightColours.unshift(this.selectedPaths[idFromClick]);
-        delete this.selectedPaths[idFromClick];
-        this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
+
 
         // make changes to map
         await this.updateMap({
           command: 'rem',
           id: idFromClick
         });
+
+        this.highlightColours.unshift(this.selectedPaths[idFromClick]);
+        delete this.selectedPaths[idFromClick];
+        this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
+
       }
 
     } else {
 
       // new route so add it - only emit pathId from map-service if its the first path selected
-      this.selectedPaths[idFromClick] = this.highlightColours.shift();
-      this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
-
-      // make changes to map
-      await this.updateMap({
+      // note things are not done in quite the nicest way in order to get the right behaviour (ie list only updates after confirmation)
+      const command = {
         command: 'add',
         id: idFromClick,
-        colour: this.selectedPaths[idFromClick],
-        emit: this.nSelectedRoutes === 1
-      });
+        colour: this.highlightColours.shift(),
+        emit: Object.keys(this.selectedPaths).length + 1 === 1
+      };
+
+      await this.updateMap(command);
 
       // bump selected item to the top of the list
+      this.selectedPaths[idFromClick] = command.colour;
+      this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
       if ( this.nSelectedRoutes === 1 ) {
         const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
         this.listItems.splice(this.nSelectedRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
       }
 
     }
-
-
   }
 
 
@@ -229,11 +233,52 @@ export class PanelListComponent implements OnInit, OnDestroy {
     styles['border-left'] = '1px #DEE2E6 solid';
     styles['border-right'] = '1px #DEE2E6 solid';
     styles['border-bottom'] = '1px #DEE2E6 solid';
-    styles['border-top'] = i === 0 ? '1px #DEE2E6 solid' : 'none';
+    styles['padding-left'] = '7px';
 
-    // if ( i === 0 ) {
-    //   styles['border-top'] = '1px #DEE2E6 solid';
-    // }
+
+
+    if ( this.nSelectedRoutes === 0 ) {
+      // styles['background'] = i % 2 === 0 ? '#fdfdfd' : 'whitesmoke';
+      if ( i === 0 ) {
+        styles['border-top'] = '1px #DEE2E6 solid';
+      } else if ( i === this.nLoadedRoutes - 1) {
+        styles['border-bottom'] = '1px #DEE2E6 solid';
+      }
+    } else {
+      // styles['background'] = i % 2 === 0 ? 'whitesmoke' : '#fdfdfd';
+      if ( i <= 1 ) {
+        styles['border-top'] = '1px #DEE2E6 solid';
+      } else if ( i === this.nLoadedRoutes - 1) {
+        styles['border-bottom'] = '1px #DEE2E6 solid';
+      }
+    }
+
+    if ( i !== 0 && id in this.selectedPaths) {
+      styles['padding-left'] = '1px';
+      styles['border-left'] = `7px ${this.selectedPaths[id] + this.highlightOpacity} solid`;
+    }
+
+
+//     styles['border-bottom'] = i > 0 && i < this.nSelectedRoutes ? '1px #DEE2E6 solid' : '2px #DEE2E6 solid';
+//     styles['border-top'] = i === 0 ? '1px #DEE2E6 solid' : 'none';
+
+
+
+//     styles['background-color'] = i % 2 === 0 ? '' : 'whitesmoke';
+// // console.log(this.nSelectedRoutes)
+//     if ( this.nSelectedRoutes > 0 ) {
+
+//       if ( i % 2 === 0 ) {
+
+//         // styles['background-color'] = 'whitesmoke';
+//       } else if ( i === 1 ) {
+//         styles['border-top'] = '1px #DEE2E6 solid';
+//       }
+
+//       if ( i !== 0 && id in this.selectedPaths) {
+//         styles['background-color'] = this.selectedPaths[id] + this.highlightOpacity;
+//       }
+//     }
 
 
     // if ( this.nSelectedRoutes > 0 ) {
@@ -242,9 +287,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // }
 
-    if ( id in this.selectedPaths) {
-      styles['background-color'] = this.selectedPaths[id] + this.highlightOpacity;
-    }
+
 
     return styles;
 

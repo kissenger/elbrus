@@ -8,7 +8,7 @@
 
     <div class="form-group m-0 p-0">
       <select [(ngModel)]="isPublicOrPrivate" [ngModelOptions]="{standalone: true}"
-        (change)="onSelectMenuChange()" class="custom-select custom-select-sm mt-2 mb-2">
+        (change)="onSelectMenuChange()" class="custom-select custom-select-sm my-1">
         <option *ngIf="!isRegisteredUser" disabled value=false>My routes</option>
         <option *ngIf="isRegisteredUser" value=false>My routes</option>
         <option value=true>Public routes</option>
@@ -41,7 +41,7 @@
   <div *ngIf="nRoutesInView > 0" class="m-1  p-0 h-100 overflow-auto">
 
     <div class="m-0 p-0 d-flex flex-column active-route-holder">
-      Active Route:
+      <i>Active Route:</i>
       <app-panel-list-item *ngIf="nSelectedRoutes > 0" [item]="listItems[0]" class="my-auto list-item"
         (click)="onListClick(listItems[0].pathId)" [ngStyle]="getCssStyle(listItems[0].pathId, 0)">
       </app-panel-list-item>
@@ -51,14 +51,13 @@
 
 
 
-    <div *ngIf="nSelectedRoutes === 0" class="m-1 p-0">Select a route to activate:</div>
-    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView <= 1" class="m-1 p-0">No more routes to show.</div>
-    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView > 1" class="m-1 p-0">Select routes to overlay:</div>
+    <div *ngIf="nSelectedRoutes === 0" class="m-1 p-0"><i>Select a route to view:</i></div>
+    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView <= 1" class="m-1 p-0"><i>No more routes to show.</i></div>
+    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView > 1" class="m-1 p-0"><i>Select routes to overlay:</i></div>
 
+      <div *ngFor="let item of listItems; let i = index"  >
 
-      <div *ngFor="let item of listItems; let i = index" class="list-item" >
-
-        <div *ngIf="nSelectedRoutes === 0 || i > 0" (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
+        <div *ngIf="nSelectedRoutes === 0 || i > 0" (click)="onListClick(item.pathId)" class="list-item" [ngStyle]="getCssStyle(item.pathId, i)">
           <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
         </div>
 

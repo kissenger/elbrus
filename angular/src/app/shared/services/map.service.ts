@@ -9,8 +9,6 @@ import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
-import { convertCompilerOptionsFromJson } from 'typescript';
-import { promises } from 'fs';
 
 @Injectable({
   providedIn: 'root'
