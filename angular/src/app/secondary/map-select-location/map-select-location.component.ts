@@ -1,4 +1,3 @@
-
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../shared/services/auth.service';
 import { TsCoordinate, TsUser } from '../../shared/interfaces';
@@ -16,11 +15,11 @@ import { MapService } from 'src/app/shared/services/map.service';
 export class MapSelectLocationComponent implements OnInit, OnDestroy {
 
   private user: TsUser;
-  private locationSubscription: Subscription;
+  private newLocationListener: Subscription;
   public location: TsCoordinate;
 
   constructor(
-    private mapService: MapService,
+    private map: MapService,
     private data: DataService,
     private router: Router,
     private auth: AuthService
@@ -30,18 +29,18 @@ export class MapSelectLocationComponent implements OnInit, OnDestroy {
 
     this.user = this.auth.getUser();
     this.location = this.user.homeLngLat;
-    await this.mapService.newMap(this.location);
-    this.mapService.plotMarker(this.user.homeLngLat);
+    await this.map.newMap(this.location);
+    this.map.plotMarker(this.user.homeLngLat);
 
-    this.mapService.getLocationOnClick();
-    this.locationSubscription = this.data.locationEmitter.subscribe( (loc: TsCoordinate) => {
+    this.map.getLocationOnClick();
+    this.newLocationListener = this.data.locationEmitter.subscribe( (loc: TsCoordinate) => {
       this.location = loc;
     });
 
   }
 
   onOK () {
-    this.data.saveToStore('newLocation', this.location);
+    this.data.set('newLocation', this.location);
     this.router.navigate(['profile']);
   }
 
@@ -50,8 +49,7 @@ export class MapSelectLocationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.locationSubscription) { this.locationSubscription.unsubscribe(); }
-    console.log(this.location);
+    if (this.newLocationListener) { this.newLocationListener.unsubscribe(); }
   }
 
 }

@@ -35,9 +35,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
    * and we use it, otherwise use the location stored in auth.user
    */
   async ngOnInit() {
-    console.log('enter profile');
+
     this.user = this.auth.getUser();
-    const newLocation = this.data.getFromStore('newLocation', this.CLEAR_KEY);
+    const newLocation = this.data.get('newLocation', this.CLEAR_KEY);
     const oldLocation = this.user.homeLngLat; // needed in case new location cannot be saved, revert back to old
 
     if ( !!newLocation ) {

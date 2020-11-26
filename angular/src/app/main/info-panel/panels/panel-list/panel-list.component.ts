@@ -30,7 +30,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   private getListListener: Subscription;
   private mapUpdateListener: Subscription;
-  private dataListener: Subscription;
+  private newDataListener: Subscription;
+  private newPathListener: Subscription;
 
   // keep track of the routes user has selected
   public nSelectedRoutes = 0;
@@ -91,7 +92,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     });
 
     // in case units are changed while viewing the list
-    this.dataListener = this.data.unitsUpdateEmitter.subscribe( () => {
+    this.newDataListener = this.data.unitsUpdateEmitter.subscribe( () => {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
@@ -146,9 +147,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  onListClick(idFromClick: string) {
-
-    let emitCommand: Object;
+  async onListClick(idFromClick: string) {
 
     if ( idFromClick in this.selectedPaths) {
 
@@ -160,9 +159,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
         this.nSelectedRoutes = 0;
 
         // make changes to map
-        emitCommand = {
+        await this.updateMap({
           command: 'clear'
-        };
+        }) ;
 
       } else {
 
@@ -172,10 +171,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
         this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
 
         // make changes to map
-        emitCommand = {
+        await this.updateMap({
           command: 'rem',
           id: idFromClick
-        };
+        });
       }
 
     } else {
@@ -185,12 +184,12 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
 
       // make changes to map
-      emitCommand = {
+      await this.updateMap({
         command: 'add',
         id: idFromClick,
         colour: this.selectedPaths[idFromClick],
         emit: this.nSelectedRoutes === 1
-      };
+      });
 
       // bump selected item to the top of the list
       if ( this.nSelectedRoutes === 1 ) {
@@ -200,8 +199,25 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     }
 
-    this.data.pathCommandEmitter.emit( emitCommand );
 
+  }
+
+
+  updateMap(emitOptions: {command?: string, id?: string, colour?: string, emit?: boolean}) {
+
+    return new Promise( (resolve, reject) => {
+
+      // listen for path emitter to indicate data has loaded
+      this.newPathListener = this.data.pathIdEmitter.subscribe( (path: {action: string, pid: string} ) => {
+          this.newPathListener.unsubscribe();
+          console.log('map update finished');
+          resolve();
+      });
+
+      // request map update
+      this.data.pathCommandEmitter.emit(emitOptions);
+
+    });
   }
 
 
@@ -243,7 +259,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.getListListener) { this.getListListener.unsubscribe(); }
     if (this.mapUpdateListener) { this.mapUpdateListener.unsubscribe(); }
-    if (this.dataListener) { this.dataListener.unsubscribe(); }
+    if (this.newDataListener) { this.newDataListener.unsubscribe(); }
   }
 
 

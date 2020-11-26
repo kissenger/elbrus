@@ -11,14 +11,14 @@ import { Router } from '@angular/router';
 export class RoutesReviewComponent implements OnInit {
 
   constructor(
-    private mapService: MapService,
-    private dataService: DataService,
+    private map: MapService,
+    private data: DataService,
     private router: Router,
   ) { }
 
   ngOnInit() {
 
-    const geoJSON = this.dataService.getFromStore('activePath', true).pathAsGeoJSON;
+    const geoJSON = this.data.get('activePath', true).pathAsGeoJSON;
 
     if (typeof geoJSON === 'undefined') {
       this.router.navigate(['routes/list']);
@@ -28,10 +28,10 @@ export class RoutesReviewComponent implements OnInit {
         lng: ( geoJSON.bbox[0] + geoJSON.bbox[2] ) / 2,
         lat: ( geoJSON.bbox[1] + geoJSON.bbox[3] ) / 2 };
 
-      this.mapService.newMap(cog)
+      this.map.newMap(cog)
         .then( () => {
           const plotOptions = {booReplaceExisting: false, booResizeView: true, booSaveToStore: true};
-          this.mapService.add(geoJSON, {}, plotOptions);
+          this.map.add(geoJSON, {}, plotOptions);
         })
         .catch( e => {
           throw new Error(e);

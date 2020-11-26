@@ -65,7 +65,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
-    this.pathListener = this.data.pathIdEmitter.subscribe( (pathId) => {
+    this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
       this.geoJson = this.data.get('activePath', false);
 

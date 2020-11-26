@@ -35,12 +35,16 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.activePathSubscription = this.data.pathIdEmitter.subscribe( (geoJson) => {
+    this.activePathSubscription = this.data.pathIdEmitter.subscribe( () => {
+
+      const geoJson = this.data.get('activePath', false);
+
       this.isPathPublic = geoJson.properties.info.isPublic;
       this.createdBy = geoJson.properties.info.createdBy;
       this.pathId = geoJson.properties.pathId;
       this.pathType = geoJson.properties.info.pathType;
       this.nPoints = geoJson.properties.stats.nPoints;
+
     });
 
   }

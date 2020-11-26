@@ -1,3 +1,4 @@
+import { TsFeatureCollection } from 'src/app/shared/interfaces';
 import { EventEmitter, Injectable } from '@angular/core';
 
 @Injectable({
@@ -54,7 +55,13 @@ export class DataService {
 
   private dataStore: Object = {};
 
-  // saves a key/value pair to the data store, also emitting the same data if {{emit}} is true
+  // set path has option to emit - actually controls save and always emits but the maintaining the legacy terminology for now
+  public setPath(geoJson: TsFeatureCollection, emit: boolean) {
+    if (emit) { this.dataStore['activePath'] = geoJson; }
+    this.pathIdEmitter.emit(geoJson.properties.pathId);
+  }
+
+  // saves a key/value pair to the data store
   public set(keyName: string, value: any) {
     this.dataStore[keyName] = value;
   }

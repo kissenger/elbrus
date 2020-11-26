@@ -46,14 +46,14 @@ export class MapCreateService extends MapService {
 
 
   constructor(
-    httpService: HttpService,
-    dataService: DataService,
+    http: HttpService,
+    data: DataService,
     auth: AuthService,
     geoJsonPipe: GeoJsonPipe,
     private spinner: SpinnerService,
     private alert: AlertService
   ) {
-    super(httpService, dataService, auth, geoJsonPipe);
+    super(http, data, auth, geoJsonPipe);
   }
 
 
@@ -67,7 +67,7 @@ export class MapCreateService extends MapService {
 
   public createRoute() {
 
-    this.pathToEdit = this.dataService.getFromStore('activePath', false);
+    this.pathToEdit = this.data.get('activePath', false);
     this._options.snapProfile = 'driving';
     if ( this.pathToEdit ) {
       this.history = new PathHistory( new Path( this.pathToEdit ) );
@@ -82,12 +82,15 @@ export class MapCreateService extends MapService {
 
   private updateMap() {
 
+    this.tsMap.once('idle', (e) => {
+      if (this.history.length > 0) { this.data.setPath(this.history.fullGeo, true); }
+    });
+
     this.line = this.history.simpleGeo;
     this.points = this.history.activePoints;
     this.symbols = this.history.startEndPoints;
 
     this.updateMapSource();
-    this.emitDetails();
 
   }
 
@@ -100,13 +103,6 @@ export class MapCreateService extends MapService {
   }
 
 
-
-  emitDetails() {
-    if (this.history.length >= 1) {
-      this.dataService.activePathEmitter.emit(this.history.fullGeo);
-      this.dataService.saveToStore('activePath', this.history.fullGeo);
-    }
-  }
 
 
 
@@ -133,7 +129,7 @@ export class MapCreateService extends MapService {
 
     return new Promise<TsFeatureCollection>( (resolve, reject) => {
 
-      this.httpService.getPathFromPoints(coords, options).subscribe( (result) => {
+      this.http.getPathFromPoints(coords, options).subscribe( (result) => {
         resolve(result.hills);
       }, error => reject(error));
 
@@ -158,7 +154,7 @@ export class MapCreateService extends MapService {
       // otherwise, get coords from directions service
       } else {
 
-        this.httpService.mapboxDirectionsQuery(this._options.snapProfile, start, end).subscribe( (result) => {
+        this.http.mapboxDirectionsQuery(this._options.snapProfile, start, end).subscribe( (result) => {
 
           if (result.code === 'Ok') {
             const coords = result.routes[0].geometry.coordinates.map( (c: TsPosition) => ({lat: c[1], lng: c[0]}) );

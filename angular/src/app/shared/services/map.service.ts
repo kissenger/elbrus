@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
+import { convertCompilerOptionsFromJson } from 'typescript';
+import { promises } from 'fs';
 
 @Injectable({
   providedIn: 'root'
@@ -119,28 +121,18 @@ export class MapService {
 
   public add(pathAsGeoJSON: TsFeatureCollection, styleOptions?: TsLineStyle, plotOptions?: TsPlotPathOptions ) {
 
-    console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
-
     return new Promise( (resolve, reject) => {
+
+      console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
+      const path = new Path( pathAsGeoJSON );
+      const pathId = pathAsGeoJSON.properties.pathId;
 
       // map listener will fire only once when the data has finished loading
       this.tsMap.once('idle', (e) => {
-
-        if (plotOptions.booResizeView) {
-          this.bounds = pathAsGeoJSON.bbox;
-        }
-
-        if (plotOptions.booEmit) {
-          this.data.pathIdEmitter.emit(pathAsGeoJSON);
-          this.data.set('activePath', pathAsGeoJSON);
-        }
-
+        if (plotOptions.booResizeView) { this.bounds = pathAsGeoJSON.bbox; }
+        this.data.setPath(pathAsGeoJSON, plotOptions.booEmit);
         resolve();
-
       });
-
-      const path = new Path( pathAsGeoJSON );
-      const pathId = pathAsGeoJSON.properties.pathId;
 
       this.layers.add(pathId);
       this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
@@ -182,11 +174,7 @@ export class MapService {
       paint: {
         'circle-radius': 4,
         'circle-opacity': 0.5,
-        // 'circle-opacity': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 1, 0 ],
-        // 'circle-stroke-opacity': [ 'case', ['boolean', ['feature-state', 'hover'], false ], 1, 0 ],
         'circle-stroke-width': 1,
-        // 'circle-stroke-color': 'black',
-        // 'circle-color': 'black'
         'circle-color':
           [ 'case',
             ['boolean', ['feature-state', 'enabled'], false ],
@@ -213,7 +201,6 @@ export class MapService {
       source: layerId,
       layout: {
         'symbol-placement': 'point',
-        // 'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
         'text-anchor': 'bottom-left',
         'text-font': ['Open Sans Regular'],
         'text-field': '{title}',
@@ -225,12 +212,20 @@ export class MapService {
 
 
   public remove(pathId: string) {
+    return new Promise( (resolve, reject) => {
 
-    this.removeLayer(pathId, 'line');
-    this.removeLayer(pathId, 'sym');
-    this.removeLayer(pathId, 'pts');
+      this.tsMap.once('idle', (e) => {
+        this.data.pathIdEmitter.emit(pathId);
+        resolve();
+      });
 
-    this.layers.remove( pathId );
+      this.removeLayer(pathId, 'line');
+      this.removeLayer(pathId, 'sym');
+      this.removeLayer(pathId, 'pts');
+
+      this.layers.remove( pathId );
+
+    });
 
   }
 
@@ -248,17 +243,17 @@ export class MapService {
 
 
   public clear() {
-    if ( this.layers ) {
-      this.layers.get.forEach( pathId => {
-        this.remove(pathId);
-      });
-    }
 
-    // send an empty linestring
-    // const tempGeo = this.geoJsonPipe.transform([], 'LineString');
-    this.data.pathIdEmitter.emit(globals.emptyGeoJson);
-    this.data.set('activePath', globals.emptyGeoJson);
+    return new Promise( async (resolve, reject) => {
 
+      if ( this.layers ) {
+        await Promise.all( this.layers.get.map( pathId => { this.remove(pathId); }) );
+      }
+
+      resolve();
+      this.data.setPath(globals.emptyGeoJson, true);
+
+    });
   }
 
 

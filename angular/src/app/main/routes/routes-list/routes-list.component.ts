@@ -44,23 +44,24 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     if ( urlParam.length > 10 ) {
 
       await this.map.newMap();
-      await this.plotPath(urlParam, {}, {booEmit: true, booResizeView: true});
+      this.plotPath(urlParam, {}, {booEmit: true, booResizeView: true});
 
     } else {
       this.map.newMap();
     }
 
 
-    this.pathIdListener = this.data.pathCommandEmitter.subscribe( async ( request ) => {
+    this.pathIdListener = this.data.pathCommandEmitter.subscribe(
+      async ( request: {command?: string, id?: string, colour?: string, emit?: boolean} ) => {
 
         if ( request.command === 'add' ) {
           await this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit} );
 
         } else if ( request.command === 'rem' ) {
-          this.map.remove(request.id);
+          await this.map.remove(request.id);
 
         } else if ( request.command === 'clear' ) {
-          this.map.clear();
+          await this.map.clear();
 
         }
 
@@ -81,12 +82,12 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
       }, (error) => {
         this.spinner.removeElement();
-        this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {
-          reject();
-        } );
+        reject();
+        this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {} );
       });
 
     });
+
   }
 
   ngOnDestroy() {
