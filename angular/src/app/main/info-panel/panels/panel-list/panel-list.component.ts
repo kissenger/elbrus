@@ -18,7 +18,7 @@ import { SpinnerService } from 'src/app/shared/services/spinner.service';
 const PRIVATE = false;
 const PUBLIC = true;
 const LIST_ITEM_HEIGHT = 37;
-const LIST_HEIGHT_CORRECTION = 700;  // higher number results in fewer routes loaded
+const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes loaded
 
 @Component({
   selector: 'app-panel-list',
@@ -68,7 +68,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     // determine the number of list items we can fit in the current view height
-    this.nRoutesToLoad = Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT));
+    this.nRoutesToLoad = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
 
     // check url for pathId - if supplied we'll show that path
     const pathId = this.router.url.split('/').slice(-1)[0];
@@ -134,7 +134,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-
   onMoreClick() {
     this.offset++;
     this.addPathsToList();
@@ -154,8 +153,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
       if ( this.selectedPaths[idFromClick] === null ) {
 
         // reclicked on first route, clear it and all overlays
-
-
         // make changes to map
         await this.updateMap({
           command: 'clear'
@@ -168,8 +165,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
       } else {
 
         // reclicked an overlay, just clear the overlay
-
-
         // make changes to map
         await this.updateMap({
           command: 'rem',
@@ -204,6 +199,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
       }
 
     }
+
+
+    // store some data for panel details to pick up
+    this.data.set('nRoutes', this.nSelectedRoutes);
+
   }
 
 
@@ -220,6 +220,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       // request map update
       this.data.pathCommandEmitter.emit(emitOptions);
+
 
     });
   }
@@ -245,19 +246,14 @@ export class PanelListComponent implements OnInit, OnDestroy {
       styles['border-left'] = '1px #DEE2E6 solid';
       styles['border-right'] = '1px #DEE2E6 solid';
       styles['border-bottom'] = '1px #DEE2E6 solid';
-      // styles['padding-left'] = '7px';
-
-
 
       if ( this.nSelectedRoutes === 0 ) {
-        // styles['background'] = i % 2 === 0 ? '#fdfdfd' : 'whitesmoke';
         if ( i === 0 ) {
           styles['border-top'] = '1px #DEE2E6 solid';
         } else if ( i === this.nLoadedRoutes - 1) {
           styles['border-bottom'] = '1px #DEE2E6 solid';
         }
       } else {
-        // styles['background'] = i % 2 === 0 ? 'whitesmoke' : '#fdfdfd';
         if ( i === 0 ) {
           styles['background'] = 'var(--ts-green)';
 
@@ -269,43 +265,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
         }
       }
 
-      // if ( i !== 0 && id in this.selectedPaths) {
-      //   styles['padding-left'] = '1px';
-      //   styles['border-left'] = `7px ${this.selectedPaths[id] + this.highlightOpacity} solid`;
-      // }
-
     }
-
-
-//     styles['border-bottom'] = i > 0 && i < this.nSelectedRoutes ? '1px #DEE2E6 solid' : '2px #DEE2E6 solid';
-//     styles['border-top'] = i === 0 ? '1px #DEE2E6 solid' : 'none';
-
-
-
-//     styles['background-color'] = i % 2 === 0 ? '' : 'whitesmoke';
-// // console.log(this.nSelectedRoutes)
-//     if ( this.nSelectedRoutes > 0 ) {
-
-//       if ( i % 2 === 0 ) {
-
-//         // styles['background-color'] = 'whitesmoke';
-//       } else if ( i === 1 ) {
-//         styles['border-top'] = '1px #DEE2E6 solid';
-//       }
-
-//       if ( i !== 0 && id in this.selectedPaths) {
-//         styles['background-color'] = this.selectedPaths[id] + this.highlightOpacity;
-//       }
-//     }
-
-
-    // if ( this.nSelectedRoutes > 0 ) {
-    //   styles['border-top'] = i === 1 ? '1px #DEE2E6 solid' : 'none';
-    //   styles['background-color'] = i === 0 ? 'whitesmoke' : 'none';
-
-    // }
-
-
 
     return styles;
 

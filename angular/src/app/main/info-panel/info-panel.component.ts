@@ -1,3 +1,4 @@
+import { DataService } from './../../shared/services/data.service';
 import { Component, OnInit, Input } from '@angular/core';
 import { InfoPanelService } from 'src/app/shared/services/info-panel.service';
 import { TsTabsArray, TsTab } from 'src/app/shared/interfaces';
@@ -18,15 +19,17 @@ export class InfoPanelComponent implements OnInit {
   public isMinimised = false;
 
   constructor(
-    private infoPanelService: InfoPanelService
+    private infoPanel: InfoPanelService,
+    private data: DataService
   ) { }
 
   ngOnInit() {
-    this.tabsArray = this.infoPanelService.getTabs(this.callingPage);
+    this.tabsArray = this.infoPanel.getTabs(this.callingPage);
   }
 
   onMinimiseClick() {
     this.isMinimised = !this.isMinimised;
+    this.data.minimisePanelEmitter.emit(this.isMinimised);
   }
 
   getTabsClass(tab: TsTab) {

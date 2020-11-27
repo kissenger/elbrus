@@ -14,14 +14,16 @@
     </div>
 
     <!-- ROUTE SELECTED -->
-    <div *ngIf="isData" class="row no-gutters text-center">
-      <div class="col-6 m-0 p-1 text-left">
+
+    <div *ngIf="isData" class="row no-gutters text-center mx-2 my-1">
+      <i>Active route and {{nRoutes-1}} overlays plotted.</i>
+      <div class="col-6 m-0 text-left">
         {{geoJson.properties.info.name | shortName: 16}}
       </div>
-      <div class="col-3 m-0 px-0 py-1 text-center">
+      <div class="col-3 m-0 text-center">
         {{geoJson.properties.stats.distance | units: 'distance': units.distance}}
       </div>
-      <div class="col-3 m-0 p-1 text-center">
+      <div class="col-3 m-0 text-center">
         {{geoJson.properties.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}
       </div>
     </div>

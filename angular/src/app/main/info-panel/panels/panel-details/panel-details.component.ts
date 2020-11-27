@@ -44,6 +44,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   public pathType: string;
   public pathStats: TsPathStats = globals.emptyStats;
   public pathDirection: string;
+  public nRoutes = 0;
 
   constructor(
     private data: DataService,
@@ -61,6 +62,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // subscribe to any changes in the minimised status of the panel
     this.minimisePanelSubscription = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
       this.isMinimised = minimise;
+      if (this.isMinimised) {
+        this.nRoutes = this.data.get('nRoutes', false);
+      }
     });
 
 

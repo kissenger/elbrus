@@ -19,9 +19,10 @@
 
 
     <!-- MAXIMISED VIEW -->
-    <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100 position-relative d-flex flex-column flex-grow-1">
+    <!-- <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100 d-flex flex-column flex-grow-1"> -->
+    <div [ngClass]="isMinimised ? 'hidden-view' : 'd-flex flex-column flex-grow-1'" class="">
 
-      <div class="border-fix position-absolute h-100 w-100 border"></div>
+      <div class="border-fix position-absolute border-left border-right"></div>
 
       <!-- TABS -->
       <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->

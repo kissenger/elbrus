@@ -7,7 +7,7 @@ div{
 
 .outer-container {
   top: 10px;
-  bottom: 100px;
+  bottom: 30px;
   right: 0px;
   left: 0px;
   font-size: smaller;
@@ -84,7 +84,6 @@ the active tab, do not interfere with the active tab inputs */
   margin-left: -1px;
   margin-right: -1px;
   pointer-events: none;
-  /* border: 1px red solid; */
 }
 
 
