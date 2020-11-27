@@ -118,7 +118,8 @@ export interface TsFeature {
   id?: string; // mapbox
   type: 'Feature';
   geometry: TsGeometry;
-  properties: TsGeoJsonProperties | TsMapboxProperties | null;
+  // properties: TsGeoJsonProperties | TsMapboxProperties | null;
+  properties: TsGeoJsonProperties | null;
 }
 
 export type TsGeometry = TsPoint | TsLineString;
@@ -139,17 +140,18 @@ export type TsPosition = [number, number];
 export type TsBoundingBox = [number, number, number, number];
 
 export interface TsGeoJsonProperties {
-    pathId: string;
-    info: TsInfo;
-    params: TsParams;
-    stats: TsPathStats;
-    colour?: string;
+    pathId?: string;
+    info?: TsInfo;
+    params?: TsParams;
+    stats?: TsPathStats;
+    lineColour?: string;
     creationDate?: string;
     lastEditDate?: string;
     plotType?: string;
     userID?: string;
     latitude?: number;   // front need, used by map service when creating points geoJson
     matched?: boolean;
+    title?: string;
 }
 
 export interface TsMapboxProperties {
@@ -176,7 +178,7 @@ export interface TsParams {
     time: number[];
     heartRate: number[];
     cadence: number[];
-    cumDistance: number[];
+    cumDist: number[];
     matchedPoints?: number[][]; /// used for debugging route algorthims on the back end
 }
 

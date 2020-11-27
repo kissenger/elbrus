@@ -83,7 +83,8 @@ class GeoJSON {
       this._getHillSegments().forEach( segment => {
         let coords = this._lngLats.slice(segment.start, segment.end + 1);
         let elevs = this._elevs.slice(segment.start, segment.end + 1);
-        this._features.push(this._feature(coords, elevs, segment.colour));
+        let cumDist = this._properties.params.cumDistance.slice(segment.start, segment.end + 1).map(x=>Math.round(x));
+        this._features.push(this._feature(coords, elevs, cumDist, segment.colour));
       });
     } else {
       this._features = [ this._feature(this._lngLats, this._elevs, ROUTE_COLOUR) ];
@@ -152,7 +153,7 @@ class GeoJSON {
 
 
   // returns a geoJson feature for the provided coordinates, elevations and colour
-  _feature(coords, elevs, colour) {
+  _feature(coords, elevs, cumd, colour) {
     return {
       type: 'Feature',
       geometry: {
@@ -164,6 +165,7 @@ class GeoJSON {
         lineWidth: 5,
         lineOpacity: 0.5,
         params: {
+          cumDist: cumd,
           elev: elevs
         }
       }

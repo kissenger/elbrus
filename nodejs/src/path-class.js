@@ -12,6 +12,8 @@ const Path = require('geo-points-and-paths').Path;
 const jael = require('jael');
 jael.setPath(process.env.GEOTIFF_PATH);
 
+
+const SHORT_PATH_THRESHOLD            = require('./globals').SHORT_PATH_THRESHOLD;
 const LONG_PATH_THRESHOLD            = require('./globals').LONG_PATH_THRESHOLD;
 const SIMPLIFICATION_FACTOR_PASS_1   = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
 const SIMPLIFICATION_FACTOR_PASS_2   = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
@@ -98,8 +100,10 @@ class PathWithStats extends Path{
         path.addParam('elev', elev);
       };
       
-      path.simplify(SIMPLIFICATION_FACTOR_PASS_1);
-      debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 1`);
+      if (path.length > SHORT_PATH_THRESHOLD) {
+        path.simplify(SIMPLIFICATION_FACTOR_PASS_1);
+        debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 1`);
+      }
 
       // if the path is still long, be a bit more agressive
       if (path.length > LONG_PATH_THRESHOLD) {

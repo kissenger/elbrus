@@ -105,10 +105,10 @@ const emptyProps: TsGeoJsonProperties = {
     time: [],
     heartRate: [],
     cadence: [],
-    cumDistance: []
+    cumDist: []
   },
   stats: emptyStats,
-  colour: '',
+  lineColour: '',
   creationDate: '',
   lastEditDate: '',
   plotType: '',

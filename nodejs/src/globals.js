@@ -6,6 +6,7 @@
 
 module.exports = {
 
+  SHORT_PATH_THRESHOLD: 250,     // number of points (before simplification) below which there is no simplification
   LONG_PATH_THRESHOLD: 1000,     // number of points (after simplification) above which the path will be treated as long
 
   // Hills

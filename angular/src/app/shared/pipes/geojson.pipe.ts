@@ -72,9 +72,7 @@ export class GeoJsonPipe implements PipeTransform {
       };
 
       if (text) {
-        feature.properties = {
-          title: text
-        };
+        feature.properties = {title: text};
       }
 
       return feature;

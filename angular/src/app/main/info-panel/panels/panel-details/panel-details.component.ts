@@ -1,15 +1,17 @@
 
 import { TsFeatureCollection } from './../../../../shared/interfaces';
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, AfterViewInit } from '@angular/core';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { ChartsService } from 'src/app/shared/services/charts-service';
-import { TsUnits, TsPathStats } from 'src/app/shared/interfaces';
+import { TsUnits, TsPathStats, TsFeature } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
+import { Color, Label } from 'ng2-charts';
+import { ChartDataSets, ChartOptions } from 'chart.js';
 
 @Component({
   selector: 'app-panel-details',
@@ -26,7 +28,13 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   public isMinimised = window.innerWidth < 900 ? true : false;
   private minimisePanelSubscription: Subscription;
 
-  private chartData: Array<Array<number>>;
+  public chartData: ChartDataSets[] = [];
+  chartLabels: Label[] = [];
+  chartOptions: ChartOptions = {};
+  chartColors: Color[] = [];
+  chartLegend = false;
+
+
   private colourArray: Array<string>;
   public geoJson: TsFeatureCollection;
 
@@ -78,11 +86,51 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
       this.isLong = this.geoJson.properties.info.isLong;
       this.isElevations = this.geoJson.properties.info.isElevations && !this.isLong;
+      console.log(this.isElevations);
       if (this.pathStats.hills) {
         this.isHills = this.pathStats.hills.length > 0;
       } else {
         this.isHills = false;
       }
+
+      // chartData = [ {data: }]
+
+      // this.geoJson.properties.params.cumDistance
+
+      // const xRaw = this.geoJson.properties.params.cumDistance;
+      this.chartData = [];
+
+      this.geoJson.features.forEach( (feature: TsFeature) => {
+
+        const localData =  [];
+        for (let i = 0; i < feature.properties.params.elev.length; i++) {
+          localData.push({x: feature.properties.params.cumDist[i]/1000, y: feature.properties.params.elev[i]});
+        }
+        this.chartData.push({
+          data: localData,
+          showLine: true,
+          lineTension: 0,
+          pointRadius: 0,
+          fill: false,
+          borderColor: feature.properties.lineColour,
+          borderWidth: 1
+        });
+
+    });
+
+    this.chartLabels = [];
+    this.chartOptions = {};
+    this.chartColors = [];
+    this.chartLegend = false;
+
+    console.log(this.chartData);
+
+
+      //   const y = this.geoJson.properties.params.cumDistance.length - feature.properties.params.elev.length - x;
+      //   this.chartData.push( Array(x).fill(null).concat(feature.properties.params.elev).concat(Array(y).fill(null)) );
+      //   x += feature.properties.params.elev.length - 1;
+      //   this.colourArray.push(feature.properties.lineColour);
+      // });
 
       /**
        * TODO: This should be in a subroutine
@@ -112,6 +160,17 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     });
 
   }
+
+  // ngAfterViewInit() {
+
+
+  //   const canvas = <HTMLCanvasElement> document.getElementById('chart_div');
+  //   let elevationChart = new Chart(canvas.getContext('2d'), {
+  //     type: 'line',
+  //     data: [{x: 1, y: 2}];
+  // });
+  // }
+
 
   onSave() {
 

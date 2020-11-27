@@ -1,7 +1,4 @@
-<div class="d-flex flex-column">
-
-
-
+<div class="p-2 d-flex flex-column">
 
 
   <!-- MINIMISED VIEW -->
@@ -15,7 +12,7 @@
 
     <!-- ROUTE SELECTED -->
 
-    <div *ngIf="isData" class="row no-gutters text-center mx-2 my-1">
+    <div *ngIf="isData" class="row no-gutters text-center">
       <i>Active route and {{nRoutes-1}} overlays plotted.</i>
       <div class="col-6 m-0 text-left">
         {{geoJson.properties.info.name | shortName: 16}}
@@ -32,11 +29,11 @@
 
 
 
-
   <!-- MAXIMISED VIEW -->
 
   <div *ngIf="!isMinimised" class="maximised-container h-100 d-flex flex-column ">
 
+    <!-- NO DATA -->
     <div *ngIf="!isData" class="w-100 text-center d-flex flex-column flex-grow-1 ">
 
       <div class="text-center m-3">
@@ -49,13 +46,18 @@
 
     </div>
 
+
+    <!-- DATA -->
     <div *ngIf="isData">
 
       <!-- NAME & DESCRIPTION only for list page -->
-      <div *ngIf="callingPage==='list'; else showForm">
+      <div *ngIf="callingPage==='list'; else showForm" class="pb-2 border-bottom text-center">
 
-        <div class="h6 mt-1 mb-1 pt-1 pb-1 text-center border-bottom">{{geoJson.properties.info.name}}</div>
-        <div *ngIf="pathDescription" class="mt-1 mb-1 pt-1 pb-1 border-bottom">{{geoJson.properties.info.description}}</div>
+        <div class="h6 my-0 py-0">{{geoJson.properties.info.name}}</div>
+
+        <div *ngIf="geoJson.properties.info.description" class="">
+          <i>{{geoJson.properties.info.description}}</i>
+        </div>
 
       </div>
 
@@ -78,8 +80,8 @@
 
       <!-- PATH DATA -->
 
-      <div class="mt-1 mb-1 pt-1 pb-1 border-bottom">
-        <table class="table table-sm m-0 p-0">
+      <div class="py-1 border-bottom">
+        <table class="table table-sm mx-1 my-0 p-0">
           <tbody>
             <tr>
               <td>Distance</td>
@@ -136,14 +138,24 @@
           </tbody>
         </table>
       </div>
-
     </div>
 
     <!-- ELEVATIONS CHART -->
-    <div class="w-100 small">
-        <div [hidden]="!isElevations" class="w-100" id="chart_div"></div>
-    </div>
 
+    <canvas height="200" baseChart
+      [datasets]="chartData"
+      [chartType]="'scatter'"
+      [labels]="chartLabels"
+      [options]="chartOptions"
+      [colors]="chartColors"
+      [legend]="chartLegend"
+      >
+    </canvas>
+
+
+    <!-- <div class="w-100 small">
+        <div [hidden]="!isElevations" class="w-100" id="chart_div"></div>
+    </div> -->
 
     <!-- HILLS TABLE -->
     <div *ngIf="isHills" class="pt-2 w-100 mx-auto text-center small border-top">
