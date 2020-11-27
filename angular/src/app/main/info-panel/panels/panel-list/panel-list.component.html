@@ -1,6 +1,6 @@
 
 
-<div class="p-0 h-100  d-flex flex-column">
+<div class="p-0 h-100 d-flex flex-column temp2">
 
 
   <!-- PUBLIC/PRIVATE DROPDOWN -->
@@ -38,27 +38,35 @@
 
   <!-- ROUTE LIST -->
 
-  <div *ngIf="nRoutesInView > 0" class="m-1  p-0 h-100 overflow-auto">
+  <div *ngIf="nRoutesInView > 0" class="m-0 p-0 h-100 overflow-auto">
 
     <div class="m-0 p-0 d-flex flex-column active-route-holder">
-      <i>Active Route:</i>
-      <app-panel-list-item *ngIf="nSelectedRoutes > 0" [item]="listItems[0]" class="my-auto list-item"
-        (click)="onListClick(listItems[0].pathId)" [ngStyle]="getCssStyle(listItems[0].pathId, 0)">
-      </app-panel-list-item>
+      <div class="m-1">
+        <i>Active Route:</i>
+      </div>
+
+      <!-- <div class="highlight" [ngStyle]="getCssStyle(listItems[0].pathId, 0)"> -->
+        <app-panel-list-item *ngIf="nSelectedRoutes > 0" [item]="listItems[0]" class="my-auto list-item"
+          (click)="onListClick(listItems[0].pathId)" [ngStyle]="getCssStyle(listItems[0].pathId, 0)">
+        </app-panel-list-item>
+      <!-- </div> -->
 
       <div *ngIf="nSelectedRoutes === 0" class="w-100 text-center my-auto">No route selected.</div>
+
     </div>
 
 
 
     <div *ngIf="nSelectedRoutes === 0" class="m-1 p-0"><i>Select a route to view:</i></div>
-    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView <= 1" class="m-1 p-0"><i>No more routes to show.</i></div>
-    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView > 1" class="m-1 p-0"><i>Select routes to overlay:</i></div>
+    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView <= 1" class="my-1 p-0"><i>No more routes to show.</i></div>
+    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView > 1" class="my-1 p-0"><i>Select routes to overlay:</i></div>
 
-      <div *ngFor="let item of listItems; let i = index"  >
+      <div *ngFor="let item of listItems; let i = index">
 
-        <div *ngIf="nSelectedRoutes === 0 || i > 0" (click)="onListClick(item.pathId)" class="list-item" [ngStyle]="getCssStyle(item.pathId, i)">
-          <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
+        <div *ngIf="nSelectedRoutes === 0 || i > 0" (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
+          <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
+            <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
+          </div>
         </div>
 
 
@@ -76,7 +84,7 @@
   <!-- MORE -->
   <div *ngIf="nRoutesInView > 0" class="text-center small">
     showing {{nLoadedRoutes}} of {{nRoutesInView}} routes <br>
-    <span *ngIf="!nRoutesInView" class="global-make-text-look-like-link" (click)="onMoreClick()"> Load more </span> <br>
+    <span *ngIf="!isAllRoutesLoaded" class="global-make-text-look-like-link" (click)="onMoreClick()"> Load more </span> <br>
   </div>
 
 </div>

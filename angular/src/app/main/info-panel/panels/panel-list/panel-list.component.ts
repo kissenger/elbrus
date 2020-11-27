@@ -18,7 +18,7 @@ import { SpinnerService } from 'src/app/shared/services/spinner.service';
 const PRIVATE = false;
 const PUBLIC = true;
 const LIST_ITEM_HEIGHT = 37;
-const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes loaded
+const LIST_HEIGHT_CORRECTION = 700;  // higher number results in fewer routes loaded
 
 @Component({
   selector: 'app-panel-list',
@@ -225,37 +225,55 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
+
+
   /** Set syles for list items based on position in list, and whether route is selected. */
-  getCssStyle(id: string, i: number) {
+  getCssStyle(id: string, i: number, name?: string) {
 
     const styles = {};
 
-    styles['border-left'] = '1px #DEE2E6 solid';
-    styles['border-right'] = '1px #DEE2E6 solid';
-    styles['border-bottom'] = '1px #DEE2E6 solid';
-    styles['padding-left'] = '7px';
+    if ( name === 'highlight' ) {
+      if ( i !== 0 && id in this.selectedPaths) {
 
+        styles['border-left'] = `7px ${this.selectedPaths[id] + this.highlightOpacity} solid`;
+      } else {
+        styles['border-left'] = `7px transparent solid`;
 
-
-    if ( this.nSelectedRoutes === 0 ) {
-      // styles['background'] = i % 2 === 0 ? '#fdfdfd' : 'whitesmoke';
-      if ( i === 0 ) {
-        styles['border-top'] = '1px #DEE2E6 solid';
-      } else if ( i === this.nLoadedRoutes - 1) {
-        styles['border-bottom'] = '1px #DEE2E6 solid';
       }
     } else {
-      // styles['background'] = i % 2 === 0 ? 'whitesmoke' : '#fdfdfd';
-      if ( i <= 1 ) {
-        styles['border-top'] = '1px #DEE2E6 solid';
-      } else if ( i === this.nLoadedRoutes - 1) {
-        styles['border-bottom'] = '1px #DEE2E6 solid';
-      }
-    }
 
-    if ( i !== 0 && id in this.selectedPaths) {
-      styles['padding-left'] = '1px';
-      styles['border-left'] = `7px ${this.selectedPaths[id] + this.highlightOpacity} solid`;
+      styles['border-left'] = '1px #DEE2E6 solid';
+      styles['border-right'] = '1px #DEE2E6 solid';
+      styles['border-bottom'] = '1px #DEE2E6 solid';
+      // styles['padding-left'] = '7px';
+
+
+
+      if ( this.nSelectedRoutes === 0 ) {
+        // styles['background'] = i % 2 === 0 ? '#fdfdfd' : 'whitesmoke';
+        if ( i === 0 ) {
+          styles['border-top'] = '1px #DEE2E6 solid';
+        } else if ( i === this.nLoadedRoutes - 1) {
+          styles['border-bottom'] = '1px #DEE2E6 solid';
+        }
+      } else {
+        // styles['background'] = i % 2 === 0 ? 'whitesmoke' : '#fdfdfd';
+        if ( i === 0 ) {
+          styles['background'] = 'var(--ts-green)';
+
+        }
+        if ( i <= 1 ) {
+          styles['border-top'] = '1px #DEE2E6 solid';
+        } else if ( i === this.nLoadedRoutes - 1) {
+          styles['border-bottom'] = '1px #DEE2E6 solid';
+        }
+      }
+
+      // if ( i !== 0 && id in this.selectedPaths) {
+      //   styles['padding-left'] = '1px';
+      //   styles['border-left'] = `7px ${this.selectedPaths[id] + this.highlightOpacity} solid`;
+      // }
+
     }
 
 

@@ -1,9 +1,9 @@
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 
-<div class="outer-container position-absolute ">
+<div class="outer-container position-absolute">
 
-  <div [ngClass]="isMinimised ? '' : 'h-100'" class="inner-container position-absolute border">
+  <div [ngClass]="isMinimised ? '' : 'h-100'" class="inner-container position-absolute d-flex flex-column ">
 
 
     <!-- MINIMISE BUTTON -->
@@ -19,7 +19,7 @@
 
 
     <!-- MAXIMISED VIEW -->
-    <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100">
+    <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100 flex-grow-1 temp">
 
       <!-- <div class="border-fix position-absolute h-100 w-100 border"></div> -->
 

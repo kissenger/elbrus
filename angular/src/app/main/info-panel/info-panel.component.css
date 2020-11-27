@@ -7,7 +7,7 @@ div{
 
 .outer-container {
   top: 10px;
-  bottom: 30px;
+  bottom: 100px;
   right: 0px;
   left: 0px;
   font-size: smaller;
@@ -20,8 +20,7 @@ div{
   width: 225px;
   background: white;
   pointer-events: auto;
-  /* border: 1px red solid; */
-  overflow: hidden;
+  border: 1px purple solid;
 }
 
 .hidden-view {
@@ -43,7 +42,9 @@ div{
   vertical-align: middle
 }
 
-
+.temp {
+  border: 1px red solid;
+}
 /* remove hover effect on small screens */
 @media only screen and (min-width: 900px) {
   .collapse-btn:hover {

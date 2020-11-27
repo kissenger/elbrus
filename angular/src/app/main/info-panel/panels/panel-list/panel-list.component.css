@@ -1,4 +1,7 @@
 
+.temp2 {
+  border: 1px blue solid;
+}
 .name {
   font-size: small;
   font-weight: bold;
@@ -23,19 +26,25 @@
   box-shadow: none;
 }
 
+
+
 /* @media only screen and (min-width: 900px) { */
-  .list-item:hover {
+  .highlight:hover {
     /* background-color: var(--ts-grey-background); */
     /* box-shadow: 5px 10px; */
     /* box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.2); */
-    border-left: 7px royalblue solid !important;
-    padding-left: 1px;
+    border-left: 7px var(--ts-green) solid !important;
+    padding-left: 0px;
 
   }
-  .list-item {
-    /* background-color: red; */
+
+  .highlight {
+    /* border-left: 0px; */
+    /* padding-left: 7px; */
+    border-left: 7px transparent solid;
 
   }
+
 /* } */
 
 
