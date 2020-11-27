@@ -20,7 +20,7 @@ div{
   width: 225px;
   background: white;
   pointer-events: auto;
-  border: 1px purple solid;
+  /* border: 1px purple solid; */
 }
 
 .hidden-view {
@@ -42,9 +42,14 @@ div{
   vertical-align: middle
 }
 
-.temp {
-  border: 1px red solid;
+.content-inner {
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
 }
+
+
 /* remove hover effect on small screens */
 @media only screen and (min-width: 900px) {
   .collapse-btn:hover {
@@ -76,6 +81,8 @@ the active tab, do not interfere with the active tab inputs */
   bottom: 0px;
   left: 0px;
   right: 0px;
+  margin-left: -1px;
+  margin-right: -1px;
   pointer-events: none;
   /* border: 1px red solid; */
 }

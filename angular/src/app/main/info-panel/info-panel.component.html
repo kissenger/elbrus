@@ -3,7 +3,7 @@
 
 <div class="outer-container position-absolute">
 
-  <div [ngClass]="isMinimised ? '' : 'h-100'" class="inner-container position-absolute d-flex flex-column ">
+  <div [ngClass]="isMinimised ? '' : 'h-100'" class="inner-container position-absolute border d-flex flex-column">
 
 
     <!-- MINIMISE BUTTON -->
@@ -19,9 +19,9 @@
 
 
     <!-- MAXIMISED VIEW -->
-    <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100 flex-grow-1 temp">
+    <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100 position-relative d-flex flex-column flex-grow-1">
 
-      <!-- <div class="border-fix position-absolute h-100 w-100 border"></div> -->
+      <div class="border-fix position-absolute h-100 w-100 border"></div>
 
       <!-- TABS -->
       <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
@@ -37,8 +37,8 @@
       <!-- TAB CONTENT -->
       <!-- Inject panels depending on the type of page -->
       <div #div *ngFor="let tab of tabsArray" [ngClass]="getTabsClass(tab)" id={{tab.name}}
-        role="tabpanel" class="h-100 w-100 tab-panel bg-white">
-        <div class="m-2 p-0 h-100 overflow-auto">
+        role="tabpanel" class="w-100 flex-grow-1 tab-panel bg-white position-relative">
+        <div class="position-absolute content-inner">
           <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
         </div>
       </div>
