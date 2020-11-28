@@ -115,6 +115,12 @@ export class MapService {
     return [mapBounds.getSouthWest().lng, mapBounds.getSouthWest().lat, mapBounds.getNorthEast().lng, mapBounds.getNorthEast().lat];
   }
 
+  public goto(point: TsPosition) {
+    this.tsMap.flyTo({
+      center: {lng: point[0], lat: point[1]}
+      });
+  }
+
 
 
   public add(pathAsGeoJSON: TsFeatureCollection, styleOptions?: TsLineStyle, plotOptions?: TsPlotPathOptions ) {
@@ -189,10 +195,7 @@ export class MapService {
   }
 
   public addDataToLayer(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>) {
-    // if data is empty then use pipe to generate empty geoJson
-    console.log(data);
     const _data = this.geoJsonPipe.transform(data, dataType);
-    console.log(_data);
     (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);
   }
 

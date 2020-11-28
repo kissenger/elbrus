@@ -54,8 +54,12 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     // listen for coordinate from chart and plot on map
     this.map.addPointsLayer('pointHighlighter');
-    this.chartPointListener = this.data.chartPointEmitter.subscribe( (coord: Array<TsPosition> = []) => {
-      this.map.addDataToLayer('pointHighlighter', 'Point', coord);
+    this.chartPointListener = this.data.chartPointEmitter.subscribe( (data) => {
+      if (data.action === 'show') {
+        this.map.addDataToLayer('pointHighlighter', 'Point', data.point);
+      } else if (data.action === 'centre') {
+        this.map.goto(data.point[0]);
+      }
     });
 
 

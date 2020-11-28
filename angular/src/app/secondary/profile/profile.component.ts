@@ -7,6 +7,7 @@ import { AlertService } from '../../shared/services/alert.service';
 import { DataService } from '../../shared/services/data.service';
 import { SpinnerService } from '../../shared/services/spinner.service';
 import { Router } from '@angular/router';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -26,7 +27,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private alert: AlertService,
     private data: DataService,
     private spinner: SpinnerService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) { }
 
   /**
@@ -101,11 +103,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    this.router.navigate(['/']);
+    // this.router.navigate(['/']);
+    this.location.back();
   }
 
   ngOnDestroy(): void {
-    console.log('leave profile');
     this.data.unitsUpdateEmitter.emit();
     if (this.httpSubscription) { this.httpSubscription.unsubscribe(); }
 

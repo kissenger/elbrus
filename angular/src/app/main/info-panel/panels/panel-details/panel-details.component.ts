@@ -123,6 +123,47 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
       this.chartLabels = [];
       this.chartOptions = {
+        layout: {
+          padding: {
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0
+          }
+        },
+        scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: this.units.distance,
+              lineHeight: 0.8,
+              padding: 0
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: true,
+              labelString: this.units.elevation,
+              lineHeight: 0.8,
+              padding: 0
+            }
+          }]
+        },
+        tooltips: {
+          displayColors: false,
+          mode: 'nearest',
+          intersect: true,
+          callbacks: {
+            label: (tooltipItems) => {
+              return [
+                'distance: ' + tooltipItems.xLabel + this.units.distance,
+                'elevation: ' + tooltipItems.yLabel + this.units.elevation,
+                '(Click to fly to point)',
+              ];
+            }
+          }
+
+        }
       };
       this.chartColors = [];
       this.chartLegend = false;
@@ -134,15 +175,22 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   }
 
+  onChartClick(e) {
+    const featureIndex = e.active[0]._datasetIndex;
+    const pointIndex = e.active[0]._index;
+    const lngLat = <TsPosition>this.geoJson.features[featureIndex].geometry.coordinates[pointIndex];
+    this.data.chartPointEmitter.emit({action: 'centre', point: [lngLat]});
+  }
+
   onChartHover(e) {
     const featureIndex = e.active[0]._datasetIndex;
     const pointIndex = e.active[0]._index;
     const lngLat = <TsPosition>this.geoJson.features[featureIndex].geometry.coordinates[pointIndex];
-    this.data.chartPointEmitter.emit([lngLat]);
+    this.data.chartPointEmitter.emit({action: 'show', point: [lngLat]});
   }
 
   onChartOut() {
-    this.data.chartPointEmitter.emit();
+    this.data.chartPointEmitter.emit({action: 'show', point: []});
   }
 
   // ngAfterViewInit() {

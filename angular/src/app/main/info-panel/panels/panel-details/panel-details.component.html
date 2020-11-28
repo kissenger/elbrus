@@ -62,6 +62,7 @@
       </div>
 
 
+
       <!-- FORM INPUTS only if create page -->
       <ng-template #showForm>
 
@@ -78,11 +79,14 @@
       </ng-template>
 
 
-      <!-- PATH DATA -->
+
 
       <div class="py-1 border-bottom">
         <table class="table table-sm mx-1 my-0 p-0">
           <tbody>
+
+
+            <!-- PATH DATA -->
             <tr>
               <td>Distance</td>
               <td>{{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}</td>
@@ -108,8 +112,8 @@
               <td>{{geoJson.properties.info.createdBy}}</td>
             </tr>
 
-            <!-- Elevations shown only if isElevations is true -->
 
+            <!-- ELEVATIONS -->
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Ascent</td>
@@ -138,26 +142,25 @@
           </tbody>
         </table>
       </div>
+
+
+      <!-- ELEVATIONS CHART -->
+
+      <canvas class="py-2" height="250" baseChart
+          [datasets]="chartData"
+          [chartType]="'scatter'"
+          [labels]="chartLabels"
+          [options]="chartOptions"
+          [colors]="chartColors"
+          [legend]="chartLegend"
+          (chartHover)="onChartHover($event)"
+          (chartClick)="onChartClick($event)"
+          (mouseout)="onChartOut()">
+      </canvas>
+
     </div>
 
-    <!-- ELEVATIONS CHART -->
 
-    <canvas height="200" baseChart
-      [datasets]="chartData"
-      [chartType]="'scatter'"
-      [labels]="chartLabels"
-      [options]="chartOptions"
-      [colors]="chartColors"
-      [legend]="chartLegend"
-      (chartHover)="onChartHover($event)"
-      (mouseout)="onChartOut()"
-      >
-    </canvas>
-
-
-    <!-- <div class="w-100 small">
-        <div [hidden]="!isElevations" class="w-100" id="chart_div"></div>
-    </div> -->
 
     <!-- HILLS TABLE -->
     <div *ngIf="isHills" class="pt-2 w-100 mx-auto text-center small border-top">
