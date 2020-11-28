@@ -25,6 +25,7 @@ export class DataService {
   public activeTabEmitter = new EventEmitter();           // from map service to info panel
   public loginUserEmitter = new EventEmitter();           // from login to header
   public pathCommandEmitter = new EventEmitter();         // from panel-list to routes-list
+  public chartPointEmitter = new EventEmitter();          // from panel-details to routes-list - listen for mouse on chart event
 
   // public selectedPathsEmitter = new EventEmitter();       // from panel-list to panel-details-minimised
 

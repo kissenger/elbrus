@@ -18,10 +18,10 @@
         {{geoJson.properties.info.name | shortName: 16}}
       </div>
       <div class="col-3 m-0 text-center">
-        {{geoJson.properties.stats.distance | units: 'distance': units.distance}}
+        {{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}
       </div>
       <div class="col-3 m-0 text-center">
-        {{geoJson.properties.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}
+        {{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}
       </div>
     </div>
 
@@ -85,7 +85,7 @@
           <tbody>
             <tr>
               <td>Distance</td>
-              <td>{{geoJson.properties.stats.distance | units: 'distance': units.distance}}</td>
+              <td>{{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}</td>
             </tr>
             <tr>
               <td>Points</td>
@@ -113,27 +113,27 @@
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Ascent</td>
-              <td>{{geoJson.properties.stats.elevations.ascent | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.ascent | unitsString: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Descent</td>
-              <td>{{geoJson.properties.stats.elevations.descent | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.descent | unitsString: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Max Elev</td>
-              <td>{{geoJson.properties.stats.elevations.maxElev | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.maxElev | unitsString: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Min Elev</td>
-              <td>{{geoJson.properties.stats.elevations.minElev | units: 'elevation': units.elevation}}</td>
+              <td>{{geoJson.properties.stats.elevations.minElev | unitsString: 'elevation': units.elevation}}</td>
             </tr>
             <tr *ngIf="isElevations">
               <!-- <th scope="row"></th> -->
               <td>Lumpiness</td>
-              <td>{{geoJson.properties.stats.elevations.lumpiness | units: 'lumpiness': units.elevation: units.distance}}</td>
+              <td>{{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}</td>
             </tr>
           </tbody>
         </table>
@@ -149,6 +149,8 @@
       [options]="chartOptions"
       [colors]="chartColors"
       [legend]="chartLegend"
+      (chartHover)="onChartHover($event)"
+      (mouseout)="onChartOut()"
       >
     </canvas>
 

@@ -39,7 +39,7 @@
     <div class="row justify-content-center">
       <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Distance</div>
-      <div class="col-4 p-2 m-0 text-left"> {{ user.units.distance | unitName }}</div>
+      <div class="col-4 p-2 m-0 text-left"> {{ user.units.distance | unitsShortName }}</div>
       <div class="col-2 p-2 m-0 pr-3text-center">
         <span class="global-make-text-look-like-link" (click)="onChangeDistanceUnits()">change</span>
       </div>
@@ -48,7 +48,7 @@
     <div class="row justify-content-center">
       <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Elevation</div>
-      <div class="col-4 p-2 m-0 text-left"> {{ user.units.elevation | unitName }}</div>
+      <div class="col-4 p-2 m-0 text-left"> {{ user.units.elevation | unitsShortName }}</div>
       <div class="col-2 p-2 m-0 text-center">
         <span class="global-make-text-look-like-link" (click)="onChangeElevationUnits()">change</span>
       </div>

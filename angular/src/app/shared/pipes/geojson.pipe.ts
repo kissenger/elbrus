@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString } from 'src/app/shared/interfaces';
+import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString, TsCoordinate } from 'src/app/shared/interfaces';
 
 @Pipe({
   name: 'geojson'
@@ -13,6 +13,7 @@ import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString } fro
 export class GeoJsonPipe implements PipeTransform {
 
   transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', labels?: Array<string>): TsFeatureCollection {
+
 
     if ( labels ) {
       if ( coords.length !== labels.length ) {
@@ -37,6 +38,7 @@ export class GeoJsonPipe implements PipeTransform {
         }
         return getPointFeature(coord, `${index}`, text);
       });
+
 
       return getFeatureCollection(pointFeatures);
 

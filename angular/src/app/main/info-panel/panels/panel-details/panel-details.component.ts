@@ -1,17 +1,16 @@
 
-import { TsFeatureCollection } from './../../../../shared/interfaces';
-import { Component, OnInit, OnDestroy, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { ChartsService } from 'src/app/shared/services/charts-service';
-import { TsUnits, TsPathStats, TsFeature } from 'src/app/shared/interfaces';
+import { TsUnits, TsPathStats, TsFeature, TsFeatureCollection, TsPosition } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Color, Label } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
+import { UnitsConvertPipe } from 'src/app/shared/pipes/units-convert.pipe';
 
 @Component({
   selector: 'app-panel-details',
@@ -58,9 +57,10 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     private data: DataService,
     private httpService: HttpService,
     private router: Router,
-    private chartsService: ChartsService,
     private auth: AuthService,
-    private alert: AlertService
+    private alert: AlertService,
+    private unitConvertPipe: UnitsConvertPipe
+
   ) {}
 
   ngOnInit() {
@@ -75,6 +75,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.data.unitsUpdateEmitter.subscribe( () => {
+      this.units = this.auth.getUser().units;
+    });
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.pathListener = this.data.pathIdEmitter.subscribe( () => {
@@ -93,18 +96,16 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         this.isHills = false;
       }
 
-      // chartData = [ {data: }]
-
-      // this.geoJson.properties.params.cumDistance
-
-      // const xRaw = this.geoJson.properties.params.cumDistance;
       this.chartData = [];
 
       this.geoJson.features.forEach( (feature: TsFeature) => {
 
         const localData =  [];
         for (let i = 0; i < feature.properties.params.elev.length; i++) {
-          localData.push({x: feature.properties.params.cumDist[i]/1000, y: feature.properties.params.elev[i]});
+          localData.push({
+            x: this.unitConvertPipe.transform(feature.properties.params.cumDist[i], 'distance', this.units.distance),
+            y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
+          });
         }
         this.chartData.push({
           data: localData,
@@ -116,49 +117,32 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
           borderWidth: 1
         });
 
-    });
+      });
 
-    this.chartLabels = [];
-    this.chartOptions = {};
-    this.chartColors = [];
-    this.chartLegend = false;
+      console.log(this.chartData);
 
-    console.log(this.chartData);
+      this.chartLabels = [];
+      this.chartOptions = {
+      };
+      this.chartColors = [];
+      this.chartLegend = false;
 
-
-      //   const y = this.geoJson.properties.params.cumDistance.length - feature.properties.params.elev.length - x;
-      //   this.chartData.push( Array(x).fill(null).concat(feature.properties.params.elev).concat(Array(y).fill(null)) );
-      //   x += feature.properties.params.elev.length - 1;
-      //   this.colourArray.push(feature.properties.lineColour);
-      // });
-
-      /**
-       * TODO: This should be in a subroutine
-       * Calculate data to plot on chart - complex due to plotting hills in different colours
-       * Need one array for cumulative distance, and one array each for each subsequent segment on the chart, eg
-       *    [[x1, x2, x3, x4, x5, ....],
-       *     [e1, e2,   ,   ,   , ....],
-       *     [  ,   , e3, e4, e5, ....]]
-       * where x is cumDist, e is elevation point, and spaces are null points
-       */
-      // this.chartData = [this.geoJson.properties.params.cumDistance];
-      // this.colourArray = [];
-      // let x = 0;
-      // this.geoJson.features.forEach( feature => {
-      //   const y = this.geoJson.properties.params.cumDistance.length - feature.properties.params.elev.length - x;
-      //   this.chartData.push( Array(x).fill(null).concat(feature.properties.params.elev).concat(Array(y).fill(null)) );
-      //   x += feature.properties.params.elev.length - 1;
-      //   this.colourArray.push(feature.properties.lineColour);
-      // });
-
-      // this.chartsService.plotChart(document.getElementById('chart_div'), this.chartData, this.colourArray);
 
     });
 
-    this.data.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.auth.getUser().units;
-    });
 
+
+  }
+
+  onChartHover(e) {
+    const featureIndex = e.active[0]._datasetIndex;
+    const pointIndex = e.active[0]._index;
+    const lngLat = <TsPosition>this.geoJson.features[featureIndex].geometry.coordinates[pointIndex];
+    this.data.chartPointEmitter.emit([lngLat]);
+  }
+
+  onChartOut() {
+    this.data.chartPointEmitter.emit();
   }
 
   // ngAfterViewInit() {

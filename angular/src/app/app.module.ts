@@ -29,8 +29,8 @@ import { ProfileComponent } from './secondary/profile/profile.component';
 
 // Services
 import { HttpService } from './shared/services/http.service';
-import { MapService } from './shared/services/map.service';
 import { MapCreateService } from './shared/services/map-create.service';
+import { MapService } from './shared/services/map.service';
 import { AlertService } from './shared/services/alert.service';
 import { SpinnerService } from './shared/services/spinner.service';
 import { AuthService } from './shared/services/auth.service';
@@ -38,8 +38,9 @@ import { TokenInterceptorService } from './shared/services/token-interceptor.ser
 import { AuthGuard } from './auth.guard';
 
 // Pipes
-import { UnitPipe } from './shared/pipes/unit.pipe';
-import { UnitNamePipe } from './shared/pipes/unit-name.pipe';
+import { UnitsStringPipe } from './shared/pipes/units-string.pipe';
+import { UnitsShortNamePipe } from './shared/pipes/units-shortname.pipe';
+import { UnitsConvertPipe } from './shared/pipes/units-convert.pipe';
 import { GeoJsonPipe } from './shared/pipes/geojson.pipe';
 import { NamePipe } from './shared/pipes/name.pipe';
 import { AutoNamePipe } from './shared/pipes/auto-name.pipe';
@@ -55,10 +56,11 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     FooterComponent,
     InfoPanelComponent,
     MenuBarComponent,
-    UnitPipe,
+    UnitsStringPipe,
+    UnitsShortNamePipe,
+    UnitsConvertPipe,
     GeoJsonPipe,
     NamePipe,
-    UnitNamePipe,
     AutoNamePipe,
     ShortNamePipe,
     CoordsPipe,
@@ -84,16 +86,17 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
   ],
   providers: [
     HttpService,
-    MapService,
     MapCreateService,
+    MapService,
     AlertService,
     SpinnerService,
     AuthService,
     AuthGuard,
-    UnitPipe,
     GeoJsonPipe,
     NamePipe,
-    UnitNamePipe,
+    UnitsStringPipe,
+    UnitsShortNamePipe,
+    UnitsConvertPipe,
     AutoNamePipe,
     ShortNamePipe,
     CoordsPipe,

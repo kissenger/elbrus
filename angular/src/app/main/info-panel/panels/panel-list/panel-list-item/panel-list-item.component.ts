@@ -1,9 +1,6 @@
 import { Subscription } from 'rxjs';
-
-
 import { Component, OnInit, OnDestroy, Input} from '@angular/core';
 import * as globals from 'src/app/shared/globals';
-
 import { TsListItem, TsUnits } from 'src/app/shared/interfaces';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { DataService } from 'src/app/shared/services/data.service';

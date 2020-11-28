@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
@@ -160,9 +160,10 @@ export class MapService {
   }
 
 
-  public addPointsLayer(layerId: string, data?: TsFeatureCollection, ) {
+  public addPointsLayer(layerId: string) {
 
-    data = data ? data : this.geoJsonPipe.transform([], 'Point');
+    // if data is empty then use pipe to generate empty geoJson
+    const data = this.geoJsonPipe.transform([], 'Point');
 
     this.tsMap.addSource(layerId, {type: 'geojson', data } );
     this.tsMap.addLayer({
@@ -187,6 +188,14 @@ export class MapService {
 
   }
 
+  public addDataToLayer(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>) {
+    // if data is empty then use pipe to generate empty geoJson
+    console.log(data);
+    const _data = this.geoJsonPipe.transform(data, dataType);
+    console.log(_data);
+    (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);
+  }
+
 
   public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
 
@@ -207,6 +216,8 @@ export class MapService {
     });
 
   }
+
+  // public showPoint()
 
 
   public remove(pathId: string) {

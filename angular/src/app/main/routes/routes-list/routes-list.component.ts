@@ -1,3 +1,4 @@
+import { TsPosition } from 'src/app/shared/interfaces';
 /**
  * Listens for request from panel-list component, makes the backend request and uses
  * map-service to make the desired changes to the plot
@@ -11,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
-import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
 
 @Component({
   selector: 'app-routes',
@@ -23,6 +24,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
   private pathIdListener: Subscription;
   private httpListener: Subscription;
+  private chartPointListener: Subscription;
 
   constructor(
     private data: DataService,
@@ -47,8 +49,14 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       this.plotPath(urlParam, {}, {booEmit: true, booResizeView: true});
 
     } else {
-      this.map.newMap();
+      await this.map.newMap();
     }
+
+    // listen for coordinate from chart and plot on map
+    this.map.addPointsLayer('pointHighlighter');
+    this.chartPointListener = this.data.chartPointEmitter.subscribe( (coord: Array<TsPosition> = []) => {
+      this.map.addDataToLayer('pointHighlighter', 'Point', coord);
+    });
 
 
     this.pathIdListener = this.data.pathCommandEmitter.subscribe(
@@ -93,6 +101,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.pathIdListener) { this.pathIdListener.unsubscribe(); }
     if (this.httpListener) { this.httpListener.unsubscribe(); }
+    if (this.chartPointListener) { this.chartPointListener.unsubscribe(); }
   }
 
 }

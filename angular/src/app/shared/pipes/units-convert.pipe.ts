@@ -1,10 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'units'
+  name: 'unitConvert'
 })
 
-export class UnitPipe implements PipeTransform {
+export class UnitsConvertPipe implements PipeTransform {
 
   /**
    * @param value value to be piped
@@ -12,7 +12,12 @@ export class UnitPipe implements PipeTransform {
    * @param unitA can be km or mi for distance, or ft or m for elevation or lumpiness
    * @param unitB can be km or mi for lumpiness
    */
-  transform(value: number, type: 'distance' | 'elevation' | 'lumpiness', unitA: 'km' | 'mi' | 'ft' | 'm', unitB?: 'km' | 'mi'): string {
+  transform(
+      value: number,
+      type: 'distance' | 'elevation' | 'lumpiness',
+      unitA: 'km' | 'mi' | 'ft' | 'm',
+      unitB?: 'km' | 'mi'
+    ): number {
 
     const M_2_FT = 3.28084;
     const KM_2_MI = 0.62137;
@@ -24,40 +29,36 @@ export class UnitPipe implements PipeTransform {
       value /= 1000.0;
 
       if (unitA === 'km') {
-        return (value).toPrecision(3) + 'km';
+        return (value);
       } else if (unitA === 'mi') {
-        return (value * KM_2_MI).toPrecision(3) + 'mi';
+        return (value * KM_2_MI);
       }
 
     // if value is an elevation, baseline is meters
     } else if (type === 'elevation') {
       if (unitA === 'm') {
-        return value.toFixed(0) + 'm';
+        return value;
       } else if (unitA === 'ft') {
-        return (value * M_2_FT).toFixed(0) + 'ft';
+        return (value * M_2_FT);
       }
 
     // if value is a lumpiness (elevation/height), baseline is m/km
     } else if (type === 'lumpiness') {
 
-
-      // work out what output units should be
-      const unitString = unitA + '/' + unitB;
-
       // check for divide by 0 error
-      if (isNaN(value)) { return '0' + unitString; }
+      if (isNaN(value)) { return 0; }
 
       if (unitA === 'm') {
         if (unitB === 'km' ) {
-          return value.toFixed(0) + unitString;
+          return value;
         } else if (unitB === 'mi') {
-          return (value / KM_2_MI).toFixed(0) + unitString;
+          return value / KM_2_MI;
         }
       } else if (unitA === 'ft') {
         if (unitB === 'km' ) {
-          return (value * M_2_FT).toFixed(0) + unitString;
+          return value * M_2_FT;
         } else if (unitB === 'mi') {
-          return (value * M_2_FT / KM_2_MI).toFixed(0) + unitString;
+          return value * M_2_FT / KM_2_MI;
         }
       }
     }
