@@ -1,10 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'unitsShortName'
+  name: 'unitsLongName'
 })
 
-export class UnitsShortNamePipe implements PipeTransform {
+export class UnitsLongNamePipe implements PipeTransform {
 
   transform(shortName: string): string {
 

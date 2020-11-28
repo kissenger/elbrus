@@ -178,7 +178,7 @@ export interface TsParams {
     time: number[];
     heartRate: number[];
     cadence: number[];
-    cumDist: number[];
+    cumDistance: number[];
     matchedPoints?: number[][]; /// used for debugging route algorthims on the back end
 }
 

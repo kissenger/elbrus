@@ -185,7 +185,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
         command: 'add',
         id: idFromClick,
         colour: this.highlightColours.shift(),
-        emit: Object.keys(this.selectedPaths).length + 1 === 1
+        emit: Object.keys(this.selectedPaths).length + 1 === 1,
+        resize: Object.keys(this.selectedPaths).length + 1 === 1,
       };
 
       await this.updateMap(command);

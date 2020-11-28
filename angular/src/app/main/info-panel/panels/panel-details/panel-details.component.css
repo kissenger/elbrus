@@ -12,22 +12,11 @@
   cursor: default;
 }
 
-.table thead tr th, .table tbody tr td {
-  height: 10px;
-  border: none;
-  padding: 0px;
-  margin: 0px;
-  /* margin-top: 0px; */
- }
-/*
-.table tbody tr {
-  height: 10px;
-} */
-
-/* .outer {
-  border: 1px blue solid;
+.maximised-container {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  overflow: auto;
 }
-
-.buttons {
-  border: 1px green dashed;
-} */

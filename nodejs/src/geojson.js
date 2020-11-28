@@ -165,7 +165,7 @@ class GeoJSON {
         lineWidth: 5,
         lineOpacity: 0.5,
         params: {
-          cumDist: cumd,
+          cumDistance: cumd,
           elev: elevs
         }
       }

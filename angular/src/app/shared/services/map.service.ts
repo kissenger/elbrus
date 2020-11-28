@@ -177,8 +177,8 @@ export class MapService {
       type: 'circle',
       source: layerId,
       paint: {
-        'circle-radius': 4,
-        'circle-opacity': 0.5,
+        'circle-radius': 8,
+        'circle-opacity': 0.3,
         'circle-stroke-width': 1,
         'circle-color':
           [ 'case',

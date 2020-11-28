@@ -5,12 +5,14 @@ import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsPathStats, TsFeature, TsFeatureCollection, TsPosition } from 'src/app/shared/interfaces';
+import { TsUnits, TsFeature, TsFeatureCollection, TsPosition } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Color, Label } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
+import 'chartjs-plugin-zoom';
 import { UnitsConvertPipe } from 'src/app/shared/pipes/units-convert.pipe';
+import { UnitsLongNamePipe } from 'src/app/shared/pipes/units-longname.pipe';
 
 @Component({
   selector: 'app-panel-details',
@@ -21,35 +23,30 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   // local variables
   @Input() callingPage = 'list';
+
+  // listeners
   private pathListener: Subscription;
+  private minimisePanelListener: Subscription;
 
   /* panel is minimised for thinner screens; also happens in info-panel component so changes need to be reflected there also */
   public isMinimised = window.innerWidth < 900 ? true : false;
-  private minimisePanelSubscription: Subscription;
 
+  // charting variables
   public chartData: ChartDataSets[] = [];
-  chartLabels: Label[] = [];
-  chartOptions: ChartOptions = {};
-  chartColors: Color[] = [];
-  chartLegend = false;
+  public chartLabels: Label[] = [];
+  public chartOptions: ChartOptions = {};
+  public chartColors: Color[] = [];
+  public chartLegend = false;
 
-
-  private colourArray: Array<string>;
+  // geoJson variables
   public geoJson: TsFeatureCollection;
-
   public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
   public givenPathName: string;     // name given to the path in the details form; overrides the default nam
   public pathDescription = '';
-  public isLong: boolean;
-  public isPublic: boolean;
-  public createdBy: string;
   public isElevations: boolean;
-  public isHills: boolean;
   public isData = false;
   public units: TsUnits;
-  public pathCategory: string;
   public pathType: string;
-  public pathStats: TsPathStats = globals.emptyStats;
   public pathDirection: string;
   public nRoutes = 0;
 
@@ -59,7 +56,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private auth: AuthService,
     private alert: AlertService,
-    private unitConvertPipe: UnitsConvertPipe
+    private unitConvertPipe: UnitsConvertPipe,
+    private unitLongNamePipe: UnitsLongNamePipe
 
   ) {}
 
@@ -68,7 +66,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
 
     // subscribe to any changes in the minimised status of the panel
-    this.minimisePanelSubscription = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
+    this.minimisePanelListener = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
       this.isMinimised = minimise;
       if (this.isMinimised) {
         this.nRoutes = this.data.get('nRoutes', false);
@@ -83,19 +81,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
       this.geoJson = this.data.get('activePath', false);
-
-      // note this is a boolean to tell tempplate whether there is data to display or not
       this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
-
-      this.isLong = this.geoJson.properties.info.isLong;
-      this.isElevations = this.geoJson.properties.info.isElevations && !this.isLong;
-      console.log(this.isElevations);
-      if (this.pathStats.hills) {
-        this.isHills = this.pathStats.hills.length > 0;
-      } else {
-        this.isHills = false;
-      }
-
+      this.isElevations = this.geoJson.properties.info.isElevations && !this.geoJson.properties.info.isLong;
       this.chartData = [];
 
       this.geoJson.features.forEach( (feature: TsFeature) => {
@@ -103,75 +90,22 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         const localData =  [];
         for (let i = 0; i < feature.properties.params.elev.length; i++) {
           localData.push({
-            x: this.unitConvertPipe.transform(feature.properties.params.cumDist[i], 'distance', this.units.distance),
+            x: this.unitConvertPipe.transform(feature.properties.params.cumDistance[i], 'distance', this.units.distance),
             y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
           });
         }
+
         this.chartData.push({
           data: localData,
-          showLine: true,
-          lineTension: 0,
-          pointRadius: 0,
-          fill: false,
           borderColor: feature.properties.lineColour,
-          borderWidth: 1
+          ...this.localChartOptions
         });
 
       });
 
-      console.log(this.chartData);
-
-      this.chartLabels = [];
-      this.chartOptions = {
-        layout: {
-          padding: {
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0
-          }
-        },
-        scales: {
-          xAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: this.units.distance,
-              lineHeight: 0.8,
-              padding: 0
-            }
-          }],
-          yAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: this.units.elevation,
-              lineHeight: 0.8,
-              padding: 0
-            }
-          }]
-        },
-        tooltips: {
-          displayColors: false,
-          mode: 'nearest',
-          intersect: true,
-          callbacks: {
-            label: (tooltipItems) => {
-              return [
-                'distance: ' + tooltipItems.xLabel + this.units.distance,
-                'elevation: ' + tooltipItems.yLabel + this.units.elevation,
-                '(Click to fly to point)',
-              ];
-            }
-          }
-
-        }
-      };
-      this.chartColors = [];
+      this.chartOptions = this.globalChartOptions;
       this.chartLegend = false;
-
-
     });
-
-
 
   }
 
@@ -193,19 +127,87 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.data.chartPointEmitter.emit({action: 'show', point: []});
   }
 
-  // ngAfterViewInit() {
+  get localChartOptions() {
+    return {
+      showLine: true,
+      lineTension: 0,
+      pointRadius: 8,
+      pointBackgroundColor: 'rgba(0, 0, 0, 0)',
+      pointBorderColor: 'rgba(0, 0, 0, 0)',
+      pointHoverBackgroundColor: 'rgba(0,0,0,0.3)',
+      pointHoverBorderColor: 'rgba(0,0,0,0.8)',
+      fill: false,
+      borderWidth: 1
+    };
+  }
+
+  get globalChartOptions() {
+    return {
+      title: {
+        display: false,
+        text: 'Elevation Profile',
+        fontStyle: 'normal'
+      },
+      scales: {
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: this.unitLongNamePipe.transform(this.units.distance),
+            lineHeight: 0.8,
+            padding: 0,
+            fontSize: 12
+          },
+          ticks: {
+            fontSize: 10
+          }
+        }],
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: this.unitLongNamePipe.transform(this.units.elevation),
+            lineHeight: 1.0,
+            padding: 0,
+            fontSize: 12
+          },
+          ticks: {
+            fontSize: 10
+          }
+        }]
+      },
+      tooltips: {
+        displayColors: false,
+        // mode: 'nearest',
+        intersect: true,
+        callbacks: {
+          label: (tooltipItems) => {
+            return [
+              'distance: ' + tooltipItems.xLabel + this.units.distance,
+              'elevation: ' + tooltipItems.yLabel + this.units.elevation,
+              '(Click to fly to point)',
+            ];
+          }
+        }
+      },
+      plugins: {
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x'
+          },
+          zoom: {
+            enabled: true,
+            mode: 'x'
+          }
+        }
+      }
+    };
+  }
 
 
-  //   const canvas = <HTMLCanvasElement> document.getElementById('chart_div');
-  //   let elevationChart = new Chart(canvas.getContext('2d'), {
-  //     type: 'line',
-  //     data: [{x: 1, y: 2}];
-  // });
-  // }
 
+  // FORM BUTTONS
 
   onSave() {
-
 
     // activePath is stored from two locations - both are full geoJSON descriptions of the path:
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
@@ -213,10 +215,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     const newPath = this.data.get('activePath', false);
     const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
 
-
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     // if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
-    console.log(this.callingPage);
     if ( this.callingPage === 'create' || this.callingPage === 'edit' ) {
 
       const sendObj = {
@@ -228,32 +228,11 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       };
 
       this.httpService.saveRoute( sendObj ).subscribe( () => {
-
         this.router.navigate(['/route/list/']);
-
       }, (error) => {
-
-        this.alert
-          .showAsElement('Something went wrong :(', error, true, false)
-          .subscribe( () => {} );
-
+        this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {} );
       });
 
-    // } else if ( this.callingPage === 'edit' ) {
-
-    //     this.httpService.updateEditedRoute( getSendObj() ).subscribe( () => {
-
-    //       this.router.navigate(['/route/list/']);
-
-    //     }, (error) => {
-
-    //       this.alert
-    //         .showAsElement('Something went wrong :(', error, true, false)
-    //         .subscribe( () => {} );
-
-    //     });
-
-    // imported file, backend only needs to knw the pathType, pathId, name and description, so create theis object and call http
     } else {
 
       const sendObj = {
@@ -262,42 +241,22 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         name: pathName,
         description: this.pathDescription
       };
-      this.httpService.saveImportedPath(sendObj).subscribe( () => {
-        this.router.navigate(['/route/list/']);
-      });
+      this.httpService.saveImportedPath(sendObj).subscribe( () => {this.router.navigate(['/route/list/']); });
     }
-
-    // const getSendObj = () => {
-
-    //   return {
-    //     pathId: newPath.properties.pathId,
-    //     coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
-    //     elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),
-    //     name: pathName,
-    //     description: this.pathDescription
-    //   };
-
-    // }
 
   }
 
   onCancel() {
     this.router.navigate(['/route/list/']);
-
   }
-  // onClick() {
-  //   this.isMinimised = !this.isMinimised;
-  //   this.icon = this.isMinimised ? '+' : '-';
-  // }
 
+
+
+  // TIDY UP
 
   ngOnDestroy() {
-    this.pathListener.unsubscribe();
-    this.minimisePanelSubscription.unsubscribe();
-
-    // this.httpService.flushDatabase().subscribe( () => {
-    //   console.log('db flushed');
-    // });
+    if (this.pathListener) { this.pathListener.unsubscribe(); }
+    if (this.minimisePanelListener) { this.minimisePanelListener.unsubscribe(); }
   }
 
 }

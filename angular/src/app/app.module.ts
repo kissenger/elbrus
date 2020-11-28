@@ -39,7 +39,7 @@ import { AuthGuard } from './auth.guard';
 
 // Pipes
 import { UnitsStringPipe } from './shared/pipes/units-string.pipe';
-import { UnitsShortNamePipe } from './shared/pipes/units-shortname.pipe';
+import { UnitsLongNamePipe } from './shared/pipes/units-longname.pipe';
 import { UnitsConvertPipe } from './shared/pipes/units-convert.pipe';
 import { GeoJsonPipe } from './shared/pipes/geojson.pipe';
 import { NamePipe } from './shared/pipes/name.pipe';
@@ -57,7 +57,7 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     InfoPanelComponent,
     MenuBarComponent,
     UnitsStringPipe,
-    UnitsShortNamePipe,
+    UnitsLongNamePipe,
     UnitsConvertPipe,
     GeoJsonPipe,
     NamePipe,
@@ -95,7 +95,7 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     GeoJsonPipe,
     NamePipe,
     UnitsStringPipe,
-    UnitsShortNamePipe,
+    UnitsLongNamePipe,
     UnitsConvertPipe,
     AutoNamePipe,
     ShortNamePipe,

@@ -31,6 +31,7 @@
     "babel-runtime": "^6.26.0",
     "bootstrap": "^4.5.3",
     "chart.js": "^2.9.4",
+    "chartjs-plugin-zoom": "^0.7.7",
     "core-js": "^3.7.0",
     "debug": "^4.3.1",
     "document-register-element": "^1.14.10",

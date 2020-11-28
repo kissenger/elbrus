@@ -64,10 +64,10 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
 
     this.pathIdListener = this.data.pathCommandEmitter.subscribe(
-      async ( request: {command?: string, id?: string, colour?: string, emit?: boolean} ) => {
+      async ( request: {command?: string, id?: string, colour?: string, emit: false, resize: false} ) => {
 
         if ( request.command === 'add' ) {
-          await this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit} );
+          await this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
 
         } else if ( request.command === 'rem' ) {
           await this.map.remove(request.id);
