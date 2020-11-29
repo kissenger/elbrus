@@ -15,11 +15,11 @@ body {
   --ts-grey-background: whitesmoke;
 }
 
-.global-make-text-look-like-link{
+.text-like-link{
   cursor: pointer;
   color: #007BFF;
 }
-.global-make-text-look-like-link:hover{
+.text-like-link:hover{
   text-decoration: underline;
   color: #0056B3;
   cursor: pointer;

@@ -118,7 +118,8 @@ export class MapCreateService extends MapService {
 
     } catch (error) {
 
-      this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});;
 
     }
   }
@@ -239,7 +240,8 @@ export class MapCreateService extends MapService {
       this.updateMap();
 
     } catch (error) {
-      this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
     }
 
     this.spinner.removeElement();
@@ -299,7 +301,8 @@ export class MapCreateService extends MapService {
         this.updateMap();
 
       } catch (error) {
-        this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
+        console.log(error);
+        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       }
 
       this.spinner.removeElement();
@@ -353,7 +356,8 @@ export class MapCreateService extends MapService {
       this.tsMap.removeFeatureState( {source: '0000pts'} );
 
     } catch (error) {
-      this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
     }
 
     this.spinner.removeElement();
@@ -432,7 +436,8 @@ export class MapCreateService extends MapService {
         }
 
       } catch (error) {
-        this.alert.showAsElement('something went wrong :(', error, true, false).subscribe( () => {});
+        console.log(error);
+        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       }
 
       this.history.add( new Path(backendResult) );

@@ -128,13 +128,13 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       this.httpListener = this.http.getPathById('route', pathId).subscribe( async (result) => {
 
         await this.map.add(result.hills, style, options );
-        // this.spinner.removeElement();
         resolve();
 
       }, (error) => {
-        // this.spinner.removeElement();
         reject();
-        this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {} );
+        console.log(error);
+        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+
       });
 
     });

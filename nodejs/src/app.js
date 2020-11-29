@@ -273,7 +273,7 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, as
       }
     ]);
     
-    let count;
+    let count; 
     try {
       count = docs[0].count[0].count;
     } catch {

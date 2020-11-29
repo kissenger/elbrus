@@ -105,45 +105,43 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList(protectedPaths: TsListArray = null) {
 
-      // this.spinner.showAsElement();
-      this.isLoading = true;
+    this.isLoading = true;
 
-      // stop listening to previous requests if they are still active
-      // TODO: send a cencellation request to to the backend process
-      if (this.listListener) {
-        this.listListener.unsubscribe();
-      }
+    // stop listening to previous requests if they are still active
+    // TODO: send a cencellation request to to the backend process
+    if (this.listListener) {
+      this.listListener.unsubscribe();
+    }
 
-      this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
-        .subscribe( result => {
+    this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
+      .subscribe( result => {
 
-          // get a full list of existing and backend results
-          const backendList = result.list;
-          const count = result.count;
-          const temp = protectedPaths ? protectedPaths : this.listItems;
-          const fullList = [...temp, ...backendList];
+        // get a full list of existing and backend results
+        const backendList = result.list;
+        const count = result.count;
+        const temp = protectedPaths ? protectedPaths : this.listItems;
+        const fullList = [...temp, ...backendList];
 
-          // filter out duplicates
-          const fullListPathIds = fullList.map( item => item.pathId );
-          const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
-          this.listItems = filteredList;
+        // filter out duplicates
+        const fullListPathIds = fullList.map( item => item.pathId );
+        const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
+        this.listItems = filteredList;
 
-          // work out the numbers
-          this.nRoutesInView = count - backendList.length - (this.offset * this.nRoutesToLoad)  + filteredList.length;
-          this.nLoadedRoutes = this.listItems.length;
-          this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
+        // work out the numbers
+        this.nRoutesInView = count - backendList.length - (this.offset * this.nRoutesToLoad)  + filteredList.length;
+        this.nLoadedRoutes = this.listItems.length;
+        this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
 
-          // we we can determine whether the listener is still active, used above
-          this.listListener = undefined;
-          this.isLoading = false;
-
-
-      }, (error) => {
-
+        // we we can determine whether the listener is still active, used above
+        this.listListener = undefined;
         this.isLoading = false;
-        this.alert.showAsElement('Something went wrong :(', error, true, false)
-          .subscribe( () => {});
-      });
+
+
+    }, (error) => {
+      this.isLoading = false;
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+    });
 
   }
 

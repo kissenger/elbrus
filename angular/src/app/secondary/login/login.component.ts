@@ -61,7 +61,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     } catch (error) {
 
-      this.alert.showAsElement('Something went wrong :(', error + ': ' + error, true, false).subscribe( () => {});
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
 
     }
 
@@ -93,12 +94,12 @@ export class LoginComponent implements OnInit, OnDestroy {
       };
 
       try {
-
         await this.auth.register(user);
         this.router.navigate(['route/list']);
 
       } catch (error) {
-        this.alert.showAsElement('Something went wrong :(', error + ': ' + error, true, false).subscribe( () => {});
+        console.log(error);
+        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       }
 
     }

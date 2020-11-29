@@ -230,7 +230,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       this.httpService.saveRoute( sendObj ).subscribe( () => {
         this.router.navigate(['/route/list/']);
       }, (error) => {
-        this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {} );
+        console.log(error);
+        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       });
 
     } else {

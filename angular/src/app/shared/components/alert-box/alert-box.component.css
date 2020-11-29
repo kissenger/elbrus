@@ -9,3 +9,10 @@
   margin-left: -150px;
   /* border-radius: 5px; */
 }
+
+.text-box {
+  overflow-wrap: normal;
+  word-wrap: break-word;
+  overflow-y: auto;
+
+}

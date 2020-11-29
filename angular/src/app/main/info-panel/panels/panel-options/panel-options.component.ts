@@ -30,7 +30,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     private data: DataService,
     private alert: AlertService,
     private spinner: SpinnerService,
-    private auth: AuthService
+    public auth: AuthService
   ) {}
 
   ngOnInit() {
@@ -98,15 +98,16 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   }
 
-  isLoggedIn() {
-    return !!this.auth.getUser();
-  }
-
 
   // Show option to toggle public/private its its a private path, or if its public and created by this user
   allowMakePrivate() {
     // return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
     return !this.isPathPublic || this.createdBy === this.auth.getUser();
+  }
+
+  allowCopy() {
+    // return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
+    return !this.isPathPublic;
   }
 
 
@@ -197,12 +198,11 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
       this.router.navigate(['route/review/']);
 
     }, (error) => {
-      this.alert.showAsElement('Something went wrong :(', error.status + ': ' + error.error, true, false).subscribe( () => {
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name}`, error.message, true, false).subscribe( () => {} );
         // reset the form otherwise if you do the same action again, the change event wont fire
         (<HTMLFormElement>document.getElementById('file_form')).reset();
         this.spinner.removeElement();
-      });
-
     });
 
   }

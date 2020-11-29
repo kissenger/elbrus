@@ -21,7 +21,7 @@
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Home Location</div>
       <div class="col-4 p-2 m-0 text-left"> {{user.homeLngLat | coords}}</div>
       <div class="col-2 p-2 m-0 text-center">
-        <span class="global-make-text-look-like-link" (click)="onChangeLocation()">change</span>
+        <span class="text-like-link" (click)="onChangeLocation()">change</span>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Distance</div>
       <div class="col-4 p-2 m-0 text-left"> {{ user.units.distance | unitsLongName }}</div>
       <div class="col-2 p-2 m-0 pr-3text-center">
-        <span class="global-make-text-look-like-link" (click)="onChangeDistanceUnits()">change</span>
+        <span class="text-like-link" (click)="onChangeDistanceUnits()">change</span>
       </div>
     </div>
 
@@ -50,7 +50,7 @@
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Elevation</div>
       <div class="col-4 p-2 m-0 text-left"> {{ user.units.elevation | unitsLongName }}</div>
       <div class="col-2 p-2 m-0 text-center">
-        <span class="global-make-text-look-like-link" (click)="onChangeElevationUnits()">change</span>
+        <span class="text-like-link" (click)="onChangeElevationUnits()">change</span>
       </div>
     </div>
 

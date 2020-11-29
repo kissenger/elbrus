@@ -92,10 +92,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         resolve(true);
       },
 
-      (err) => {
+      (error) => {
         this.spinner.removeElement();
-        this.alert.showAsElement('Something went wrong!', 'Could not update user data: ' + err.message, true, false)
-          .subscribe( () => {});
+        console.log(error);
+        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
         resolve(false);
       });
     });

@@ -23,7 +23,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
 
   onGuestClick() {
     this.auth.login('guest', null);
-    this.router.navigate(['/']);
+    this.router.navigate(['routes/list']);
   }
 
   onLoginClick() {
