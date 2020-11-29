@@ -280,7 +280,7 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, as
       count = 0;
     }   
 
-    // console.log(getListData(docs[0].list), count, req.params.limit * req.params.offset);
+    debugMsg(`/api/get-list: found routes`);
     res.status(201).json( {list: getListData(docs[0].list), count} );
 
 })

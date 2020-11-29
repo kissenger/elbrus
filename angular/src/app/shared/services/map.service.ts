@@ -166,7 +166,7 @@ export class MapService {
   }
 
 
-  public addPointsLayer(layerId: string) {
+  public addPointsLayer(layerId: string, layerPaint: {}) {
 
     // if data is empty then use pipe to generate empty geoJson
     const data = this.geoJsonPipe.transform([], 'Point');
@@ -176,19 +176,20 @@ export class MapService {
       id: layerId,
       type: 'circle',
       source: layerId,
-      paint: {
-        'circle-radius': 8,
-        'circle-opacity': 0.3,
-        'circle-stroke-width': 1,
-        'circle-color':
-          [ 'case',
-            ['boolean', ['feature-state', 'enabled'], false ],
-            'blue',
-            ['boolean', ['feature-state', 'hover'], false ],
-            'black',
-            'white'
-          ]
-      }
+      paint: layerPaint
+      // paint: {
+      //   'circle-radius': 8,
+      //   'circle-opacity': 0.3,
+      //   'circle-stroke-width': 1,
+      //   'circle-color':
+      //     [ 'case',
+      //       ['boolean', ['feature-state', 'enabled'], false ],
+      //       'blue',
+      //       ['boolean', ['feature-state', 'hover'], false ],
+      //       'black',
+      //       'white'
+      //     ]
+      // }
 
     });
 

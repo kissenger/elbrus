@@ -28,10 +28,12 @@ const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes lo
 
 export class PanelListComponent implements OnInit, OnDestroy {
 
-  private getListListener: Subscription;
+  private listListener: Subscription;
   private mapUpdateListener: Subscription;
   private newDataListener: Subscription;
   private newPathListener: Subscription;
+
+  public isLoading = false;
 
   // keep track of the routes user has selected
   public nSelectedRoutes = 0;
@@ -85,6 +87,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // subscribe to change in map view
     this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
+      console.log(this.mapUpdateListener);
       this.boundingBox = bounds;
       this.offset = 0;
       const selectedPaths = this.listItems.filter(listItem => listItem.pathId in this.selectedPaths);
@@ -102,9 +105,16 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList(protectedPaths: TsListArray = null) {
 
-      this.spinner.showAsElement();
+      // this.spinner.showAsElement();
+      this.isLoading = true;
 
-      this.getListListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
+      // stop listening to previous requests if they are still active
+      // TODO: send a cencellation request to to the backend process
+      if (this.listListener) {
+        this.listListener.unsubscribe();
+      }
+
+      this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
         .subscribe( result => {
 
           // get a full list of existing and backend results
@@ -122,11 +132,15 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.nRoutesInView = count - backendList.length - (this.offset * this.nRoutesToLoad)  + filteredList.length;
           this.nLoadedRoutes = this.listItems.length;
           this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
-          this.spinner.removeElement();
+
+          // we we can determine whether the listener is still active, used above
+          this.listListener = undefined;
+          this.isLoading = false;
+
 
       }, (error) => {
 
-        this.spinner.removeElement();
+        this.isLoading = false;
         this.alert.showAsElement('Something went wrong :(', error, true, false)
           .subscribe( () => {});
       });
@@ -279,7 +293,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
    * Actions to do when component is destroyed
    */
   ngOnDestroy() {
-    if (this.getListListener) { this.getListListener.unsubscribe(); }
+    if (this.listListener) { this.listListener.unsubscribe(); }
     if (this.mapUpdateListener) { this.mapUpdateListener.unsubscribe(); }
     if (this.newDataListener) { this.newDataListener.unsubscribe(); }
   }

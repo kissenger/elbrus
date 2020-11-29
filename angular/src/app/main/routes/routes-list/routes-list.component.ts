@@ -41,6 +41,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.map.isMap()) { this.map.kill(); }
 
+
     // look for a path id in the url
     const urlParam = this.router.url.split('/').slice(-1)[0];
     if ( urlParam.length > 10 ) {
@@ -52,8 +53,28 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       await this.map.newMap();
     }
 
+    // get device location
+    this.map.addPointsLayer('deviceLocation', {
+      'circle-radius': 4,
+      'circle-opacity': 1,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#523209',
+      'circle-color': '#83964B',
+    });
+    const id = navigator.geolocation.watchPosition((pos) => {
+      const loc: TsPosition = [pos.coords.longitude, pos.coords.latitude];
+      this.map.addDataToLayer('deviceLocation', 'Point', [loc]);
+      console.log(pos.coords.latitude, pos.coords.longitude);
+    },
+    (error) => {}, {});
+
     // listen for coordinate from chart and plot on map
-    this.map.addPointsLayer('pointHighlighter');
+    this.map.addPointsLayer('pointHighlighter', {
+      'circle-radius': 8,
+      'circle-opacity': 0.3,
+      'circle-stroke-width': 1,
+      'circle-color': '#FF0000',
+    });
     this.chartPointListener = this.data.chartPointEmitter.subscribe( (data) => {
       if (data.action === 'show') {
         this.map.addDataToLayer('pointHighlighter', 'Point', data.point);
@@ -63,6 +84,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
 
 
+    // listen for command from panel-list asking for map changes
     this.pathIdListener = this.data.pathCommandEmitter.subscribe(
       async ( request: {command?: string, id?: string, colour?: string, emit: false, resize: false} ) => {
 
@@ -80,20 +102,37 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
   }
 
+  // getPosition(): Promise<any> {
+
+  //   return new Promise((resolve, reject) => {
+
+  //     navigator.geolocation.getCurrentPosition(resp => {
+
+  //         resolve(<TsCoordinate>{lng: resp.coords.longitude, lat: resp.coords.latitude});
+  //       },
+  //       err => {
+  //         reject(err);
+  //       });
+  //   });
+
+  // }
+
+
+
   /** get a path id from the backend and get it plotted on the map */
   plotPath(pathId: string, style: TsLineStyle, options: TsPlotPathOptions) {
 
     return new Promise( (resolve, reject) => {
 
-      this.spinner.showAsElement();
+      // this.spinner.showAsElement();
       this.httpListener = this.http.getPathById('route', pathId).subscribe( async (result) => {
 
         await this.map.add(result.hills, style, options );
-        this.spinner.removeElement();
+        // this.spinner.removeElement();
         resolve();
 
       }, (error) => {
-        this.spinner.removeElement();
+        // this.spinner.removeElement();
         reject();
         this.alert.showAsElement('Something went wrong :(', error, true, false).subscribe( () => {} );
       });
@@ -101,6 +140,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
 
   }
+
+
 
   ngOnDestroy() {
     if (this.pathIdListener) { this.pathIdListener.unsubscribe(); }

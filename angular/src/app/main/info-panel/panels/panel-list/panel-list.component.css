@@ -1,5 +1,8 @@
+/* div {
+  border: 1px blue solid;
 
-
+}
+ */
 
 .name {
   font-size: small;
@@ -31,6 +34,22 @@
 
 .custom-select:focus {
   box-shadow: none;
+}
+
+.spinner-outer {
+  /* border: 1px red solid; */
+  position: absolute;
+  background: rgba(255,255,255,0.3);
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+
+.spinner-inner {
+  position: relative;
+  top: 30%;
+  left: 45%;
 }
 
 
