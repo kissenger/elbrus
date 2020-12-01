@@ -20,11 +20,14 @@
   background-color: white;
   border: none;
 }
+
 .btn-light:hover {
   background-color: rgb(218, 224, 229);
 }
 
-
+.clicky-btn:hover  {
+    opacity: 1.0;
+}
 
 .radio-btns  {
     border-radius: none;
@@ -33,6 +36,12 @@
 .radio-btns:hover  {
     opacity: 1.0;
 }
+
+
+/* Remove border effect from bootstrap btn */
+.btn-light:focus, .btn-light.focus {
+    box-shadow: none;
+  }
 
 
 

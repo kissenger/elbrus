@@ -20,7 +20,7 @@
     (click)="map.clear()"
     type="button"
     class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Undo All</small>
+    <small>Clear</small>
   </button>
 
   <button
@@ -54,22 +54,24 @@
     <small>Fit view</small>
   </button>
 
-  <div class="w-100 p-1 pt-3">
-    <div class="w-100 px-1 border-bottom">
-      Options
+  <div *ngIf="callingPage!=='list'" class="w-100">
+    <div class="w-100 p-1 pt-3">
+      <div class="w-100 px-1 border-bottom">
+        Options
+      </div>
     </div>
-  </div>
 
-  <div *ngIf="callingPage!=='list'" class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
-    <label (click)="onChangeOptions({snapProfile: 'driving'})" class="btn btn-light btn-sm active radio-btns text-left p-0 pl-2 rounded-0">
-      <input type="radio" name="options" id="roads" autocomplete="off" checked> <small>Follow Roads</small>
-    </label>
-    <label (click)="onChangeOptions({snapProfile: 'walking'})" class="btn btn-light btn-sm text-left p-0 pl-2 rounded-0">
-      <input type="radio" name="options" id="paths" autocomplete="off"> <Small>Follow Paths</Small>
-    </label>
-    <label (click)="onChangeOptions({snapProfile: 'none'})" class="btn btn-light btn-sm text-left p-0 pl-2 rounded-0">
-      <input type="radio" name="options" id="none" autocomplete="off"> <Small> Don't Follow</Small>
-    </label>
+    <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
+      <label (click)="onChangeOptions({snapProfile: 'driving'})" class="btn btn-light btn-sm active radio-btns text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="options" id="roads" autocomplete="off" checked> <small>Follow Roads</small>
+      </label>
+      <label (click)="onChangeOptions({snapProfile: 'walking'})" class="btn btn-light btn-sm text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="options" id="paths" autocomplete="off"> <Small>Follow Paths</Small>
+      </label>
+      <label (click)="onChangeOptions({snapProfile: 'none'})" class="btn btn-light btn-sm text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="options" id="none" autocomplete="off"> <Small> Don't Follow</Small>
+      </label>
+    </div>
   </div>
 
 </div>

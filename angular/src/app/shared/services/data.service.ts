@@ -20,7 +20,6 @@ export class DataService {
    * Collection of variables and methods to enable emission, storage and retrieval of the
    * CREATED OR IMPORTED PATHS BEFORE RECALL FROM DB
    */
-  public menuClickEmitter = new EventEmitter();           // from map service to info panel
   public pathStatsEmitter = new EventEmitter();           // from map-create to panel-create-detail
   public activeTabEmitter = new EventEmitter();           // from map service to info panel
   public loginUserEmitter = new EventEmitter();           // from login to header

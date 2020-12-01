@@ -35,47 +35,16 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     ) { }
 
   ngOnInit() {
-    // this.router.navigate(['/route/list']);
-    // centre map on the currently loading route if it exists, otherwise take users home location
-    // mapview is set by map.service
-
-    // const mapView = this.data.getFromStore('mapView', true);
-    // let startPosition: TsCoordinate;
-    // let startZoom: number;
-
-    // if ( !mapView ) {
-    //   this.map.clear();
-    //   this.router.navigate(['/route/list']);
-    // } else {
-    //   startPosition = mapView ? mapView.centre : <TsCoordinate>{lat: -999, lng: -999};
-    //   startZoom = mapView ? mapView.zoom : globals.defaultMapView.zoom;
-    // }
 
     this.callingPageListener = this.activatedRoute.data.subscribe( data => {
       this.callingPage = data.callingPage;
     });
 
     // initialise the map and launch createroute
-    // this.map.newMap(startPosition, startZoom).then( () => {
     this.map.newMap().then( () => {
       this.map.createRoute();
     });
 
-    // listen for menu commands
-    // this.menuListener = this.data.menuClickEmitter.subscribe( (fromMenu) => {
-    //   if (fromMenu.command) {
-    //     if (fromMenu.command === 'undo') { this.map.undo(); }
-    //     if (fromMenu.command === 'close') { this.map.closePath(); }
-    //     if (fromMenu.command === 'clear') { this.map.undoAll(); }
-    //     if (fromMenu.command === 'reverse') { this.map.reversePath(); }
-    //     if (fromMenu.command === 'simplify') { this.map.simplify(); }
-    //     if (fromMenu.command === 'fit') { this.map.fitView(); }
-
-    //   } else {
-    //     const optionKey = Object.keys(fromMenu.option)[0];
-    //     this.map.options = fromMenu.option[optionKey];
-    //   }
-    // });
 
     // listen for pathID emission from panel-routes-list-list, and get the path from the backend
     // TODO: I **think** this can be refactored to remove needing to search through the overlaidPaths,
