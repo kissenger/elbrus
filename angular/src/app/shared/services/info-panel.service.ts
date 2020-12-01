@@ -39,6 +39,9 @@ export class InfoPanelService {
           name: 'details',
           component: PanelDetailsComponent },
         { active: false,
+          name: 'overlays',
+          component: PanelListComponent },
+        { active: false,
           name: 'options',
           component: PanelOptionsComponent } ]
   };

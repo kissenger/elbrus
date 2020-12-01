@@ -21,6 +21,7 @@ export class PanelsInjectorComponent implements OnInit {
     const factory = this.factoryResolver.resolveComponentFactory(component);
     const newComponent = this.infoPanel.createComponent(factory);
     newComponent.instance.callingPage = this.callingPage;
+    newComponent.instance.tabName = this.tabName;
   }
 
 }

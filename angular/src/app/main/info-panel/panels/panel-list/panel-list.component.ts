@@ -4,12 +4,12 @@
  * Emits the desired changes to the displayed map (listener is routes-list component)
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate } from 'src/app/shared/interfaces';
+import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate, TsCallingPageType } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
@@ -27,6 +27,10 @@ const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes lo
 })
 
 export class PanelListComponent implements OnInit, OnDestroy {
+
+  // @Input() callingPage: TsCallingPageType;
+  // @Input() callingTab: 'Routes' | 'Overlays';
+  @Input() tabName: 'Routes' | 'Overlays';
 
   private listListener: Subscription;
   private mapUpdateListener: Subscription;
@@ -163,9 +167,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
     if ( idFromClick in this.selectedPaths) {
 
       if ( this.selectedPaths[idFromClick] === null ) {
-
         // reclicked on first route, clear it and all overlays
-        // make changes to map
+
         await this.updateMap({
           command: 'clear'
         }) ;
@@ -193,6 +196,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       // new route so add it - only emit pathId from map-service if its the first path selected
       // note things are not done in quite the nicest way in order to get the right behaviour (ie list only updates after confirmation)
+
+      if (tabName === "Route" {
+
+      })
       const command = {
         command: 'add',
         id: idFromClick,
@@ -204,12 +211,12 @@ export class PanelListComponent implements OnInit, OnDestroy {
       await this.updateMap(command);
 
       // bump selected item to the top of the list
-      this.selectedPaths[idFromClick] = command.colour;
-      this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
-      if ( this.nSelectedRoutes === 1 ) {
-        const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
-        this.listItems.splice(this.nSelectedRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
-      }
+      // this.selectedPaths[idFromClick] = command.colour;
+      // this.nSelectedRoutes = Object.keys(this.selectedPaths).length;
+      // if ( this.nSelectedRoutes === 1 ) {
+      //   const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
+      //   this.listItems.splice(this.nSelectedRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
+      // }
 
     }
 
@@ -246,39 +253,44 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     const styles = {};
 
-    if ( name === 'highlight' ) {
-      if ( i !== 0 && id in this.selectedPaths) {
-
+    if ( id in this.selectedPaths && name === 'highlight' ) {
+      if ( this.tabName === 'Overlays') {
         styles['border-left'] = `7px ${this.selectedPaths[id] + this.highlightOpacity} solid`;
       } else {
-        styles['border-left'] = `7px transparent solid`;
-
+        styles['border-left'] = `7px var(--ts-green) solid`;
       }
-    } else {
+    }
+
 
       styles['border-left'] = '1px #DEE2E6 solid';
       styles['border-right'] = '1px #DEE2E6 solid';
       styles['border-bottom'] = '1px #DEE2E6 solid';
-
-      if ( this.nSelectedRoutes === 0 ) {
-        if ( i === 0 ) {
-          styles['border-top'] = '1px #DEE2E6 solid';
-        } else if ( i === this.nLoadedRoutes - 1) {
-          styles['border-bottom'] = '1px #DEE2E6 solid';
-        }
-      } else {
-        if ( i === 0 ) {
-          styles['background'] = 'var(--ts-green)';
-
-        }
-        if ( i <= 1 ) {
-          styles['border-top'] = '1px #DEE2E6 solid';
-        } else if ( i === this.nLoadedRoutes - 1) {
-          styles['border-bottom'] = '1px #DEE2E6 solid';
-        }
+      if ( i === 0 ) {
+        styles['border-top'] = '1px #DEE2E6 solid';
       }
 
-    }
+      // if (this.tabName === 'routes') {
+      //   styles['background'] = 'var(--ts-green)';
+      // }
+
+      // if ( this.nSelectedRoutes === 0 ) {
+      //   if ( i === 0 ) {
+      //     styles['border-top'] = '1px #DEE2E6 solid';
+      //   } else if ( i === this.nLoadedRoutes - 1) {
+      //     styles['border-bottom'] = '1px #DEE2E6 solid';
+      //   }
+      // } else {
+      //   if ( i === 0 ) {
+      //     styles['background'] = 'var(--ts-green)';
+      //   }
+      //   if ( i <= 1 ) {
+      //     styles['border-top'] = '1px #DEE2E6 solid';
+      //   } else if ( i === this.nLoadedRoutes - 1) {
+      //     styles['border-bottom'] = '1px #DEE2E6 solid';
+      //   }
+      // }
+
+    // }
 
     return styles;
 
