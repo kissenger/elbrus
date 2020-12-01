@@ -62,6 +62,7 @@ export class DataService {
     this.pathIdEmitter.emit(geoJson.properties.pathId);
   }
 
+
   // saves a key/value pair to the data store
   public set(keyName: string, value: any) {
     this.dataStore[keyName] = value;

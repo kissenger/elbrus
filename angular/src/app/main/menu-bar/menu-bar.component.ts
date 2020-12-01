@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { TsCallingPageType } from 'src/app/shared/interfaces';
 import { DataService } from 'src/app/shared/services/data.service';
 
 @Component({
@@ -8,18 +9,21 @@ import { DataService } from 'src/app/shared/services/data.service';
 })
 export class MenuBarComponent implements OnInit {
 
-  constructor(
-    private dataService: DataService
-  ) { }
+
+  @Input() callingPage: TsCallingPageType;
+  @Input() map;
+
+
+  constructor(  ) { }
 
   ngOnInit() {
-
+    console.log(this.callingPage);
   }
 
-  onClick(clickItem) {
-    this.dataService.menuClickEmitter.emit( clickItem );
+  onChangeOptions(option: {}) {
+    const optionKey = Object.keys(option)[0];
+    this.map.options = option[optionKey];
   }
-
 
 }
 

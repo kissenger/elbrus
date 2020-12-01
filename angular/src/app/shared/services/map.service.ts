@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition, TsBoundingBoxObject } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
@@ -93,6 +93,23 @@ export class MapService {
 
   }
 
+  public fitView() {
+    // { minLng: 180, minLat: 90, maxLng: -180, maxLat: -90 }
+
+    // this.tsMap.getSource('activePath');
+    // const bbox = this.history.boundingBox;
+    console.log('hello');
+    console.log(this.data.get('activePath', false).properties.stats.bbox);
+    this.bounds = this.data.get('activePath', false).properties.stats.bbox;
+
+    // this.bounds = bbox;
+    // const sw = new mapboxgl.LngLat(bbox.minLng, bbox.minLat);
+    // const ne = new mapboxgl.LngLat(bbox.maxLng, bbox.maxLat);
+    // const bounds = new mapboxgl.LngLatBounds(sw, ne);
+
+    // this.tsMap.fitBounds(bounds);
+  }
+
 
   public plotMarker(location: TsCoordinate) {
     if (this.marker) {
@@ -177,19 +194,7 @@ export class MapService {
       type: 'circle',
       source: layerId,
       paint: layerPaint
-      // paint: {
-      //   'circle-radius': 8,
-      //   'circle-opacity': 0.3,
-      //   'circle-stroke-width': 1,
-      //   'circle-color':
-      //     [ 'case',
-      //       ['boolean', ['feature-state', 'enabled'], false ],
-      //       'blue',
-      //       ['boolean', ['feature-state', 'hover'], false ],
-      //       'black',
-      //       'white'
-      //     ]
-      // }
+
 
     });
 
@@ -282,9 +287,17 @@ export class MapService {
   }
 
 
-  public set bounds(boundingBox: TsBoundingBox) {
+  public set bounds(boundingBox: TsBoundingBox | TsBoundingBoxObject) {
 
-    const bbox: mapboxgl.LngLatBoundsLike = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
+    let bbox: mapboxgl.LngLatBoundsLike ;
+    if ('minLat' in boundingBox) {
+      // is of type TsBoundingBoxObject
+      bbox = [ [boundingBox.minLng, boundingBox.minLat], [boundingBox.maxLng, boundingBox.maxLat] ];
+    } else {
+      // is of type TsBoundingBox
+      bbox = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
+    }
+
     const options = {
       padding: {top: 20, bottom: 20, left: 10, right: 10},
       linear: true

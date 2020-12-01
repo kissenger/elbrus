@@ -119,7 +119,7 @@ export class MapCreateService extends MapService {
     } catch (error) {
 
       console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});;
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
 
     }
   }
@@ -171,19 +171,6 @@ export class MapCreateService extends MapService {
   }
 
 
-
-  public fitView() {
-    // { minLng: 180, minLat: 90, maxLng: -180, maxLat: -90 }
-
-    const bbox = this.history.boundingBox;
-
-    this.bounds = bbox;
-    // const sw = new mapboxgl.LngLat(bbox.minLng, bbox.minLat);
-    // const ne = new mapboxgl.LngLat(bbox.maxLng, bbox.maxLat);
-    // const bounds = new mapboxgl.LngLatBounds(sw, ne);
-
-    // this.tsMap.fitBounds(bounds);
-  }
 
 
 
@@ -254,7 +241,20 @@ export class MapCreateService extends MapService {
     this.tsMap.getCanvas().style.cursor = 'crosshair';
 
     this.addLineLayer('0000line', lineStyleOptions );
-    this.addPointsLayer('0000pts');
+    this.addPointsLayer('0000pts', {
+        'circle-radius': 8,
+        'circle-opacity': 0.3,
+        'circle-stroke-width': 1,
+        'circle-color':
+          [ 'case',
+            ['boolean', ['feature-state', 'enabled'], false ],
+            'blue',
+            ['boolean', ['feature-state', 'hover'], false ],
+            'black',
+            'white'
+          ]
+      });
+
     this.addSymbolLayer('0000sym');
 
     this.tsMap.on('click', this.onClickGetCoords);

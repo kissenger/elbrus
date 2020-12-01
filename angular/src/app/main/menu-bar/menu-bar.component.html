@@ -1,24 +1,75 @@
 
-<!-- invisible container to get d-flex onto child elements -->
-<div class="btn-group-vertical menu-bar position-absolute mt-2">
+<div class="btn-group-vertical menu-bar position-absolute mt-2 border">
 
-    <button (click)="onClick({command: 'undo'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Undo</small></button>
-    <button (click)="onClick({command: 'clear'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Undo All</small></button>
-    <button (click)="onClick({command: 'close'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Close Route</small></button>
-    <button (click)="onClick({command: 'reverse'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Reverse</small></button>
-    <button (click)="onClick({command: 'simplify'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Simplify</small></button>
-    <button (click)="onClick({command: 'fit'})" type="button" class="btn btn-light btn-sm mb-1 p-0 pl-2 text-left"><small>Fit view</small></button>
-<p>
-    <div class="btn-group-vertical btn-group-toggle" data-toggle="buttons">
-        <label (click)="onClick({option: {snapProfile: 'driving'}})" class="btn btn-light btn-sm active radio-btns text-left">
-            <input type="radio" name="options" id="roads" autocomplete="off" checked> <small>Follow Roads</small>
-        </label>
-        <label (click)="onClick({option: {snapProfile: 'walking'}})" class="btn btn-light btn-sm text-left">
-            <input type="radio" name="options" id="paths" autocomplete="off"> <Small>Follow Paths</Small>
-        </label>
-        <label (click)="onClick({option: {snapProfile: 'none'}})" class="btn btn-light btn-sm text-left">
-            <input type="radio" name="options" id="none" autocomplete="off"> <Small> Don't Follow</Small>
-        </label>
+  <div class="w-100 p-1">
+    <div class="w-100 px-1 border-bottom">
+      Actions
     </div>
+  </div>
+
+  <button
+    *ngIf="callingPage!=='list'"
+    (click)="map.undo()"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Undo</small>
+  </button>
+
+  <button
+    *ngIf="callingPage!=='list'"
+    (click)="map.clear()"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Undo All</small>
+  </button>
+
+  <button
+    *ngIf="callingPage!=='list'"
+    (click)="map.closePath();"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Close Route</small>
+  </button>
+
+  <button
+    *ngIf="callingPage!=='list'"
+    (click)="map.reverse()"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Reverse</small>
+  </button>
+
+  <button
+    *ngIf="callingPage!=='list'"
+    (click)="map.simplify()"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Simplify</small>
+  </button>
+
+  <button
+    (click)="map.fitView()"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Fit view</small>
+  </button>
+
+  <div class="w-100 p-1 pt-3">
+    <div class="w-100 px-1 border-bottom">
+      Options
+    </div>
+  </div>
+
+  <div *ngIf="callingPage!=='list'" class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
+    <label (click)="onChangeOptions({snapProfile: 'driving'})" class="btn btn-light btn-sm active radio-btns text-left p-0 pl-2 rounded-0">
+      <input type="radio" name="options" id="roads" autocomplete="off" checked> <small>Follow Roads</small>
+    </label>
+    <label (click)="onChangeOptions({snapProfile: 'walking'})" class="btn btn-light btn-sm text-left p-0 pl-2 rounded-0">
+      <input type="radio" name="options" id="paths" autocomplete="off"> <Small>Follow Paths</Small>
+    </label>
+    <label (click)="onChangeOptions({snapProfile: 'none'})" class="btn btn-light btn-sm text-left p-0 pl-2 rounded-0">
+      <input type="radio" name="options" id="none" autocomplete="off"> <Small> Don't Follow</Small>
+    </label>
+  </div>
 
 </div>

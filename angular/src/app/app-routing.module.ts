@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { TsCallingPage } from 'src/app/shared/interfaces';
 
 // Import components
 import { RoutesCreateComponent } from './main/routes/routes-create/routes-create.component';
@@ -21,8 +22,8 @@ const appRoutes: Routes = [
   { path: ':pathType/list', component: RoutesListComponent},
   { path: ':pathType/list', component: RoutesListComponent},
   { path: ':pathType/list/:pathId', component: RoutesListComponent},
-  { path: ':pathType/create', component: RoutesCreateComponent, canActivate: [AuthGuard], data : {callingPage : 'create'}},
-  { path: ':pathType/edit', component: RoutesCreateComponent, canActivate: [AuthGuard], data : {callingPage : 'edit'}},
+  { path: ':pathType/create', component: RoutesCreateComponent, canActivate: [AuthGuard], data: <TsCallingPage>{callingPage: 'create'}},
+  { path: ':pathType/edit', component: RoutesCreateComponent, canActivate: [AuthGuard], data: <TsCallingPage>{callingPage: 'edit'}},
   { path: ':pathType/review', component: RoutesReviewComponent, canActivate: [AuthGuard]},
 ];
 

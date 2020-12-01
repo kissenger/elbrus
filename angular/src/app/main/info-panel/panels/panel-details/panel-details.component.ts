@@ -5,7 +5,7 @@ import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsFeature, TsFeatureCollection, TsPosition } from 'src/app/shared/interfaces';
+import { TsUnits, TsFeature, TsFeatureCollection, TsPosition, TsCallingPageType } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Color, Label } from 'ng2-charts';
@@ -22,7 +22,8 @@ import { UnitsLongNamePipe } from 'src/app/shared/pipes/units-longname.pipe';
 export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   // local variables
-  @Input() callingPage = 'list';
+  // @Input() callingPage = 'list';
+  @Input() callingPage: TsCallingPageType;
 
   // listeners
   private pathListener: Subscription;
@@ -62,6 +63,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    console.log(this.callingPage);
 
     this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
 

@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
-import { TsCoordinate, TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
+import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
 
 @Component({
   selector: 'app-routes',
@@ -25,13 +25,14 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private pathIdListener: Subscription;
   private httpListener: Subscription;
   private chartPointListener: Subscription;
+  public tsMap;
 
   constructor(
     private data: DataService,
-    private map: MapService,
+    public map: MapService,
     private http: HttpService,
     private router: Router,
-    private spinner: SpinnerService,
+    // private spinner: SpinnerService,
     private alert: AlertService
     ) { }
 
@@ -48,10 +49,15 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
       await this.map.newMap();
       this.plotPath(urlParam, {}, {booEmit: true, booResizeView: true});
+    // console.log(this.tsMap);
+
 
     } else {
       await this.map.newMap();
+    // console.log(this.tsMap);
+      // this.map.fitView();
     }
+
 
     // get device location
     this.map.addPointsLayer('deviceLocation', {

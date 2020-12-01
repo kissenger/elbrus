@@ -5,45 +5,34 @@
     top: 0px;
     left: 0px;
     font-size: small;
-    opacity: 0.5;
+    opacity: 0.6;
+    width: 100px;
+    background-color: white;
+  box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
+
 }
 
 .menu-bar:hover {
     opacity: 1.0;
 }
 
-/* Menu button behaviours */
-.clicky-btn  {
-    background-color: white;
-    opacity: 0.5;
+.btn-light {
+  background-color: white;
+  border: none;
+}
+.btn-light:hover {
+  background-color: rgb(218, 224, 229);
 }
 
-.clicky-btn:hover  {
-    opacity: 1.0;
-}
 
-.button {
-    font-size: small;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
 
 .radio-btns  {
-    border-top-left-radius: none;
-    border-top-right-radius: none;
-    border-bottom-right-radius: none;
-    border-bottom-right-radius: none;
+    border-radius: none;
 }
 
 .radio-btns:hover  {
     opacity: 1.0;
 }
-
-
-/* Remove border effect from bootstrap btn */
-.btn-light:focus, .btn-light.focus {
-    box-shadow: none;
-  }
 
 
 
