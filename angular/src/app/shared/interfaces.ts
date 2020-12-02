@@ -55,6 +55,7 @@ export interface TsListItem {
   isElevations: boolean;
   isLong: boolean;
   isActive?: boolean;
+  colour?: string;
 }
 
 export type TsListArray = TsListItem[];
