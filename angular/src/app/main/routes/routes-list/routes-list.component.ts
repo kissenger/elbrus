@@ -95,13 +95,14 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       async ( request: {command?: string, id?: string, colour?: string, emit: false, resize: false} ) => {
 
         if ( request.command === 'add' ) {
-          await this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
+          this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
 
         } else if ( request.command === 'rem' ) {
-          await this.map.remove(request.id);
+          this.map.remove(request.id);
 
-        } else if ( request.command === 'clear' ) {
-          await this.map.clear();
+        } else if ( request.command === 'replace' ) {
+          this.map.clear();
+          this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
 
         }
 

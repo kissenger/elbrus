@@ -38,7 +38,7 @@
 
   <!-- ROUTE LIST -->
 
-  <div *ngIf="nRoutesInView > 0" class="m-0 p-0 h-100 d-flex flex-column">
+  <div *ngIf="nAvailableRoutes > 0" class="m-0 p-0 h-100 d-flex flex-column">
 
     <!-- <div class="m-0 p-0 d-flex flex-column active-route-holder">
       <div class="m-1">
@@ -60,10 +60,12 @@
     <div class=" flex-grow-1 position-relative">
       <div class=" d-flex flex-column position-absolute routes-list overflow-auto">
 
-      <div *ngFor="let item of listItems; let i = index">
+      <div *ngFor="let item of displayList; let i = index">
 
         <div (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
+        <!-- <div (click)="onListClick(item.pathId)"> -->
           <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
+          <!-- <div class="highlight"> -->
             <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
           </div>
         </div>
@@ -72,8 +74,8 @@
       </div>
 
       <!-- MORE -->
-      <div *ngIf="nRoutesInView > 0" class="mt-auto text-center small">
-        showing {{nLoadedRoutes}} of {{nRoutesInView}} routes <br>
+      <div *ngIf="nAvailableRoutes > 0" class="mt-auto text-center small">
+        showing {{nLoadedRoutes}} of {{nAvailableRoutes}} routes <br>
         <span *ngIf="!isAllRoutesLoaded" class="text-like-link" (click)="onMoreClick()"> Load more </span> <br>
       </div>
 

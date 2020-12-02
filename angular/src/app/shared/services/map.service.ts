@@ -98,7 +98,6 @@ export class MapService {
 
     // this.tsMap.getSource('activePath');
     // const bbox = this.history.boundingBox;
-    console.log('hello');
     console.log(this.data.get('activePath', false).properties.stats.bbox);
     this.bounds = this.data.get('activePath', false).properties.stats.bbox;
 
@@ -135,7 +134,7 @@ export class MapService {
   public goto(point: TsPosition) {
     this.tsMap.flyTo({
       center: {lng: point[0], lat: point[1]}
-      });
+    });
   }
 
 
@@ -230,12 +229,12 @@ export class MapService {
 
 
   public remove(pathId: string) {
-    return new Promise( (resolve, reject) => {
+    // return new Promise( (resolve, reject) => {
 
-      this.tsMap.once('idle', (e) => {
-        this.data.pathIdEmitter.emit(pathId);
-        resolve();
-      });
+      // this.tsMap.once('idle', (e) => {
+      //   this.data.pathIdEmitter.emit(pathId);
+      //   resolve();
+      // });
 
       this.removeLayer(pathId, 'line');
       this.removeLayer(pathId, 'sym');
@@ -243,7 +242,7 @@ export class MapService {
 
       this.layers.remove( pathId );
 
-    });
+    // });
 
   }
 
@@ -262,16 +261,16 @@ export class MapService {
 
   public clear() {
 
-    return new Promise( async (resolve, reject) => {
+    // return new Promise( async (resolve, reject) => {
 
       if ( this.layers ) {
-        await Promise.all( this.layers.get.map( pathId => { this.remove(pathId); }) );
+        this.layers.get.map( pathId => { this.remove(pathId); });
       }
 
-      resolve();
+      // resolve();
       this.data.setPath(globals.emptyGeoJson, true);
 
-    });
+    // });
   }
 
 

@@ -57,8 +57,11 @@ export class DataService {
 
   // set path has option to emit - actually controls save and always emits but the maintaining the legacy terminology for now
   public setPath(geoJson: TsFeatureCollection, emit: boolean) {
-    if (emit) { this.dataStore['activePath'] = geoJson; }
-    this.pathIdEmitter.emit(geoJson.properties.pathId);
+    if (emit) {
+      this.dataStore['activePath'] = geoJson;
+      this.pathIdEmitter.emit(geoJson.properties.pathId);
+    }
+
   }
 
 

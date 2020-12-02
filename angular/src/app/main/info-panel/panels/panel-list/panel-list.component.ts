@@ -9,11 +9,12 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsListArray, TsBoundingBox, TsCoordinate, TsCallingPageType, TsListItem } from 'src/app/shared/interfaces';
+import { TsUnits, TsBoundingBox, TsCoordinate, TsListItem } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
+import { ListItems } from 'src/app/shared/classes/list-items';
 
 const PRIVATE = false;
 const PUBLIC = true;
@@ -43,22 +44,27 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public nSelectedRoutes = 0;
 
 
+  // dumb array of list items to ensure we can control when the display updates
+  public displayList: Array<TsListItem> = [];
+
+  // class containing methods for manipulation of lists
+  public listItems: ListItems;
+
 
   // define the colours to highlight overlays
-  private highlightColours = [null, ...globals.lineColours];
+  private highlightColours = globals.lineColours;
   private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
 
   // keep track of the number of routes available compared to the number loades
-  public nRoutesInView: number;
+  public nAvailableRoutes: number;
   public nLoadedRoutes: number;
-  private nRoutesToLoad: number;
+  private limit: number;
   private offset = 0;
   public isAllRoutesLoaded = false;
   public isPublicOrPrivate = PUBLIC;   // state of the dropdown box
   private boundingBox: TsBoundingBox = null;    // current view
 
   // listItems is an array of data to display each list item form the backend
-  public listItems: TsListItem[];
   // activelistItems is an object with key = pathId and value = color of route on map
   // public activelistItems: {[id: string]: string} = {};
 
@@ -81,8 +87,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
+    this.listItems = new ListItems();
+
+
     // determine the number of list items we can fit in the current view height
-    this.nRoutesToLoad = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
+    this.limit = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
 
     // check url for pathId - if supplied we'll show that path
     const pathId = this.router.url.split('/').slice(-1)[0];
@@ -99,11 +108,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // subscribe to change in map view
     this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
-      console.log(this.mapUpdateListener);
       this.boundingBox = bounds;
       this.offset = 0;
-      // filter out the inactive list items
-      this.listItems = this.listItems.filter(listItem => listItem.isActive);
+      this.listItems.removeInactive();
       this.addPathsToList();
     });
 
@@ -112,10 +119,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
-    // if in overlay mode, listen for a change in active path
+    // if overlay mode, listen for a change in active route, and reset
     if ( this.tabName === 'overlay' ) {
       this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
-        this.idFromData = this.data.get('activePath', false).properties.pathId;
+        this.listItems.clear();
+        this.highlightColours = globals.lineColours;
         this.addPathsToList();
       });
     }
@@ -140,38 +148,31 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       } else {
 
-      this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.nRoutesToLoad, this.boundingBox)
+      this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
 
-        .subscribe( result => {
+        .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
-          // get a full list of existing and backend results
-          const backendList = result.list;
-          const count = result.count;
-          // const temp = protectedPaths ? protectedPaths : this.listItems;
-          const fullList = [...this.listItems, ...backendList];
 
-          // filter out duplicates
-          const fullListPathIds = fullList.map( item => item.pathId );
-          const filteredList = fullList.filter( (item, i) => fullListPathIds.indexOf(item.pathId) === i );
-          this.listItems = filteredList;
+          this.listItems.merge(result.list);
+
 
           // if in overlay mode, remove active path from list
           if ( this.tabName === 'overlay' ) {
             const idFromData = this.data.get('activePath', false).properties.pathId;
-            // this.listItems.find(item => item.pathId === idFromData).isActive = false;
-            this.listItems.splice( this.listItems.findIndex(item => item.pathId === idFromData) );
-
+            this.listItems.deleteItemById(idFromData);
           }
 
           // work out the numbers
-          this.nRoutesInView = count - backendList.length - (this.offset * this.nRoutesToLoad)  + filteredList.length;
-          this.nLoadedRoutes = this.listItems.length;
-          this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
+          this.nAvailableRoutes = 1;
+          // this.nAvailableRoutes = result.count - result.list.length - (this.offset * this.limit) + filteredList.length;
+          // this.nLoadedRoutes = this.listItems.length;
+          // this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
 
           // we we can determine whether the listener is still active, used above
           this.listListener = undefined;
           this.isLoading = false;
 
+          this.displayList = this.listItems.array;
 
       }, (error) => {
         this.isLoading = false;
@@ -196,88 +197,43 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   async onListClick(idFromClick: string) {
 
-    // if ( idFromClick in this.activelistItems) {
-    if ( this.listItems.findIndex(item => item.pathId === idFromClick)) {
+    // let command: {command: string, id?: string, emit?: boolean, colour?: string };
+    const command = {command: '', id: idFromClick, emit: false, colour: null };
 
-      // if ( this.activelistItems[idFromClick] === null ) {
-      if (this.tabName === 'routes') {
+    if ( this.listItems.isActive(idFromClick) ) {
 
-        // reclicked on first route, clear it and all overlays
 
-        await this.updateMap({
-          command: 'clear'
-        }) ;
-
-        this.highlightColours = [null, ...globals.lineColours];
-        this.activelistItems = {};
-        this.nSelectedRoutes = 0;
+      if ( this.tabName === 'routes' ) {
+        // reclicking an active item in routes mode does nothing
 
       } else {
-
-        // reclicked an overlay, just clear the overlay
-        // make changes to map
-        await this.updateMap({
-          command: 'rem',
-          id: idFromClick
-        });
-
-        this.highlightColours.unshift(this.activelistItems[idFromClick]);
-        delete this.activelistItems[idFromClick];
-        this.nSelectedRoutes = Object.keys(this.activelistItems).length;
-
+        // reclicking an active item in overlay mode clears only that path
+        command.command = 'rem';
+        const colour = this.listItems.setInactive(idFromClick);
+        this.highlightColours.unshift( colour );
       }
 
     } else {
 
-      // new route so add it - only emit pathId from map-service if its the first path selected
-      // note things are not done in quite the nicest way in order to get the right behaviour (ie list only updates after confirmation)
+      if ( this.tabName === 'routes' ) {
+        // clicking a new item in route mode unselects any other active routes (incl overlays)
+        command.command = 'replace';
+        command.emit = true;
+        this.listItems.setAllInactive();
+        this.highlightColours = globals.lineColours;
 
-      const command = {
-        command: 'add',
-        id: idFromClick,
-        colour: this.highlightColours.shift(),
-        emit: Object.keys(this.activelistItems).length + 1 === 1,
-        // resize: Object.keys(this.activelistItems).length + 1 === 1,
-      };
+      } else {
+        // clicking a new item in overlay mode just adds new overlay to map
+        command.command = 'add';
+        command.colour = this.highlightColours.shift();
+      }
 
-      await this.updateMap(command);
-
-      // bump selected item to the top of the list
-      this.activelistItems[idFromClick] = command.colour;
-      this.nSelectedRoutes = Object.keys(this.activelistItems).length;
-      // if ( this.nSelectedRoutes === 1 ) {
-      //   const indx = this.listItems.findIndex( i => i.pathId === idFromClick);
-      //   this.listItems.splice(this.nSelectedRoutes - 1, 0, this.listItems.splice(indx, 1)[0]);
-      // }
-
+      this.listItems.setActive(idFromClick, command.colour);
+      this.data.pathCommandEmitter.emit(command);
     }
 
 
-    // store some data for panel details to pick up
-    this.data.set('nRoutes', this.nSelectedRoutes);
-
   }
-
-
-  updateMap(emitOptions: {command?: string, id?: string, colour?: string, emit?: boolean}) {
-
-    return new Promise( (resolve, reject) => {
-
-      // listen for path emitter to indicate data has loaded
-      this.newPathListener = this.data.pathIdEmitter.subscribe( (path: {action: string, pid: string} ) => {
-          this.newPathListener.unsubscribe();
-          console.log('map update finished');
-          resolve();
-      });
-
-      // request map update
-      this.data.pathCommandEmitter.emit(emitOptions);
-
-
-    });
-  }
-
-
 
 
   /** Set syles for list items based on position in list, and whether route is selected. */
@@ -285,50 +241,24 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     const styles = {};
 
+    styles['border-left'] = '1px #DEE2E6 solid';
+    styles['border-right'] = '1px #DEE2E6 solid';
+    styles['border-bottom'] = '1px #DEE2E6 solid';
+    if ( i === 0 ) {
+      styles['border-top'] = '1px #DEE2E6 solid';
+    }
 
-
-
-      styles['border-left'] = '1px #DEE2E6 solid';
-      styles['border-right'] = '1px #DEE2E6 solid';
-      styles['border-bottom'] = '1px #DEE2E6 solid';
-      if ( i === 0 ) {
-        styles['border-top'] = '1px #DEE2E6 solid';
-      }
-
-      if ( name === 'highlight' ) {
-        if ( id in this.activelistItems ) {
-          if ( this.tabName === 'overlay' ) {
-            styles['border-left'] = `7px ${this.activelistItems[id] + this.highlightOpacity} solid`;
-          } else {
-            styles['border-left'] = `7px var(--ts-green) solid`;
-          }
+    if ( name === 'highlight' ) {
+      if ( this.listItems.isActive(id) ) {
+        if ( this.tabName === 'overlay' ) {
+          styles['border-left'] = `7px ${this.listItems.getItemById(id).colour + this.highlightOpacity} solid`;
         } else {
-          styles['border-left'] = '7px transparent solid';
+          styles['border-left'] = `7px var(--ts-green) solid`;
         }
+      } else {
+        styles['border-left'] = '7px transparent solid';
       }
-
-      // if (this.tabName === 'routes') {
-      //   styles['background'] = 'var(--ts-green)';
-      // }
-
-      // if ( this.nSelectedRoutes === 0 ) {
-      //   if ( i === 0 ) {
-      //     styles['border-top'] = '1px #DEE2E6 solid';
-      //   } else if ( i === this.nLoadedRoutes - 1) {
-      //     styles['border-bottom'] = '1px #DEE2E6 solid';
-      //   }
-      // } else {
-      //   if ( i === 0 ) {
-      //     styles['background'] = 'var(--ts-green)';
-      //   }
-      //   if ( i <= 1 ) {
-      //     styles['border-top'] = '1px #DEE2E6 solid';
-      //   } else if ( i === this.nLoadedRoutes - 1) {
-      //     styles['border-bottom'] = '1px #DEE2E6 solid';
-      //   }
-      // }
-
-    // }
+    }
 
     return styles;
 
