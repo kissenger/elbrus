@@ -1,3 +1,4 @@
+import { DataService } from './../../shared/services/data.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TsUser } from '../../shared/interfaces';
@@ -24,7 +25,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private alert: AlertService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private data: DataService
     ) {}
 
   ngOnInit() {}
@@ -56,8 +58,15 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       const userName = document.forms['login-form']['userName'].value;
       const password = document.forms['login-form']['password'].value;
+
       await this.auth.login(userName, password);
-      this.router.navigate(['route/list']);
+      const redirect = this.data.get('redirect', true);
+      if ( redirect ) {
+        this.router.navigate([redirect]);
+      } else {
+        this.router.navigate(['route/list']);
+      }
+
 
     } catch (error) {
 

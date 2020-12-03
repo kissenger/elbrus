@@ -66,7 +66,7 @@
 
       <div *ngFor="let item of listItems.array; let i = index">
 
-        <div (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
+        <div (click)="listAction(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
           <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
             <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
           </div>
@@ -76,9 +76,9 @@
       </div>
 
       <!-- MORE -->
-      <div *ngIf="nAvailableRoutes > 0" class="mt-auto text-center small">
+      <div *ngIf="nAvailableRoutes > 0" class="mt-auto pt-2 text-center small">
         showing {{nLoadedRoutes}} of {{nAvailableRoutes}} routes <br>
-        <span *ngIf="!isAllRoutesLoaded" class="text-like-link" (click)="onMoreClick()"> Load more </span> <br>
+        <span *ngIf="nAvailableRoutes !== nLoadedRoutes" class="text-like-link" (click)="onMoreClick()"> Load more </span> <br>
       </div>
 
     </div>

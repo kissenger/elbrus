@@ -15,15 +15,20 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     public router: Router,
     public http: HttpService,
     private auth: AuthService,
-    public dataService: DataService,
+    public data: DataService,
   ) { }
 
   ngOnInit() {
   }
 
-  onGuestClick() {
-    this.auth.login('guest', null);
-    this.router.navigate(['routes/list']);
+  async onGuestClick() {
+    await this.auth.login('guest', null);
+    const redirect = this.data.get('redirect', true);
+    if ( redirect ) {
+      this.router.navigate([redirect]);
+    } else {
+      this.router.navigate(['route/list']);
+    }
   }
 
   onLoginClick() {

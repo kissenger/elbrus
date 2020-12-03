@@ -4,7 +4,7 @@
  * Emits the desired changes to the displayed map (listener is routes-list component)
  */
 
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, PACKAGE_ROOT_URL } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -13,14 +13,12 @@ import { TsUnits, TsBoundingBox, TsCoordinate, TsListItem } from 'src/app/shared
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
-import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { ListItems } from 'src/app/shared/classes/list-items';
-import { controllers } from 'chart.js';
 
 const PRIVATE = false;
 const PUBLIC = true;
 const LIST_ITEM_HEIGHT = 37;
-const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes loaded
+const LIST_HEIGHT_CORRECTION = 300;  // higher number results in fewer routes loaded
 
 @Component({
   selector: 'app-panel-list',
@@ -30,8 +28,6 @@ const LIST_HEIGHT_CORRECTION = 400;  // higher number results in fewer routes lo
 
 export class PanelListComponent implements OnInit, OnDestroy {
 
-  // @Input() callingPage: TsCallingPageType;
-  // @Input() callingTab: 'Routes' | 'Overlays';
   @Input() tabName: 'routes' | 'overlay';
 
   private listListener: Subscription;
@@ -41,15 +37,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   public isLoading = false;
 
-  // keep track of the routes user has selected
-  public nSelectedRoutes = 0;
-
-
   // class containing methods for manipulation of lists
   public listItems: ListItems = new ListItems();
 
-
   // define the colours to highlight overlays
+  // Opacity codes: 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
   private highlightColours = {
     colours: [...globals.lineColours],
     opacity: '5A',
@@ -58,23 +50,21 @@ export class PanelListComponent implements OnInit, OnDestroy {
     }
   };
 
-  // private highlightOpacity = '5A';  // 1E=30%, 32=50%, 4B=75%, 55=85%, 5A=90%
+  private sharedPath = {
+    _pid: '',
+    get valid() { return this._pid > 10; },
+    get pid() { return this._pid; },
+    set param(p) { this._pid = p; },
+    clear() { this._pid = ''; }
+  };
 
   // keep track of the number of routes available compared to the number loades
   public nAvailableRoutes: number;
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
-  public isAllRoutesLoaded = false;
   public isPublicOrPrivate = PUBLIC;   // state of the dropdown box
   private boundingBox: TsBoundingBox = null;    // current view
-
-  // listItems is an array of data to display each list item form the backend
-  // activelistItems is an object with key = pathId and value = color of route on map
-  // public activelistItems: {[id: string]: string} = {};
-
-
-  public idFromData: string;
 
   // keep track of user and preferences
   public isRegisteredUser = this.auth.isRegisteredUser();
@@ -94,16 +84,13 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // determine the number of list items we can fit in the current view height
     this.limit = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
 
-    // check url for pathId - if supplied we'll show that path
-    const pathId = this.router.url.split('/').slice(-1)[0];
-    const isPathId = pathId.length > 10;
-    // if ( isPathId ) {
-    //   this.activelistItems[pathId] = this.highlightColours.shift();
-    // }
+    // check url for pathId; state is stored in the psuedo class and picked up again after list is updated
+    this.sharedPath.param = this.router.url.split('/').slice(-1)[0];
+
 
     // do some set up
     this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
-    if ( this.isRegisteredUser && !isPathId ) {
+    if ( this.isRegisteredUser && !this.sharedPath.valid ) {
       this.isPublicOrPrivate = PRIVATE;
     }
 
@@ -111,7 +98,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
       this.boundingBox = bounds;
       this.offset = 0;
-      // this.listItems.removeInactive();
+      this.listItems.removeInactive();
       this.addPathsToList();
     });
 
@@ -135,36 +122,26 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList() {
 
-    // stop listening to previous requests if they are still active
-    // TODO: send a cencellation request to to the backend process
-    if (this.listListener) {
-      this.listListener.unsubscribe();
-    }
+    // dont do anything if in overlay mode and there is no active path selected
+    if ( this.tabName === 'overlay' && !this.data.get('activePath', false)) {
+      // do nothing
 
-      // dont do anything if in overlay mode and there is no active path selected
-      if ( this.tabName === 'overlay' && !this.data.get('activePath', false)) {
-        // do nothing
+    } else {
 
-      } else {
-
-        this.isLoading = true;
-
+      this.isLoading = true;
       this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
-
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
-          this.listItems.removeInactive();
           this.listItems.merge(result.list);
-
-          // work out the numbers
-          this.nAvailableRoutes = result.count;
           this.nLoadedRoutes = this.listItems.length;
-          this.isAllRoutesLoaded = this.nLoadedRoutes === this.nAvailableRoutes;
-
-
-          // manage the listener
-          this.listListener = undefined;
+          this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
           this.isLoading = false;
+
+          if (this.sharedPath.valid) {
+            const idFromUrl = this.sharedPath.pid;
+            this.listItems.setActive(idFromUrl, null);
+          }
+
 
       }, (error) => {
         this.isLoading = false;
@@ -188,7 +165,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  async onListClick(idFromClick: string) {
+  async listAction(idFromClick: string) {
 
     const command = {command: '', id: idFromClick, emit: false, colour: null };
 
@@ -198,6 +175,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
       command.emit = true;
       this.listItems.setAllInactive();
       this.highlightColours.reset();
+      this.listItems.setActive(idFromClick, null);
 
     } else {
 
@@ -226,18 +204,23 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     const styles = {};
 
-
     if ( name === 'highlight' ) {
-      // if listItem is active ... dont use listItem class as thats not actually wahts displayed and it gives console errors
+
       if ( this.listItems.isActive(id) ) {
+
         if ( this.tabName === 'overlay' ) {
           styles['border-left'] = `7px ${this.listItems.getItemById(id).colour + this.highlightColours.opacity} solid`;
+          styles['background-color'] = `var(--ts-grey-background)`;
+
         } else {
           styles['border-left'] = `7px var(--ts-green) solid`;
+          styles['background-color'] = `var(--ts-grey-background)`;
+
         }
       } else {
         styles['border-left'] = '7px transparent solid';
       }
+
     } else {
       styles['border-left'] = '1px #DEE2E6 solid';
       styles['border-right'] = '1px #DEE2E6 solid';
@@ -262,11 +245,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-
-
-  /**
-   * Actions to do when component is destroyed
-   */
   ngOnDestroy() {
     if (this.listListener) { this.listListener.unsubscribe(); }
     if (this.mapUpdateListener) { this.mapUpdateListener.unsubscribe(); }

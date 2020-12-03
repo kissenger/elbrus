@@ -1,4 +1,4 @@
-import { TsPosition } from 'src/app/shared/interfaces';
+import { TsPosition, TsFeature, TsFeatureCollection, TsCoordinate, TsBoundingBox, TsBoundingBoxObject } from 'src/app/shared/interfaces';
 /**
  * Listens for request from panel-list component, makes the backend request and uses
  * map-service to make the desired changes to the plot
@@ -44,18 +44,22 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
 
     // look for a path id in the url
-    const urlParam = this.router.url.split('/').slice(-1)[0];
-    if ( urlParam.length > 10 ) {
+    const idFromUrl = this.router.url.split('/').slice(-1)[0];
+    if ( idFromUrl.length > 10 ) {
+      const path = await this.getPath(idFromUrl);
 
-      await this.map.newMap();
-      this.plotPath(urlParam, {}, {booEmit: true, booResizeView: true});
-    // console.log(this.tsMap);
+      if (path.properties.info.isPublic) {
+        const bbox: TsBoundingBoxObject = path.properties.stats.bbox;
+        const startPosition: TsCoordinate = { lng: (bbox.minLng + bbox.maxLng) / 2, lat: (bbox.minLat + bbox.maxLat) / 2 };
+        await this.map.newMap(startPosition, 10);
+        this.addPathToMap(path, {}, {booEmit: true, booResizeView: true});
 
-
+      } else {
+        this.alert.showAsElement('Error: Path not found', 'Could not find the requested path.', true, false).subscribe( () => {});
+      }
     } else {
-      await this.map.newMap();
-    // console.log(this.tsMap);
-      // this.map.fitView();
+    await this.map.newMap();
+
     }
 
 
@@ -95,17 +99,18 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       async ( request: {command?: string, id?: string, colour?: string, emit: false, resize: false} ) => {
 
         if ( request.command === 'add' ) {
-          this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
+          const path = await this.getPath(request.id);
+          this.addPathToMap(path, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
 
         } else if ( request.command === 'rem' ) {
           this.map.remove(request.id);
 
         } else if ( request.command === 'replace' ) {
           this.map.clear();
-          this.plotPath(request.id, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
+          const path = await this.getPath(request.id);
+          this.addPathToMap(path, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
 
         }
-
     });
   }
 
@@ -126,16 +131,13 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
 
 
-  /** get a path id from the backend and get it plotted on the map */
-  plotPath(pathId: string, style: TsLineStyle, options: TsPlotPathOptions) {
+  /** get a path id from the backend */
+  getPath(pathId: string) {
 
-    return new Promise( (resolve, reject) => {
+    return new Promise<TsFeatureCollection>( (resolve, reject) => {
 
-      // this.spinner.showAsElement();
       this.httpListener = this.http.getPathById('route', pathId).subscribe( async (result) => {
-
-        await this.map.add(result.hills, style, options );
-        resolve();
+        resolve(result.hills);
 
       }, (error) => {
         reject();
@@ -145,6 +147,11 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       });
 
     });
+
+  }
+
+  addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
+    this.map.add(pathAsGeojson, style, options );
 
   }
 
