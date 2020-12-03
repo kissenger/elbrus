@@ -13,6 +13,7 @@ export class InfoPanelService {
    * Define the tabs for each page - object key is the page name
    */
   private tabsDefinition: {create?: TsTabsArray, edit?: TsTabsArray, review?: TsTabsArray, list?: TsTabsArray} =
+  // private tabsDefinition: {create?: TsTabsArray, edit?: TsTabsArray, review?: TsTabsArray, list?: TsTabsArray, disabled?: boolean} =
   { create:
       [ { active: true,
           name: 'details',
@@ -37,10 +38,12 @@ export class InfoPanelService {
           component: PanelListComponent },
         { active: false,
           name: 'details',
-          component: PanelDetailsComponent },
+          component: PanelDetailsComponent,
+          disabled: true },
         { active: false,
           name: 'overlay',
-          component: PanelListComponent },
+          component: PanelListComponent,
+          disabled: true },
         { active: false,
           name: 'options',
           component: PanelOptionsComponent } ]
@@ -73,5 +76,9 @@ export class InfoPanelService {
       if (tabsArray[i].name === panelName) { return tabsArray[i].component; }
     }
   }
+
+  // setTabProperty(property: string, value: string) {
+
+  // }
 
 }

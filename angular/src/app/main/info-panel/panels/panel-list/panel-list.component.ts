@@ -15,6 +15,7 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { ListItems } from 'src/app/shared/classes/list-items';
+import { controllers } from 'chart.js';
 
 const PRIVATE = false;
 const PUBLIC = true;
@@ -81,8 +82,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     private data: DataService,
     private auth: AuthService,
     private alert: AlertService,
-    private router: Router,
-    private spinner: SpinnerService
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -134,8 +134,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList() {
 
-    this.isLoading = true;
-
     // stop listening to previous requests if they are still active
     // TODO: send a cencellation request to to the backend process
     if (this.listListener) {
@@ -147,6 +145,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
         // do nothing
 
       } else {
+
+        this.isLoading = true;
 
       this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
 
@@ -163,10 +163,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
           }
 
           // work out the numbers
-          this.nAvailableRoutes = 1;
-          // this.nAvailableRoutes = result.count - result.list.length - (this.offset * this.limit) + filteredList.length;
-          // this.nLoadedRoutes = this.listItems.length;
-          // this.isAllRoutesLoaded = this.nLoadedRoutes === this.nRoutesInView;
+          this.nAvailableRoutes = result.count;
+          this.nLoadedRoutes = this.listItems.length;
+          this.isAllRoutesLoaded = this.nLoadedRoutes === this.nAvailableRoutes;
 
           // we we can determine whether the listener is still active, used above
           this.listListener = undefined;
@@ -191,6 +190,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   onSelectMenuChange() {
     this.offset = 0;
+    this.listItems.removeInactive();
     this.addPathsToList();
   }
 
@@ -241,15 +241,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     const styles = {};
 
-    styles['border-left'] = '1px #DEE2E6 solid';
-    styles['border-right'] = '1px #DEE2E6 solid';
-    styles['border-bottom'] = '1px #DEE2E6 solid';
-    if ( i === 0 ) {
-      styles['border-top'] = '1px #DEE2E6 solid';
-    }
 
     if ( name === 'highlight' ) {
-      if ( this.listItems.isActive(id) ) {
+      // if listItem is active ... dont use listItem class as thats not actually wahts displayed and it gives console errors
+      if ( this.displayList.find(item => item.pathId === id).isActive ) {
         if ( this.tabName === 'overlay' ) {
           styles['border-left'] = `7px ${this.listItems.getItemById(id).colour + this.highlightOpacity} solid`;
         } else {
@@ -258,6 +253,14 @@ export class PanelListComponent implements OnInit, OnDestroy {
       } else {
         styles['border-left'] = '7px transparent solid';
       }
+    } else {
+      styles['border-left'] = '1px #DEE2E6 solid';
+      styles['border-right'] = '1px #DEE2E6 solid';
+      styles['border-bottom'] = '1px #DEE2E6 solid';
+      if ( i === 0 ) {
+        styles['border-top'] = '1px #DEE2E6 solid';
+      }
+
     }
 
     return styles;
@@ -274,6 +277,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     if (this.listListener) { this.listListener.unsubscribe(); }
     if (this.mapUpdateListener) { this.mapUpdateListener.unsubscribe(); }
     if (this.newUnitsListener) { this.newUnitsListener.unsubscribe(); }
+    if (this.newPathListener) { this.newPathListener.unsubscribe(); }
   }
 
 

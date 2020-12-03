@@ -51,7 +51,9 @@ export class ListItems {
   }
 
   isActive(pathId: string) {
-    return this._listItems.find(item => item.pathId === pathId).isActive;
+    console.log(this._listItems.find(item => item.pathId === pathId).isActive);
+    console.log(this._listItems.find(item => item.pathId === pathId));
+    return !!this._listItems.find(item => item.pathId === pathId).isActive;
   }
 
   setAllInactive() {

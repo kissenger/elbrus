@@ -1,7 +1,9 @@
+
 import { DataService } from './../../shared/services/data.service';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { InfoPanelService } from 'src/app/shared/services/info-panel.service';
 import { TsTabsArray, TsTab } from 'src/app/shared/interfaces';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-info-panel',
@@ -9,7 +11,7 @@ import { TsTabsArray, TsTab } from 'src/app/shared/interfaces';
   styleUrls: ['./info-panel.component.css']
 })
 
-export class InfoPanelComponent implements OnInit {
+export class InfoPanelComponent implements OnInit, OnDestroy {
 
   // bind to property in parent to determine which page called the info panel
   @Input() callingPage: string;
@@ -17,6 +19,8 @@ export class InfoPanelComponent implements OnInit {
   public tabsArray: TsTabsArray;
   public icon = '-';
   public isMinimised = false;
+  private newPathListener: Subscription;
+
 
   constructor(
     private infoPanel: InfoPanelService,
@@ -24,7 +28,19 @@ export class InfoPanelComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+
     this.tabsArray = this.infoPanel.getTabs(this.callingPage);
+
+    console.log(this.tabsArray);
+    this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
+      if ( this.data.get('activePath', false) ) {
+        this.tabsArray.forEach( tab => {
+          if ( tab.name === 'details' || tab.name === 'overlay') {
+            tab.disabled = false;
+          }
+        });
+      }
+    });
   }
 
   onMinimiseClick() {
@@ -33,7 +49,15 @@ export class InfoPanelComponent implements OnInit {
   }
 
   getTabsClass(tab: TsTab) {
-    return tab.active ? 'active show' : '';
+    let tabClass = '';
+    if ( tab.active) { tabClass += 'active show'; }
+    if ( tab.disabled ) { tabClass += 'disabled'; }
+    return tabClass;
+  }
+
+  ngOnDestroy() {
+    if (this.newPathListener) { this.newPathListener.unsubscribe(); }
+
   }
 
 }

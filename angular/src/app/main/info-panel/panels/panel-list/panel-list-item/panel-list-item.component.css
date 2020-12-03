@@ -7,6 +7,10 @@ div {
   cursor: pointer;
 }
 
+.list-item:hover{
+  background-color: var(--ts-grey-background);
+}
+
 .name {
   font-size: small;
   font-weight: bold;

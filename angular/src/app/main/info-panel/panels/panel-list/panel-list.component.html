@@ -1,6 +1,5 @@
 
 <div class="p-2 h-100 d-flex flex-column">
-  {{tabName}}
 
   <!-- PUBLIC/PRIVATE DROPDOWN -->
   <form>
@@ -19,7 +18,12 @@
 
 
   <!-- EMPTY ROUTE LIST -->
-  <!-- <div *ngIf="nRoutesInView === 0" class="w-100 text-center flex-grow-1">
+  <div *ngIf="tabName === 'overlay' && nAvailableRoutes === 0" class="w-100 text-center flex-grow-1">
+
+
+  </div>
+
+  <div *ngIf="tabName === 'routes' && nAvailableRoutes === 0" class="w-100 text-center flex-grow-1">
 
     <div class="text-center m-3">
       No routes found.
@@ -33,7 +37,7 @@
       Only routes in the current map view are listed.  Try moving the map to find routes.
     </div>
 
-  </div> -->
+  </div>
 
 
   <!-- ROUTE LIST -->
@@ -63,9 +67,7 @@
       <div *ngFor="let item of displayList; let i = index">
 
         <div (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
-        <!-- <div (click)="onListClick(item.pathId)"> -->
           <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
-          <!-- <div class="highlight"> -->
             <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
           </div>
         </div>

@@ -28,7 +28,7 @@
       <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
       <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
         <li *ngFor="let tab of tabsArray" class="nav-item">
-          <a [ngClass]="getTabsClass(tab)" id="{{tab.title}}" class='nav-link m-0 px-0 py-2 rounded-0  border-top'
+          <a [ngClass]="getTabsClass(tab)" id="{{tab.title}}" class='nav-link m-0 px-0 py-2 rounded-0 border-top'
             data-toggle="tab" href={{tab.href}} role="tab">
             {{tab.title}}
           </a>

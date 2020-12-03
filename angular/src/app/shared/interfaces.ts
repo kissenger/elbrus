@@ -81,6 +81,7 @@ export interface TsTab {
   component: any;
   title?: string;
   href?: string;
+  disabled?: boolean;
 }
 
 export type TsTabsArray = TsTab[];
