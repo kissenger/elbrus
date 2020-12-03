@@ -64,7 +64,7 @@
     <div class=" flex-grow-1 position-relative">
       <div class=" d-flex flex-column position-absolute routes-list overflow-auto">
 
-      <div *ngFor="let item of displayList; let i = index">
+      <div *ngFor="let item of listItems.array; let i = index">
 
         <div (click)="onListClick(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
           <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
