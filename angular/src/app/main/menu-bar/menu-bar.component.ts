@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
 import { DataService } from 'src/app/shared/services/data.service';
 
@@ -7,23 +8,38 @@ import { DataService } from 'src/app/shared/services/data.service';
   templateUrl: './menu-bar.component.html',
   styleUrls: ['./menu-bar.component.css']
 })
-export class MenuBarComponent implements OnInit {
+export class MenuBarComponent implements OnInit, OnDestroy {
 
 
   @Input() callingPage: TsCallingPageType;
   @Input() map;
 
+  private newPathListener: Subscription;
+  public isData = false;
 
-  constructor(  ) { }
+  constructor(
+    private data: DataService
+   ) { }
 
   ngOnInit() {
-    console.log(this.callingPage);
+
+    // listen for when data is set to be able to enable the view buttons
+    this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
+      if (this.data.get('activePath', false)) {
+        this.isData = true;
+      }
+    });
   }
 
   onChangeOptions(option: {}) {
     const optionKey = Object.keys(option)[0];
     this.map.options = option[optionKey];
   }
+
+  ngOnDestroy() {
+    if (this.newPathListener) { this.newPathListener.unsubscribe(); }
+  }
+
 
 }
 

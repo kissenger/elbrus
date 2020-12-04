@@ -96,7 +96,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // subscribe to change in map view
     this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
-      console.log('panel-list: newMapViewListener');
       this.boundingBox = bounds;
       this.offset = 0;
       this.listItems.removeInactive();
@@ -108,10 +107,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
-    // if overlay mode, listen for a change in active route, and reset
+    // if overlay mode, listen for a change in active route, and reset - also triggered when map finishes loading
     if ( this.tabName === 'overlay' ) {
       this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
-        console.log('panel-list: newActiveRouteListener');
         this.listItems.clear();
         this.highlightColours.reset();
         this.addPathsToList();
@@ -129,7 +127,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
       // do nothing
 
     } else {
-      console.log('panel-list: adding paths');
       this.isLoading = true;
       this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {

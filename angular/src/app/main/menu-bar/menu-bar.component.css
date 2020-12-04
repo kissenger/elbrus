@@ -2,18 +2,18 @@
 
 /* menu bar formatting needed to located the containerin the right place */
 .menu-bar {
-    top: 0px;
-    left: 0px;
-    font-size: small;
-    opacity: 0.6;
-    width: 100px;
-    background-color: white;
+  top: 0px;
+  left: 0px;
+  font-size: small;
+  opacity: 0.6;
+  width: 100px;
+  background-color: white;
   box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
-
+  cursor: default;
 }
 
 .menu-bar:hover {
-    opacity: 1.0;
+  opacity: 1.0;
 }
 
 .btn-light {
@@ -25,8 +25,13 @@
   background-color: rgb(218, 224, 229);
 }
 
+.disabled:hover {
+  background-color: white;
+  cursor: default;
+}
+
 .clicky-btn:hover  {
-    opacity: 1.0;
+  opacity: 1.0;
 }
 
 .radio-btns  {

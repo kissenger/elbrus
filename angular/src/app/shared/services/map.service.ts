@@ -89,7 +89,7 @@ export class MapService {
       this.tsMap.on('load', () => {
         console.log('map finished loading');
         this.data.set('mapView', this.getMapView());
-        // this.data.mapBoundsEmitter.emit(this.getMapBounds());
+        this.data.mapBoundsEmitter.emit(this.getMapBounds());
         resolve();
       });
 
@@ -97,22 +97,13 @@ export class MapService {
 
   }
 
-  public fitView() {
-    // { minLng: 180, minLat: 90, maxLng: -180, maxLat: -90 }
-
-    // this.tsMap.getSource('activePath');
-    // const bbox = this.history.boundingBox;
-    // console.log(this.data.get('activePath', false).properties.stats.bbox);
+  public fitViewOne() {
     this.bounds = this.data.get('activePath', false).bbox;
-
-    // this.bounds = bbox;
-    // const sw = new mapboxgl.LngLat(bbox.minLng, bbox.minLat);
-    // const ne = new mapboxgl.LngLat(bbox.maxLng, bbox.maxLat);
-    // const bounds = new mapboxgl.LngLatBounds(sw, ne);
-
-    // this.tsMap.fitBounds(bounds);
   }
 
+  public fitViewAll() {
+    this.bounds = this.layers.outerBoundingBox;
+  }
 
   public plotMarker(location: TsCoordinate) {
     if (this.marker) {
@@ -150,6 +141,7 @@ export class MapService {
       console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
       const path = new Path( pathAsGeoJSON );
       const pathId = pathAsGeoJSON.properties.pathId;
+      const bbox: TsBoundingBox = pathAsGeoJSON.bbox;
 
       // map listener will fire only once when the data has finished loading
       this.tsMap.once('idle', (e) => {
@@ -158,7 +150,7 @@ export class MapService {
         resolve();
       });
 
-      this.layers.add(pathId);
+      this.layers.add(pathId, bbox);
       this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
       this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
 
@@ -265,16 +257,14 @@ export class MapService {
 
   public clear() {
 
-    // return new Promise( async (resolve, reject) => {
+    // remove each active layer
+    if ( this.layers ) {
+      this.layers.get.forEach( layer => { this.remove(layer.pathId); });
+    }
 
-      if ( this.layers ) {
-        this.layers.get.map( pathId => { this.remove(pathId); });
-      }
+    this.layers.clear();
+    this.data.setPath(globals.emptyGeoJson, true);
 
-      // resolve();
-      this.data.setPath(globals.emptyGeoJson, true);
-
-    // });
   }
 
 

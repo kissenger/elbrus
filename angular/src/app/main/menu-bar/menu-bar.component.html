@@ -1,5 +1,5 @@
 
-<div class="btn-group-vertical menu-bar position-absolute mt-2 border">
+<div class="btn-group-vertical menu-bar position-absolute my-2 py-1 border">
 
   <div class="w-100 p-1">
     <div class="w-100 px-1 border-bottom">
@@ -48,10 +48,19 @@
   </button>
 
   <button
-    (click)="map.fitView()"
+    (click)="map.fitViewOne()"
+    [ngClass]="isData ? '' : 'disabled'"
     type="button"
     class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Fit view</small>
+    <small>Fit active path</small>
+  </button>
+
+  <button
+    (click)="map.fitViewAll()"
+    [ngClass]="isData ? '' : 'disabled'"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Fit all paths</small>
   </button>
 
   <div *ngIf="callingPage!=='list'" class="w-100">
