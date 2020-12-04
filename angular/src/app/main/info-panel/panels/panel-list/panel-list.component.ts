@@ -52,8 +52,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   private sharedPath = {
     _pid: '',
-    get valid() { return this._pid > 10; },
-    get pid() { return this._pid; },
+    get valid() { return this._pid.length > 10; },
+    get idFromUrl() { return this._pid; },
     set param(p) { this._pid = p; },
     clear() { this._pid = ''; }
   };
@@ -96,6 +96,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // subscribe to change in map view
     this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
+      console.log('panel-list: newMapViewListener');
       this.boundingBox = bounds;
       this.offset = 0;
       this.listItems.removeInactive();
@@ -110,6 +111,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // if overlay mode, listen for a change in active route, and reset
     if ( this.tabName === 'overlay' ) {
       this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
+        console.log('panel-list: newActiveRouteListener');
         this.listItems.clear();
         this.highlightColours.reset();
         this.addPathsToList();
@@ -127,7 +129,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
       // do nothing
 
     } else {
-
+      console.log('panel-list: adding paths');
       this.isLoading = true;
       this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
@@ -138,10 +140,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.isLoading = false;
 
           if (this.sharedPath.valid) {
-            const idFromUrl = this.sharedPath.pid;
-            this.listItems.setActive(idFromUrl, null);
+            this.listItems.setActive(this.sharedPath.idFromUrl, null);
+            this.sharedPath.clear();
           }
-
 
       }, (error) => {
         this.isLoading = false;

@@ -152,12 +152,12 @@ export type TsPosition = [number, number];
 
 /*minLng, minLat, maxLng, maxLat*/
 export type TsBoundingBox = [number, number, number, number];
-export interface TsBoundingBoxObject {
-  minLat: number;
-  maxLat: number;
-  minLng: number;
-  maxLng: number;
-}
+// export interface TsBoundingBoxObject {
+//   minLat: number;
+//   maxLat: number;
+//   minLng: number;
+//   maxLng: number;
+// }
 
 export interface TsGeoJsonProperties {
     pathId?: string;

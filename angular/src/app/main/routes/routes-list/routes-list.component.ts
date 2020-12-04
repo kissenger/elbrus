@@ -1,4 +1,4 @@
-import { TsPosition, TsFeature, TsFeatureCollection, TsCoordinate, TsBoundingBox, TsBoundingBoxObject } from 'src/app/shared/interfaces';
+import { TsPosition, TsFeatureCollection } from 'src/app/shared/interfaces';
 /**
  * Listens for request from panel-list component, makes the backend request and uses
  * map-service to make the desired changes to the plot
@@ -49,16 +49,15 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       const path = await this.getPath(idFromUrl);
 
       if (path.properties.info.isPublic) {
-        const bbox: TsBoundingBoxObject = path.properties.stats.bbox;
-        const startPosition: TsCoordinate = { lng: (bbox.minLng + bbox.maxLng) / 2, lat: (bbox.minLat + bbox.maxLat) / 2 };
-        await this.map.newMap(startPosition, 10);
-        this.addPathToMap(path, {}, {booEmit: true, booResizeView: true});
+        await this.map.newMap(null, null, path.bbox );
+        this.addPathToMap(path, {}, {booEmit: true, booResizeView: false});
 
       } else {
         this.alert.showAsElement('Error: Path not found', 'Could not find the requested path.', true, false).subscribe( () => {});
       }
     } else {
-    await this.map.newMap();
+
+      await this.map.newMap();
 
     }
 

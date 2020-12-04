@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition, TsBoundingBoxObject } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActiveLayers } from '../classes/active-layers';
@@ -33,7 +33,7 @@ export class MapService {
   }
 
 
-  newMap(startPosition?: TsCoordinate, startZoom?: number) {
+  newMap(startPosition?: TsCoordinate, startZoom?: number, boundingBox?: TsBoundingBox) {
   // newMap(location?: TsCoordinate, zoom?: number) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
@@ -72,6 +72,10 @@ export class MapService {
         zoom: mapZoom
       });
 
+      if ( boundingBox ) {
+        this.bounds = boundingBox;
+      }
+
       this.layers = new ActiveLayers();
 
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
@@ -85,7 +89,7 @@ export class MapService {
       this.tsMap.on('load', () => {
         console.log('map finished loading');
         this.data.set('mapView', this.getMapView());
-        this.data.mapBoundsEmitter.emit(this.getMapBounds());
+        // this.data.mapBoundsEmitter.emit(this.getMapBounds());
         resolve();
       });
 
@@ -98,8 +102,8 @@ export class MapService {
 
     // this.tsMap.getSource('activePath');
     // const bbox = this.history.boundingBox;
-    console.log(this.data.get('activePath', false).properties.stats.bbox);
-    this.bounds = this.data.get('activePath', false).properties.stats.bbox;
+    // console.log(this.data.get('activePath', false).properties.stats.bbox);
+    this.bounds = this.data.get('activePath', false).bbox;
 
     // this.bounds = bbox;
     // const sw = new mapboxgl.LngLat(bbox.minLng, bbox.minLat);
@@ -286,19 +290,19 @@ export class MapService {
   }
 
 
-  public set bounds(boundingBox: TsBoundingBox | TsBoundingBoxObject) {
+  public set bounds(boundingBox: TsBoundingBox) {
 
     let bbox: mapboxgl.LngLatBoundsLike ;
-    if ('minLat' in boundingBox) {
-      // is of type TsBoundingBoxObject
-      bbox = [ [boundingBox.minLng, boundingBox.minLat], [boundingBox.maxLng, boundingBox.maxLat] ];
-    } else {
+    // if ('minLat' in boundingBox) {
+    //   // is of type TsBoundingBoxObject
+    //   bbox = [ [boundingBox.minLng, boundingBox.minLat], [boundingBox.maxLng, boundingBox.maxLat] ];
+    // } else {
       // is of type TsBoundingBox
       bbox = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
-    }
+    // }
 
     const options = {
-      padding: {top: 20, bottom: 20, left: 10, right: 10},
+      padding: {top: 100, bottom: 100, left: 100, right: 300},
       linear: true
     };
     this.tsMap.fitBounds(bbox, options);
