@@ -6,20 +6,8 @@ export const M_TO_FT = 3.28084;
 export const EXPORT_FILE_SIZE_LIMIT = 100000;
 export const LONG_PATH_THRESHOLD = 1000;
 
-// export const links = {
-//     wiki: {
-//         elevations: 'https://github.com/kissenger/cotopaxi/wiki/Elevations'
-//     }
-// };
-
-// the following will eventually be set by user profile
-
-// export const units: TsUnits = {
-//         distance: 'miles',
-//         elevation: 'ft'
-//       };
-
-// export const userHomeLocation: TsCoordinate = {lat: 51, lng: -4};
+// define the screen width below which we need to adapt
+export const narrowScreenThreshold = 500;
 
 // lineStyles are defined here and on geoJSON - when specified locally they will override the geoJSON lineStyle
 // export const overlayLineStyle = {lineWidth: 2, lineColour: 'blue', lineOpacity: 0.3};
@@ -35,7 +23,7 @@ export const defaultUnits: TsUnits = {
 
 export const defaultMapView: TsMapView = {
     centre: {lat: 51.47685, lng: -0.00000},
-    zoom: 8
+    zoom: 12
 };
 
 

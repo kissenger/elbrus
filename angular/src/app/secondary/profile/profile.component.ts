@@ -103,9 +103,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    // this.router.navigate(['/']);
-    this.location.back();
+    const redirect = this.data.get('redirect', true);
+    if (redirect) {
+      this.router.navigate([redirect]);
+    } else {
+      this.router.navigate(['/routes/list']);
+    }
   }
+
 
   ngOnDestroy(): void {
     this.data.unitsUpdateEmitter.emit();

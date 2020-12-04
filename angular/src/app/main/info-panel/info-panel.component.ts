@@ -4,6 +4,7 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { InfoPanelService } from 'src/app/shared/services/info-panel.service';
 import { TsTabsArray, TsTab } from 'src/app/shared/interfaces';
 import { Subscription } from 'rxjs';
+import * as globals from 'src/app/shared/globals';
 
 @Component({
   selector: 'app-info-panel',
@@ -21,7 +22,6 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
   public isMinimised = false;
   private newPathListener: Subscription;
 
-
   constructor(
     private infoPanel: InfoPanelService,
     private data: DataService
@@ -31,8 +31,9 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
 
     this.tabsArray = this.infoPanel.getTabs(this.callingPage);
 
-    console.log(this.tabsArray);
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
+
+      // enable disabled tabs when we have data
       if ( this.data.get('activePath', false) ) {
         this.tabsArray.forEach( tab => {
           if ( tab.name === 'details' || tab.name === 'overlay') {
@@ -40,7 +41,15 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
           }
         });
       }
+
+      // if on narrow screen, minimise panel
+      if (window.screen.width < globals.narrowScreenThreshold) {
+        this.isMinimised = true;
+        this.data.minimisePanelEmitter.emit(true);
+      }
+
     });
+
   }
 
   onMinimiseClick() {

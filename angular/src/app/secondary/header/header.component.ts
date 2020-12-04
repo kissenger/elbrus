@@ -19,14 +19,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     public auth: AuthService,  // do not delete - used in html
     public router: Router,
-    public dataService: DataService,
+    public data: DataService,
     public location: Location
   ) { }
 
   ngOnInit() {
 
     // this detects a route change so we know what page we are on and dynamically set header menu
-    console.log('hiof');
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.showMenu = event.urlAfterRedirects !== '/welcome' && event.urlAfterRedirects !== '/login';
@@ -45,7 +44,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   onProfileClick() {
-    this.router.navigate(['/profile']);
+    // save url so profile knows where to navigate back to...
+    const url = this.router.url;
+    // dont do anything if already in profile
+    if (url !== '/profile') {
+      this.data.set('redirect', this.router.url);
+      this.router.navigate(['/profile']);
+    }
+
   }
 
 

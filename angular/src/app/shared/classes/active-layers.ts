@@ -24,6 +24,10 @@ export class ActiveLayers {
     return this._layers.filter( layer => layer.pathId !== pathId );
   }
 
+  public get length() {
+    return this._layers.length;
+  }
+
   public get outerBoundingBox(): TsBoundingBox {
     return this._layers.reduce( (arr, layer) => [
       Math.min(arr[0], layer.bbox[0]),

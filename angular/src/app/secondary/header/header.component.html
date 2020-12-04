@@ -7,7 +7,7 @@
     </a>
   </div>
 
-  <div *ngIf='showMenu' class="dropdown align-self-end mx-1 h-100 position-relative">
+  <div *ngIf='showMenu' class="dropdown mx-1 h-100 position-relative">
     <div class="dropbtn dropdown-toggle m-0 px-2 py-1">Menu</div>
     <div class="dropdown-content">
       <li *ngIf="auth.isRegisteredUser()" (click)="onProfileClick()" class="p-2">View Profile</li>

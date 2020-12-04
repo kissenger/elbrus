@@ -2,15 +2,21 @@
 
 /* menu bar formatting needed to located the containerin the right place */
 .menu-bar {
-  top: 0px;
+  top: 10px;
   left: 0px;
   font-size: small;
-  opacity: 0.6;
+  opacity: 1.0;
   width: 100px;
   background-color: white;
   box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
   cursor: default;
 }
+
+/* @media only screen and (max-width: 900px) {
+  .menu-bar {
+    opacity: 1.0;
+  }
+} */
 
 .menu-bar:hover {
   opacity: 1.0;
@@ -21,14 +27,18 @@
   border: none;
 }
 
-.btn-light:hover {
+.btn-light:hover:enabled {
   background-color: rgb(218, 224, 229);
 }
 
-.disabled:hover {
+/* .btn-light:hover:disabled {
+  background-color: white;
+} */
+
+/* .disabled:hover {
   background-color: white;
   cursor: default;
-}
+} */
 
 .clicky-btn:hover  {
   opacity: 1.0;

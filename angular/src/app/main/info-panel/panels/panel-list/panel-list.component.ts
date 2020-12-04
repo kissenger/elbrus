@@ -54,7 +54,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     _pid: '',
     get valid() { return this._pid.length > 10; },
     get idFromUrl() { return this._pid; },
-    set param(p) { this._pid = p; },
+    set param(p: string) { this._pid = p; },
     clear() { this._pid = ''; }
   };
 
@@ -86,7 +86,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     // check url for pathId; state is stored in the psuedo class and picked up again after list is updated
     this.sharedPath.param = this.router.url.split('/').slice(-1)[0];
-
 
     // do some set up
     this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
@@ -132,6 +131,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
           this.listItems.merge(result.list);
+          console.log(this.listItems.length, result.count);
           this.nLoadedRoutes = this.listItems.length;
           this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
           this.isLoading = false;

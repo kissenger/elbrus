@@ -2,7 +2,7 @@
 
 <div class="h-100 w-100 bg-white d-flex flex-column">
 
-  <div class="col-lg-6 offset-lg-3 small h-75 bg-white d-flex flex-column my-auto p-0">
+  <div class="col-lg-6 offset-lg-3 small h-100 bg-white d-flex flex-column my-auto p-0">
 
     <!-- INFO BLOCK -->
 
@@ -33,14 +33,14 @@
 
     <!-- PREFERENCES BLOCK -->
     <!-- <div class="row"> -->
-      <div class="h6 text-left border-bottom m-0 p-2">Preferences</div>
+      <div class="h6 text-left border-bottom m-0 mt-3 p-3">Preferences</div>
     <!-- </div> -->
 
     <div class="row justify-content-center">
       <div class="col-2 p-2 m-0"></div>
       <div class="col-4 p-2 m-0 text-left font-weight-bold">Distance</div>
       <div class="col-4 p-2 m-0 text-left"> {{ user.units.distance | unitsLongName }}</div>
-      <div class="col-2 p-2 m-0 pr-3text-center">
+      <div class="col-2 p-2 m-0 text-center">
         <span class="text-like-link" (click)="onChangeDistanceUnits()">change</span>
       </div>
     </div>

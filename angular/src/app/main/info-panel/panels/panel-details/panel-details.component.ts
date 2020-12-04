@@ -13,6 +13,7 @@ import { ChartDataSets, ChartOptions } from 'chart.js';
 import 'chartjs-plugin-zoom';
 import { UnitsConvertPipe } from 'src/app/shared/pipes/units-convert.pipe';
 import { UnitsLongNamePipe } from 'src/app/shared/pipes/units-longname.pipe';
+import { readBuilderProgram } from 'typescript';
 
 @Component({
   selector: 'app-panel-details',

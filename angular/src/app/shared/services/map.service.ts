@@ -22,6 +22,10 @@ export class MapService {
   public tsMap: mapboxgl.Map;
   public layers: ActiveLayers;
   private marker: mapboxgl.Marker;
+  private padding = {
+    wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
+    narrowScreen: {top: 10, left: 10, bottom: 10, right: 10}
+  };
 
   constructor(
     public http: HttpService,
@@ -97,13 +101,41 @@ export class MapService {
 
   }
 
+
+
   public fitViewOne() {
     this.bounds = this.data.get('activePath', false).bbox;
   }
 
+
+
   public fitViewAll() {
-    this.bounds = this.layers.outerBoundingBox;
+    if (this.layers.length > 0) {
+      this.bounds = this.layers.outerBoundingBox;
+    } else {
+      // fall back to fitOne if there are no layers (create route mode)
+      this.fitViewOne();
+    }
+
   }
+
+
+
+  private set bounds(boundingBox: TsBoundingBox) {
+
+    let bbox: mapboxgl.LngLatBoundsLike ;
+    bbox = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
+
+    const options = {
+      padding: window.screen.width < globals.narrowScreenThreshold ? this.padding.narrowScreen : this.padding.wideScreen,
+      linear: true
+    };
+
+    this.tsMap.fitBounds(bbox, options);
+
+  }
+
+
 
   public plotMarker(location: TsCoordinate) {
     if (this.marker) {
@@ -280,23 +312,7 @@ export class MapService {
   }
 
 
-  public set bounds(boundingBox: TsBoundingBox) {
 
-    let bbox: mapboxgl.LngLatBoundsLike ;
-    // if ('minLat' in boundingBox) {
-    //   // is of type TsBoundingBoxObject
-    //   bbox = [ [boundingBox.minLng, boundingBox.minLat], [boundingBox.maxLng, boundingBox.maxLat] ];
-    // } else {
-      // is of type TsBoundingBox
-      bbox = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
-    // }
-
-    const options = {
-      padding: {top: 100, bottom: 100, left: 100, right: 300},
-      linear: true
-    };
-    this.tsMap.fitBounds(bbox, options);
-  }
 
 
   public getLocationOnClick() {
