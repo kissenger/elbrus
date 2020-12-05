@@ -25,9 +25,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
     // listen for when data is set to be able to enable the view buttons
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
-      if (this.data.get('activePath', false)) {
-        this.isData = true;
-      }
+      this.isData = this.data.getPath(false);
     });
   }
 

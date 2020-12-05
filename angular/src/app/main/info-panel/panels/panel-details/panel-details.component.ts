@@ -46,7 +46,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   public givenPathName: string;     // name given to the path in the details form; overrides the default nam
   public pathDescription = '';
   public isElevations: boolean;
-  public isData = false;
+  // public isData = false;
   public units: TsUnits;
   public pathType: string;
   public pathDirection: string;
@@ -83,31 +83,35 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
-      this.geoJson = this.data.get('activePath', false);
-      this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
-      this.isElevations = this.geoJson.properties.info.isElevations && !this.geoJson.properties.info.isLong;
-      this.chartData = [];
+      this.geoJson = this.data.getPath(false);
 
-      this.geoJson.features.forEach( (feature: TsFeature) => {
+      // this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
 
-        const localData =  [];
-        for (let i = 0; i < feature.properties.params.elev.length; i++) {
-          localData.push({
-            x: this.unitConvertPipe.transform(feature.properties.params.cumDistance[i], 'distance', this.units.distance),
-            y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
+      if (this.geoJson) {
+        this.isElevations = this.geoJson.properties.info.isElevations && !this.geoJson.properties.info.isLong;
+        this.chartData = [];
+
+        this.geoJson.features.forEach( (feature: TsFeature) => {
+
+          const localData =  [];
+          for (let i = 0; i < feature.properties.params.elev.length; i++) {
+            localData.push({
+              x: this.unitConvertPipe.transform(feature.properties.params.cumDistance[i], 'distance', this.units.distance),
+              y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
+            });
+          }
+
+          this.chartData.push({
+            data: localData,
+            borderColor: feature.properties.lineColour,
+            ...this.localChartOptions
           });
-        }
 
-        this.chartData.push({
-          data: localData,
-          borderColor: feature.properties.lineColour,
-          ...this.localChartOptions
         });
 
-      });
-
-      this.chartOptions = this.globalChartOptions;
-      this.chartLegend = false;
+        this.chartOptions = this.globalChartOptions;
+        this.chartLegend = false;
+      }
     });
 
   }

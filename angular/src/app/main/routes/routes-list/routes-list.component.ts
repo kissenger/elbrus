@@ -73,7 +73,6 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     const id = navigator.geolocation.watchPosition((pos) => {
       const loc: TsPosition = [pos.coords.longitude, pos.coords.latitude];
       this.map.addDataToLayer('deviceLocation', 'Point', [loc]);
-      console.log(pos.coords.latitude, pos.coords.longitude);
     },
     (error) => {}, {});
 

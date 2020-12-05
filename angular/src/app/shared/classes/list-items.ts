@@ -23,14 +23,10 @@ export class ListItems {
   }
 
   setInactive(pathId: string) {
-    console.log(JSON.parse(JSON.stringify(this._listItems)));
     const indx = this._listItems.findIndex(item => item.pathId === pathId);
-    console.log(indx)
-
     const colour = this._listItems[indx].colour;
     this._listItems[indx].isActive = false;
     this._listItems[indx].colour = null;
-    console.log(JSON.parse(JSON.stringify(this._listItems)));
 
     return colour;
   }

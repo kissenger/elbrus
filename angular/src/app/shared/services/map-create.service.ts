@@ -83,10 +83,18 @@ export class MapCreateService extends MapService {
   private updateMap() {
 
     this.tsMap.once('idle', (e) => {
-      if (this.history.length > 0) { this.data.setPath(this.history.fullGeo, true); }
+      // if (this.history.length > 0) { this.data.setPath(this.history.fullGeo, true); }
+      // emit the full geoJson to enable properties to be displayed in details
+      if (this.history.length === 0) {
+        this.data.setPath(null, true);
+      } else {
+
+        this.data.setPath(this.history.geoJson, true);
+
+      }
     });
 
-    this.line = this.history.simpleGeo;
+    this.line = this.history.geojsonClone;
     this.points = this.history.activePoints;
     this.symbols = this.history.startEndPoints;
 
@@ -102,27 +110,6 @@ export class MapCreateService extends MapService {
     (this.tsMap.getSource('0000sym') as mapboxgl.GeoJSONSource).setData(this.symbols);
   }
 
-
-
-
-
-  async simplify() {
-
-    try {
-
-      this.spinner.showAsElement();
-      const backendResult = await this.getPathFromBackend(this.history.coords, {simplify: true});
-      this.history.add( new Path( backendResult ) );
-      this.updateMap();
-      this.spinner.removeElement();
-
-    } catch (error) {
-
-      console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
-
-    }
-  }
 
 
 
@@ -177,9 +164,9 @@ export class MapCreateService extends MapService {
   public undo() {
 
     if ( !this.history.undo() ) {
-      this.alert.showAsElement('Warning', 'No more to undo ...', true, false)
-        .subscribe( (alertBoxResponse: boolean) => {});
+      this.alert.showAsElement('Warning', 'No more to undo ...', true, false).subscribe( () => {});
     }
+
     this.updateMap();
 
   }
@@ -187,13 +174,15 @@ export class MapCreateService extends MapService {
 
 
 
-  public undoAll() {
+  public clear() {
 
-    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, false)
+    console.log('how confusing');
+
+    this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, true)
       .subscribe( (alertBoxResponse: boolean) => {
 
       if (alertBoxResponse) {
-        this.history.undoAll();
+        this.history.clear();
         this.updateMap();
       }
 
@@ -212,6 +201,25 @@ export class MapCreateService extends MapService {
 
   }
 
+
+
+  async simplify() {
+
+    try {
+
+      this.spinner.showAsElement();
+      const backendResult = await this.getPathFromBackend(this.history.coords, {simplify: true});
+      this.history.add( new Path( backendResult ) );
+      this.updateMap();
+      this.spinner.removeElement();
+
+    } catch (error) {
+
+      console.log(error);
+      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+
+    }
+  }
 
 
 

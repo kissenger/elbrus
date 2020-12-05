@@ -59,11 +59,29 @@ export class DataService {
   public setPath(geoJson: TsFeatureCollection, emit: boolean) {
     if (emit) {
       this.dataStore['activePath'] = geoJson;
-      this.pathIdEmitter.emit(geoJson.properties.pathId);
+      const pathId = geoJson ? geoJson.properties.pathId : '0000';
+      // if (geoJson.properties) {
+      //   pathId = geoJson.properties.pathId;
+      // } else {
+      //   pathId = '0000';
+      // }
+      // const pathId = geoJson.properties.pathId ? geoJson.properties.pathId : '0000';
+      this.pathIdEmitter.emit(pathId);
     }
-
   }
 
+
+  public getPath(clearKey: boolean) {
+    const path = this.dataStore['activePath'];
+    // if (path) {
+      if (clearKey) { delete this.dataStore['activePath']; }
+      return path;
+    // } else {
+    //   return false;
+    // }
+
+
+  }
 
   // saves a key/value pair to the data store
   public set(keyName: string, value: any) {

@@ -46,12 +46,16 @@ export class Path {
   }
 
 
-  get simplifiedGeoJson(): TsFeatureCollection {
-    // return the last GeoJson in the history
-    // important to clone the object to avoid route edits affecting the undo history
-    const activePath = {type: 'FeatureCollection', features: this._geoJson.features};
-    return  JSON.parse(JSON.stringify( activePath ));
-    // return activePath;
+  /**
+   * Returns a clone of the geojson features (global properties are dropped)
+   * This is needed as this will be displayed on the map, and we need to break the pointer so that map updates dont
+   * affect the undo history
+   */
+  get geojsonClone(): TsFeatureCollection {
+    return JSON.parse(JSON.stringify( {
+      type: 'FeatureCollection',
+      features: this._geoJson.features
+    }));
   }
 
 

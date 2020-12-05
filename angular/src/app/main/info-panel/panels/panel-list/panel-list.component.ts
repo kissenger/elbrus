@@ -29,6 +29,7 @@ const LIST_HEIGHT_CORRECTION = 300;  // higher number results in fewer routes lo
 export class PanelListComponent implements OnInit, OnDestroy {
 
   @Input() tabName: 'routes' | 'overlay';
+  @Input() callingPage: 'list' | 'create';
 
   private listListener: Subscription;
   private mapUpdateListener: Subscription;
@@ -106,14 +107,17 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
+    console.log(this.callingPage);
     // if overlay mode, listen for a change in active route, and reset - also triggered when map finishes loading
-    if ( this.tabName === 'overlay' ) {
+    // only do this for list - if create then load anyway
+    if ( this.callingPage === 'list' && this.tabName === 'overlay' ) {
       this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
         this.listItems.clear();
         this.highlightColours.reset();
         this.addPathsToList();
       });
     }
+
 
   }
 
@@ -122,7 +126,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   addPathsToList() {
 
     // dont do anything if in overlay mode and there is no active path selected
-    if ( this.tabName === 'overlay' && !this.data.get('activePath', false)) {
+    if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath(false)) {
       // do nothing
 
     } else {
@@ -131,7 +135,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
           this.listItems.merge(result.list);
-          console.log(this.listItems.length, result.count);
           this.nLoadedRoutes = this.listItems.length;
           this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
           this.isLoading = false;
@@ -176,6 +179,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
       this.listItems.setActive(idFromClick, null);
 
     } else {
+      // tabName==='overlay'
 
       if ( this.listItems.isActive(idFromClick) ) {
         // reclicking an active item in overlay mode clears only that path
@@ -184,10 +188,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
         this.highlightColours.colours.unshift( colour );
 
       } else {
-          // clicking a new item in overlay mode just adds new overlay to map
-          command.command = 'add';
-          command.colour = this.highlightColours.colours.shift();
-          this.listItems.setActive(idFromClick, command.colour);
+        // clicking a new item in overlay mode just adds new overlay to map
+        command.command = 'add';
+        command.colour = this.highlightColours.colours.shift();
+        this.listItems.setActive(idFromClick, command.colour);
       }
     }
 
@@ -229,11 +233,15 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       // if overlay, disable the listitem that is stored in data (selected in routes)
       if ( this.tabName === 'overlay' ) {
-        if ( this.data.get('activePath', false).properties.pathId === id) {
-          styles['color'] = 'lightgrey';
-          styles['cursor'] = 'auto';
-          styles['pointer-events'] = 'none';
+        const activePath = this.data.getPath(false);
+        if ( activePath ) {
+          if ( activePath.properties.pathId === id) {
+            styles['color'] = 'lightgrey';
+            styles['cursor'] = 'auto';
+            styles['pointer-events'] = 'none';
+          }
         }
+
       }
 
     }

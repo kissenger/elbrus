@@ -57,6 +57,7 @@ export class GeoJsonPipe implements PipeTransform {
 
       return <TsFeatureCollection>{
         type: 'FeatureCollection',
+        // properties: {pathId: '0000'},
         features: features
       };
 
