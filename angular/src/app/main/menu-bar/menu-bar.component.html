@@ -68,6 +68,24 @@
     <small>Fit all paths</small>
   </button>
 
+  <button
+    (click)="map.gotoHome()"
+    [disabled]="!isData"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Go to Home</small>
+  </button>
+
+  <button
+    (click)="map.gotoMyLocation()"
+    [disabled]="!map.location"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Where am I?</small>
+  </button>
+
+
+
   <div *ngIf="callingPage!=='list'" class="w-100">
     <div class="w-100 px-1 pt-2 pb-1">
       <div class="w-100 p-1 border-bottom">

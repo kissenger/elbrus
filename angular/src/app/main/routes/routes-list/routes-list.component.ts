@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
+import { LocationService } from 'src/app/shared/services/location.service';
 
 @Component({
   selector: 'app-routes',
@@ -33,7 +34,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private router: Router,
     // private spinner: SpinnerService,
-    private alert: AlertService
+    private alert: AlertService,
+    private location: LocationService
     ) { }
 
 
@@ -70,11 +72,15 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       'circle-stroke-color': '#523209',
       'circle-color': '#83964B',
     });
-    const id = navigator.geolocation.watchPosition((pos) => {
-      const loc: TsPosition = [pos.coords.longitude, pos.coords.latitude];
-      this.map.addDataToLayer('deviceLocation', 'Point', [loc]);
+
+    this.location.watch().subscribe( (position: TsPosition) => {
+      console.log('there')
+      this.map.addDataToLayer('deviceLocation', 'Point', [position]);
     },
-    (error) => {}, {});
+    (error) => {
+      console.log('here');
+      this.map.addDataToLayer('deviceLocation', 'Point', null);
+    });
 
     // listen for coordinate from chart and plot on map
     this.map.addPointsLayer('pointHighlighter', {

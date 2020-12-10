@@ -8,6 +8,7 @@ import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString, TsCo
 
 /**
  * Converts an array of points into a geoJson object
+ * returns empty geojson if coords is null or []
  */
 
 export class GeoJsonPipe implements PipeTransform {
@@ -32,13 +33,22 @@ export class GeoJsonPipe implements PipeTransform {
        * Places 'start' as title on the first point, 'end' on the last point, and nothing on the other points
        */
       let text: string;
-      const pointFeatures = coords.map( (coord, index) => {
-        if ( labels ) {
-          text = labels[index];
-        }
-        return getPointFeature(coord, `${index}`, text);
-      });
+      let pointFeatures: any;
 
+      console.log(coords);
+      if (coords) {
+        console.log('a')
+        pointFeatures = coords.map( (coord, index) => {
+          if ( labels ) {
+            text = labels[index];
+          }
+          return getPointFeature(coord, `${index}`, text);
+        });
+      } else {
+        console.log('b')
+
+        pointFeatures =  getPointFeature([], '0', text);
+      }
 
       return getFeatureCollection(pointFeatures);
 

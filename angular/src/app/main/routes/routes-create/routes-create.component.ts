@@ -1,10 +1,11 @@
+import { LocationService } from 'src/app/shared/services/location.service';
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { HttpService } from 'src/app/shared/services/http.service';
-import { TsPlotPathOptions, TsCallingPage, TsFeatureCollection, TsLineStyle } from 'src/app/shared/interfaces';
+import { TsPlotPathOptions, TsCallingPage, TsFeatureCollection, TsLineStyle, TsPosition } from 'src/app/shared/interfaces';
 import { ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/shared/services/alert.service';
 
@@ -27,10 +28,11 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     public map: MapCreateService,
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
-    private alert: AlertService
+    private alert: AlertService,
+    private location: LocationService
     ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     this.callingPageListener = this.activatedRoute.data.subscribe( data => {
       this.callingPage = data.callingPage;
@@ -38,9 +40,27 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
 
     // initialise the map and launch create route
-    this.map.newMap().then( () => {
-      this.map.createRoute();
+    await this.map.newMap();
+    this.map.createRoute();
+
+
+    // get device location
+    this.map.addPointsLayer('deviceLocation', {
+      'circle-radius': 4,
+      'circle-opacity': 1,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#523209',
+      'circle-color': '#83964B',
     });
+
+    this.location.watch().subscribe( (position: TsPosition) => {
+      this.map.addDataToLayer('deviceLocation', 'Point', [position]);
+    },
+    (error) => {
+      console.log('here');
+      this.map.addDataToLayer('deviceLocation', 'Point', null);
+    });
+
 
 
     // listen for command from panel-list asking for map changes
