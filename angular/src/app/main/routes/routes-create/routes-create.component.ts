@@ -45,17 +45,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
 
     // get device location
-    this.map.addPointsLayer('deviceLocation', {
-      'circle-radius': 4,
-      'circle-opacity': 1,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': '#523209',
-      'circle-color': '#83964B',
-    });
-
-    this.location.watch().subscribe( (position: TsPosition) => {
-      this.map.addDataToLayer('deviceLocation', 'Point', [position]);
-    });
+    this.location.watch(this.map);
 
 
     // listen for command from panel-list asking for map changes

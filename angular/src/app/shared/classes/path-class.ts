@@ -132,7 +132,9 @@ export class Path {
 
   get startEndPoints() {
 
-    return this.geoJsonPipe.transform([this.positions[0], this.positions[this.positions.length - 1]], 'Point', ['start', 'end'] );
+    return this.geoJsonPipe.transform(
+      [this.positions[0], this.positions[this.positions.length - 1]], 'Point', [{title: 'start'}, {title: 'end'}]
+    );
   }
 
 }

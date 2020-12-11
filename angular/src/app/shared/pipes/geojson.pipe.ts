@@ -13,18 +13,18 @@ import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString, TsCo
 
 export class GeoJsonPipe implements PipeTransform {
 
-  transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', labels?: Array<string>): TsFeatureCollection {
+  transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', properties?: Array<Object>): TsFeatureCollection {
+
+    // properties, if supplied, should be an array of the same length as the coords array, each element
+    // being an object of the desired key-value pairs
 
     // bit of a hack - ensure we return an empty geojson if supplied with nulls
-    if (coords === null  || !coords[0]) { coords = []; }
+    // if (coords === null  || !coords[0]) { coords = []; }
 
 
-    if ( labels ) {
-      if ( coords.length !== labels.length ) {
+    if ( properties ) {
+      if ( coords.length !== properties.length ) {
         throw new Error('Labels array not of same length as coords array');
-      }
-      if ( type === 'LineString' ) {
-        throw new Error('Labels array not expected for LineString geoJSON');
       }
     }
 
@@ -35,20 +35,15 @@ export class GeoJsonPipe implements PipeTransform {
        * Places an id on each point, incrementally numbered from 0
        * Places 'start' as title on the first point, 'end' on the last point, and nothing on the other points
        */
-      let text: string;
       let pointFeatures: any;
 
       if (coords) {
-        pointFeatures = coords.map( (coord, index) => {
-          if ( labels ) {
-            text = labels[index];
-          }
-          return getPointFeature(coord, `${index}`, text);
-        });
+        pointFeatures = coords.map( (coord, index) => getPointFeature(coord, `${index}`, properties ? properties[index] : undefined ) );
       } else {
-        pointFeatures =  getPointFeature([], '0', text);
+        pointFeatures =  getPointFeature([], '0', {});
       }
 
+      console.log(getFeatureCollection(pointFeatures));
       return getFeatureCollection(pointFeatures);
 
     } else if ( type === 'LineString' ) {
@@ -71,20 +66,23 @@ export class GeoJsonPipe implements PipeTransform {
 
     }
 
-    function getPointFeature(point: TsPosition | [], pointId?: string, text?: string) {
+    function getPointFeature(point: TsPosition | [], pointId: string, props?: {} ) {
 
       const feature =  <TsFeature> {
         type: 'Feature',
         id: pointId,
+        properties: {
+          ...props
+        },
         geometry: <TsPoint>{
           type: 'Point',
           coordinates: point
         }
       };
 
-      if (text) {
-        feature.properties = {title: text};
-      }
+      // if (text) {
+      //   feature.properties = {title: text};
+      // }
 
       return feature;
     }

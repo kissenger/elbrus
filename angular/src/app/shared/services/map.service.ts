@@ -221,15 +221,13 @@ export class MapService {
       type: 'circle',
       source: layerId,
       paint: layerPaint
-
-
     });
 
   }
 
-  public addDataToLayer(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>) {
+  public setLayerData(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>, properties?: Array<Object>) {
 
-    const _data = this.geoJsonPipe.transform(data, dataType);
+    const _data = this.geoJsonPipe.transform(data, dataType, properties ? properties : undefined);
     // console.log(_data);
     (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);
   }

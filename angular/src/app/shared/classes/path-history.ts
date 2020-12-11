@@ -93,13 +93,34 @@
 
     // returns a geojson containing the first and last points of the last path in the undo history
     get startEndPoints() {
-      if ( this.lastPath ) {
-        return this.lastPath.startEndPoints;
-      } else if ( this.firstPoint ) {
-        return this.geoJsonPipe.transform([[this.firstPoint.lng, this.firstPoint.lat]], 'Point', ['start']);
-      } else {
-        return this.geoJsonPipe.transform([], 'Point');
+
+      let coords = [];
+      let props = [];
+
+      if (this.lastPath) {
+        coords = [[this.lastPoint.lng, this.lastPoint.lat]];
+        props = [{title: 'end'}];
       }
+
+      if (this.firstPoint) {
+        coords.unshift([this.firstPoint.lng, this.firstPoint.lat]);
+        props.unshift({title: 'start'});
+      }
+
+      return this.geoJsonPipe.transform(coords, 'Point', props);
+
+
+      // if ( this.lastPath ) {
+      //   coords = [this.positions[0], this.positions[this.positions.length - 1]], 'Point', [{label: 'start'}, {label: 'end'}]
+      //   );
+      // } else if ( this.firstPoint ) {
+      //   return this.geoJsonPipe.transform(
+      //     [[this.firstPoint.lng, this.firstPoint.lat]], 'Point', [{label: 'start'}]);
+      // } else {
+      //   return this.geoJsonPipe.transform([], 'Point');
+      // }
+      // return this.geoJsonPipe.transform(
+      //   coords, 'Point', labels);
     }
 
 

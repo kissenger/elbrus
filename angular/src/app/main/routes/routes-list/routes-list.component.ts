@@ -65,17 +65,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
 
     // get device location
-    this.map.addPointsLayer('deviceLocation', {
-      'circle-radius': 4,
-      'circle-opacity': 1,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': '#523209',
-      'circle-color': '#83964B',
-    });
-
-    this.location.watch().subscribe( (position: TsPosition) => {
-      this.map.addDataToLayer('deviceLocation', 'Point', [position]);
-    });
+    this.location.watch(this.map);
 
     // listen for coordinate from chart and plot on map
     this.map.addPointsLayer('pointHighlighter', {
@@ -86,7 +76,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
     this.chartPointListener = this.data.chartPointEmitter.subscribe( (data) => {
       if (data.action === 'show') {
-        this.map.addDataToLayer('pointHighlighter', 'Point', data.point);
+        this.map.setLayerData('pointHighlighter', 'Point', data.point);
       } else if (data.action === 'centre') {
         this.map.goto(data.point[0]);
       }
