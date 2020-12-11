@@ -228,6 +228,7 @@ export class MapService {
   }
 
   public addDataToLayer(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>) {
+
     const _data = this.geoJsonPipe.transform(data, dataType);
     // console.log(_data);
     (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);

@@ -55,12 +55,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
     this.location.watch().subscribe( (position: TsPosition) => {
       this.map.addDataToLayer('deviceLocation', 'Point', [position]);
-    },
-    (error) => {
-      console.log('here');
-      this.map.addDataToLayer('deviceLocation', 'Point', null);
     });
-
 
 
     // listen for command from panel-list asking for map changes

@@ -9,6 +9,7 @@ import { TsPosition } from '../interfaces';
 
 export class LocationService {
 
+  private navHandler: any;
   private currentLocation: TsPosition = null;
   private watchOptions: {
     enableHighAccuracy: false,
@@ -17,31 +18,35 @@ export class LocationService {
   };
 
   constructor(
-    // public map: MapService
   ) {
   }
 
   watch(): Observable<Object> {
 
     return new Observable(observer => {
-      navigator.geolocation.watchPosition((pos: Position) => {
-        console.log(pos);
-        this.currentLocation = [pos.coords.longitude, pos.coords.latitude];
-        // observer.next(this.currentLocation);
-        observer.next(this.currentLocation);
 
+      this.navHandler = navigator.geolocation.watchPosition(
+      (pos: Position) => {
+        this.currentLocation = [pos.coords.longitude, pos.coords.latitude];
+        observer.next(this.currentLocation);
       },
       (error) => {
-        console.log(error);
-        // observer.error(error);
-        throw error;
+        this.currentLocation = null;
+        observer.next(this.currentLocation);
       },
       this.watchOptions);
     });
+
   }
+
 
   isLocation() {
     return !!this.currentLocation;
+  }
+
+
+  unwatch() {
+    navigator.geolocation.clearWatch(this.navHandler);
   }
 
 }

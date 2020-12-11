@@ -15,6 +15,9 @@ export class GeoJsonPipe implements PipeTransform {
 
   transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', labels?: Array<string>): TsFeatureCollection {
 
+    // bit of a hack - ensure we return an empty geojson if supplied with nulls
+    if (coords === null  || !coords[0]) { coords = []; }
+
 
     if ( labels ) {
       if ( coords.length !== labels.length ) {
@@ -35,9 +38,7 @@ export class GeoJsonPipe implements PipeTransform {
       let text: string;
       let pointFeatures: any;
 
-      console.log(coords);
       if (coords) {
-        console.log('a')
         pointFeatures = coords.map( (coord, index) => {
           if ( labels ) {
             text = labels[index];
@@ -45,8 +46,6 @@ export class GeoJsonPipe implements PipeTransform {
           return getPointFeature(coord, `${index}`, text);
         });
       } else {
-        console.log('b')
-
         pointFeatures =  getPointFeature([], '0', text);
       }
 
@@ -67,7 +66,6 @@ export class GeoJsonPipe implements PipeTransform {
 
       return <TsFeatureCollection>{
         type: 'FeatureCollection',
-        // properties: {pathId: '0000'},
         features: features
       };
 

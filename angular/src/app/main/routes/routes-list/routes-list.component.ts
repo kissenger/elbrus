@@ -74,12 +74,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
 
     this.location.watch().subscribe( (position: TsPosition) => {
-      console.log('there')
       this.map.addDataToLayer('deviceLocation', 'Point', [position]);
-    },
-    (error) => {
-      console.log('here');
-      this.map.addDataToLayer('deviceLocation', 'Point', null);
     });
 
     // listen for coordinate from chart and plot on map
