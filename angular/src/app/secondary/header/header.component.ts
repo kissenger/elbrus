@@ -48,7 +48,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const url = this.router.url;
     // dont do anything if already in profile
     if (url !== '/profile') {
-      this.data.set('redirect', this.router.url);
+      this.data.set({redirect: this.router.url});
       this.router.navigate(['/profile']);
     }
 

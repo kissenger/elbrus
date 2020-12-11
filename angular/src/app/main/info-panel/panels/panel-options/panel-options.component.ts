@@ -37,7 +37,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
     this.activePathSubscription = this.data.pathIdEmitter.subscribe( () => {
 
-      const geoJson = this.data.get('activePath', false);
+      const geoJson = this.data.getPath();
 
       this.isPathPublic = geoJson.properties.info.isPublic;
       this.createdBy = geoJson.properties.info.createdBy;
@@ -161,7 +161,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   onReverseClick() {
     this.httpSubscription = this.http.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
-      this.data.set('activePath', {source: 'created', pathAsGeoJSON});
+      this.data.setPath(pathAsGeoJSON);
       this.spinner.removeElement();
       this.router.navigate(['route/review/']);
     });
@@ -169,7 +169,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onCreateClick() {
-    this.data.set('activePath', null);
+    this.data.setPath(null);
     this.router.navigate(['/route/create']);
   }
 
@@ -193,7 +193,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
     this.httpSubscription = this.http.importRoute(fileData).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
-      this.data.set('activePath', {source: 'imported', pathAsGeoJSON});
+      this.data.setPath(pathAsGeoJSON);
       this.spinner.removeElement();
       this.router.navigate(['route/review/']);
 

@@ -33,14 +33,14 @@ export class MapSelectLocationComponent implements OnInit, OnDestroy {
     this.map.plotMarker(this.user.homeLngLat);
 
     this.map.getLocationOnClick();
-    this.newLocationListener = this.data.locationEmitter.subscribe( (loc: TsCoordinate) => {
+    this.newLocationListener = this.data.clickedCoordsEmitter.subscribe( (loc: TsCoordinate) => {
       this.location = loc;
     });
 
   }
 
   onOK () {
-    this.data.set('newLocation', this.location);
+    this.data.set({newLocation: this.location});
     this.router.navigate(['profile']);
   }
 

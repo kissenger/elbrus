@@ -51,11 +51,11 @@ export class MapService {
         mapCentre = startPosition;
         mapZoom = startZoom ? startZoom : globals.defaultMapView.zoom;
 
-      } else if ( this.data.get('mapView', false) ) {
+      } else if ( this.data.get('mapView') ) {
 
         // otherwise look for stored mapview
-        mapCentre = this.data.get('mapView', false).centre;
-        mapZoom = this.data.get('mapView', false).zoom;
+        mapCentre = this.data.get('mapView').centre;
+        mapZoom = this.data.get('mapView').zoom;
 
       } else if ( this.auth.isRegisteredUser() ) {
         // if that doesnt work, try to find the default location of the logged-in user
@@ -86,13 +86,13 @@ export class MapService {
 
       this.tsMap.on('moveend', () => {
         console.log('map finished moving');
-        this.data.set('mapView', this.getMapView());
+        this.data.set({mapView: this.getMapView()});
         this.data.mapBoundsEmitter.emit(this.getMapBounds());
       });
 
       this.tsMap.on('load', () => {
         console.log('map finished loading');
-        this.data.set('mapView', this.getMapView());
+        this.data.set({mapView: this.getMapView()});
         this.data.mapBoundsEmitter.emit(this.getMapBounds());
         resolve();
       });
@@ -104,7 +104,7 @@ export class MapService {
 
 
   public fitViewOne() {
-    this.bounds = this.data.get('activePath', false).bbox;
+    this.bounds = this.data.get('activePath').bbox;
   }
 
 
@@ -178,7 +178,7 @@ export class MapService {
       // map listener will fire only once when the data has finished loading
       this.tsMap.once('idle', (e) => {
         if (plotOptions.booResizeView) { this.bounds = pathAsGeoJSON.bbox; }
-        this.data.setPath(pathAsGeoJSON, plotOptions.booEmit);
+        this.data.setPath(pathAsGeoJSON);
         resolve();
       });
 
@@ -295,7 +295,7 @@ export class MapService {
     }
 
     this.layers.clear();
-    this.data.setPath(globals.emptyGeoJson, true);
+    this.data.setPath(globals.emptyGeoJson);
 
   }
 
@@ -323,7 +323,7 @@ export class MapService {
       this.tsMap.on('click', (e) => {
         const location = { lat: e.lngLat.lat, lng: e.lngLat.lng };
         this.plotMarker({ lat: e.lngLat.lat, lng: e.lngLat.lng });
-        this.data.locationEmitter.emit(location);
+        this.data.clickedCoordsEmitter.emit(location);
 
         // this.tsMap.getCanvas().style.cursor = 'pointer';
         // resolve({ lat: e.lngLat.lat, lng: e.lngLat.lng });

@@ -67,7 +67,7 @@ export class MapCreateService extends MapService {
 
   public createRoute() {
 
-    this.pathToEdit = this.data.get('activePath', false);
+    this.pathToEdit = this.data.get('activePath');
     this._options.snapProfile = 'driving';
     if ( this.pathToEdit ) {
       this.history = new PathHistory( new Path( this.pathToEdit ) );
@@ -86,10 +86,10 @@ export class MapCreateService extends MapService {
       // if (this.history.length > 0) { this.data.setPath(this.history.fullGeo, true); }
       // emit the full geoJson to enable properties to be displayed in details
       if (this.history.length === 0) {
-        this.data.setPath(null, true);
+        this.data.setPath(null);
       } else {
 
-        this.data.setPath(this.history.geoJson, true);
+        this.data.setPath(this.history.geoJson);
 
       }
     });

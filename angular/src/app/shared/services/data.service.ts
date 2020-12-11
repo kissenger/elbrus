@@ -1,3 +1,4 @@
+import { TsCoordinate } from './../interfaces';
 import { TsFeatureCollection } from 'src/app/shared/interfaces';
 import { EventEmitter, Injectable } from '@angular/core';
 
@@ -7,106 +8,72 @@ import { EventEmitter, Injectable } from '@angular/core';
 
 export class DataService {
 
-  // used by header component to show different elements when welcome page is shown
-  public locationEmitter = new EventEmitter();
-
-
-
-
+  public clickedCoordsEmitter = new EventEmitter();
   public unitsUpdateEmitter = new EventEmitter();
-  // private units: TsUnits;
-
-  /**
-   * Collection of variables and methods to enable emission, storage and retrieval of the
-   * CREATED OR IMPORTED PATHS BEFORE RECALL FROM DB
-   */
   public pathStatsEmitter = new EventEmitter();           // from map-create to panel-create-detail
   public activeTabEmitter = new EventEmitter();           // from map service to info panel
   public loginUserEmitter = new EventEmitter();           // from login to header
   public pathCommandEmitter = new EventEmitter();         // from panel-list to routes-list
   public chartPointEmitter = new EventEmitter();          // from panel-details to routes-list - listen for mouse on chart event
-
-  // public selectedPathsEmitter = new EventEmitter();       // from panel-list to panel-details-minimised
-
-  // from map-service & map-create-service to panel-details & panel-deails minimsied
-  // ensures the details panel has required information about the route being plotted
-  public pathIdEmitter = new EventEmitter();
-  public minimisePanelEmitter = new EventEmitter();
-
-  public mapBoundsEmitter = new EventEmitter();
-  // stored by map-create-service, accessed by panel-routes-create-details
-  // public createdPathData: {coords: Array<TsCoordinate>, elevations: {elevs: Array<number>, elevationStatus: string}};
-  // stored by panel-routes-list-options, accessed by panel-routes-create-details
-  // public importedPathData: {pathId: string, info: {}};
-
-  /**
-   * Collection of variables and methods to enable emission, storage and retrieval of the
-   * CURRENTLY ACTIVE PATH RECALLED FROM DATABASE
-   */
-  // public desiredPathEmitter = new EventEmitter();   // emits from panel-routes-list-list and subscribed to in routes-list
-  // public activePathEmitter = new EventEmitter();
-
-  // emitter: panel-list, subscriber: routes-list
-  /**
-   * Data store
-   * @param dataStore is a key/value object to store all shared dat in one place
-   */
-
+  public pathIdEmitter = new EventEmitter();              // from data to panel-details, panel-list
+  public minimisePanelEmitter = new EventEmitter();       // from info-panel to panel-details
+  public mapBoundsEmitter = new EventEmitter();           // from map to ...
 
   private dataStore: Object = {};
 
-  // set path has option to emit - actually controls save and always emits but the maintaining the legacy terminology for now
-  public setPath(geoJson: TsFeatureCollection, emit: boolean) {
-    if (emit) {
-      this.dataStore['activePath'] = geoJson;
-      const pathId = geoJson ? geoJson.properties.pathId : '0000';
-      // if (geoJson.properties) {
-      //   pathId = geoJson.properties.pathId;
-      // } else {
-      //   pathId = '0000';
-      // }
-      // const pathId = geoJson.properties.pathId ? geoJson.properties.pathId : '0000';
-      this.pathIdEmitter.emit(pathId);
+
+  // set path is a wrapper for set function for storing path data - also emits the pathId to let
+  // components know that a new route is available
+  public setPath(geoJson: TsFeatureCollection) {
+    this.set({activePath: geoJson});
+    this.pathIdEmitter.emit(geoJson ? geoJson.properties.pathId : '0000');
+  }
+
+
+  // a wrapper for getting paths, for consistency with setPath
+  public getPath() {
+    return this.get('activePath');
+  }
+
+
+
+  // saves a key/value pair to the data store
+  public set(data: {
+    mapView?: any,
+    redirect?: string,
+    isPosition?: boolean,
+    activePath?: TsFeatureCollection,
+    newLocation?: TsCoordinate
+  }) {
+    Object.keys(data).forEach( key => {
+      this.dataStore[key] = data[key];
+    });
+  }
+
+
+  // returns the value for a provided key
+  public get(keyName: string) {
+    if (keyName in this.dataStore) {
+      return this.dataStore[keyName];
+    } else {
+      console.log('WARNING: attempted to get un-set data');
     }
   }
 
 
-  public getPath(clearKey: boolean) {
-    const path = this.dataStore['activePath'];
-    // if (path) {
-      if (clearKey) { delete this.dataStore['activePath']; }
-      return path;
-    // } else {
-    //   return false;
-    // }
-
-
+  // delete key/value pair from the store
+  public clearKey(keyName: string) {
+    if (keyName in this.dataStore) {
+      delete this.dataStore[keyName];
+    }
   }
 
-  // saves a key/value pair to the data store
-  public set(keyName: string, value: any) {
-    this.dataStore[keyName] = value;
-  }
 
-  // returns the current value of a named key, setting the value to null if {{clearKey}} is true
-  public get(keyName: string, clearKey: boolean) {
-    const returnData = this.dataStore[keyName];
-    if (clearKey) { delete this.dataStore[keyName]; }
-    return returnData;
-  }
-
+  // debugging
   public show() {
     console.log(this.dataStore);
   }
 
-
-  // setUnits(units: TsUnits) {
-  //   this.units = units;
-  // }
-
-  // getUnits() {
-  //   return this.units;
-  // }
 
 
 }

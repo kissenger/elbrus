@@ -126,7 +126,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   addPathsToList() {
 
     // dont do anything if in overlay mode and there is no active path selected
-    if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath(false)) {
+    if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath()) {
       // do nothing
 
     } else {
@@ -233,7 +233,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       // if overlay, disable the listitem that is stored in data (selected in routes)
       if ( this.tabName === 'overlay' ) {
-        const activePath = this.data.getPath(false);
+        const activePath = this.data.getPath();
         if ( activePath ) {
           if ( activePath.properties.pathId === id) {
             styles['color'] = 'lightgrey';

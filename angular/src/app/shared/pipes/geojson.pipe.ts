@@ -7,20 +7,14 @@ import { TsFeatureCollection, TsFeature, TsPosition, TsPoint, TsLineString, TsCo
 
 
 /**
- * Converts an array of points into a geoJson object
- * returns empty geojson if coords is null or []
+ * Converts an array of points into a geoJson object returns empty geojson if coords is null or []
+ * If an array of properties is defined it should be the same length at the coords array
+ * Properties will be added to each point
  */
 
 export class GeoJsonPipe implements PipeTransform {
 
   transform(coords: Array<TsPosition>, type: 'Point' | 'LineString', properties?: Array<Object>): TsFeatureCollection {
-
-    // properties, if supplied, should be an array of the same length as the coords array, each element
-    // being an object of the desired key-value pairs
-
-    // bit of a hack - ensure we return an empty geojson if supplied with nulls
-    // if (coords === null  || !coords[0]) { coords = []; }
-
 
     if ( properties ) {
       if ( coords.length !== properties.length ) {
@@ -43,7 +37,6 @@ export class GeoJsonPipe implements PipeTransform {
         pointFeatures =  getPointFeature([], '0', {});
       }
 
-      console.log(getFeatureCollection(pointFeatures));
       return getFeatureCollection(pointFeatures);
 
     } else if ( type === 'LineString' ) {

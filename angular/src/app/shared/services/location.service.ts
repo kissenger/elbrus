@@ -1,3 +1,4 @@
+import { DataService } from 'src/app/shared/services/data.service';
 
 import { Injectable } from '@angular/core';
 
@@ -17,6 +18,7 @@ export class LocationService {
   };
 
   constructor(
+    private data: DataService
   ) {
   }
 
@@ -31,6 +33,7 @@ export class LocationService {
     this.navHandler = navigator.geolocation.watchPosition(
     (pos: Position) => {
       this.geoLocation = pos;
+      this.data.set({isPosition: !!this.geoLocation});
       this.updateMap();
     },
     (error) => {
@@ -42,10 +45,6 @@ export class LocationService {
 
   }
 
-
-  isposition() {
-    return !!this.geoLocation;
-  }
 
 
   updateMap() {

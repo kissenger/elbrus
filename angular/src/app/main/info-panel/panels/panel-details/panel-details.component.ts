@@ -72,7 +72,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.minimisePanelListener = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
       this.isMinimised = minimise;
       if (this.isMinimised) {
-        this.nRoutes = this.data.get('nRoutes', false);
+        // TODO: dont thisk this is ever set??
+        this.nRoutes = this.data.get('nRoutes');
       }
     });
 
@@ -83,7 +84,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
     this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
-      this.geoJson = this.data.getPath(false);
+      this.geoJson = this.data.getPath();
 
       // this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
 
@@ -219,7 +220,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // activePath is stored from two locations - both are full geoJSON descriptions of the path:
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
-    const newPath = this.data.get('activePath', false);
+    const newPath = this.data.getPath();
     const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
