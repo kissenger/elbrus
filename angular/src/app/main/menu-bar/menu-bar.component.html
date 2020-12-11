@@ -69,16 +69,15 @@
   </button>
 
   <button
-    (click)="map.gotoHome()"
-    [disabled]="!isData"
+    (click)="map.goto(homeLngLat)"
     type="button"
     class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
     <small>Go to Home</small>
   </button>
 
   <button
-    (click)="map.gotoMyLocation()"
-    [disabled]="!map.location"
+    (click)="map.goto(position)"
+    [disabled]="!position"
     type="button"
     class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
     <small>Where am I?</small>

@@ -1,3 +1,5 @@
+import { AuthService } from './../../shared/services/auth.service';
+import { TsPosition, TsCoordinate } from './../../shared/interfaces';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
@@ -15,19 +17,32 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   @Input() map;
 
   private newPathListener: Subscription;
+  private locationListener: Subscription;
   public isData = false;
+  public position: TsPosition;
+  public homeLngLat: TsCoordinate;
 
   constructor(
-    private data: DataService
+    private data: DataService,
+    private auth: AuthService
    ) { }
 
   ngOnInit() {
+
+    this.homeLngLat = this.auth.getUser().homeLngLat;
 
     // listen for when data is set to be able to enable the view buttons
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
       this.isData = this.data.getPath();
     });
+
+    // listen for availability of location
+    this.locationListener = this.data.locationEmitter.subscribe( (pos) => {
+      this.position = pos;
+    });
+
   }
+
 
   onChangeOptions(option: {}) {
     const optionKey = Object.keys(option)[0];
@@ -36,6 +51,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.newPathListener) { this.newPathListener.unsubscribe(); }
+    if (this.locationListener) { this.locationListener.unsubscribe(); }
   }
 
 

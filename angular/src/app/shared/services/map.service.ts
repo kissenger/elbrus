@@ -158,10 +158,13 @@ export class MapService {
     return [mapBounds.getSouthWest().lng, mapBounds.getSouthWest().lat, mapBounds.getNorthEast().lng, mapBounds.getNorthEast().lat];
   }
 
-  public goto(point: TsPosition) {
-    this.tsMap.flyTo({
-      center: {lng: point[0], lat: point[1]}
-    });
+
+  public goto(point: TsPosition | TsCoordinate) {
+    if ( 'lng' in point) {
+      this.tsMap.flyTo({center: point});
+    } else {
+      this.tsMap.flyTo({center: {lng: point[0], lat: point[1]}});
+    }
   }
 
 

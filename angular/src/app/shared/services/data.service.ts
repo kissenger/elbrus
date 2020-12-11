@@ -9,6 +9,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 export class DataService {
 
   public clickedCoordsEmitter = new EventEmitter();
+  public locationEmitter = new EventEmitter();            // from location service to menu-bar
   public unitsUpdateEmitter = new EventEmitter();
   public pathStatsEmitter = new EventEmitter();           // from map-create to panel-create-detail
   public activeTabEmitter = new EventEmitter();           // from map service to info panel

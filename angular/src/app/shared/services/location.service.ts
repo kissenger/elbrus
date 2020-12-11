@@ -1,5 +1,5 @@
+import { TsPosition } from './../interfaces';
 import { DataService } from 'src/app/shared/services/data.service';
-
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -16,6 +16,8 @@ export class LocationService {
     timeout: 5000,
     maximumAge: 5000
   };
+  private position: TsPosition;
+  private accuracy: number;
 
   constructor(
     private data: DataService
@@ -32,12 +34,15 @@ export class LocationService {
 
     this.navHandler = navigator.geolocation.watchPosition(
     (pos: Position) => {
-      this.geoLocation = pos;
-      this.data.set({isPosition: !!this.geoLocation});
+      this.position = [pos.coords.longitude, pos.coords.latitude];
+      this.accuracy = pos.coords.accuracy;
+      this.data.locationEmitter.emit(this.position);
       this.updateMap();
     },
     (error) => {
-      this.geoLocation = null;
+      this.position = null;
+      this.accuracy = null;
+      this.data.locationEmitter.emit(this.position);
       this.updateMap();
     },
     this.watchOptions);
@@ -52,8 +57,8 @@ export class LocationService {
     // keep this log - useful feedback
     console.log(this.geoLocation);
 
-    const coords = this.geoLocation ? [[this.geoLocation.coords.longitude, this.geoLocation.coords.latitude]] : null;
-    const props = [{accuracy: this.geoLocation.coords.accuracy, latitude: this.geoLocation.coords.latitude}];
+    const coords = this.position ? [this.position] : null;
+    const props = this.position ? [{accuracy: this.accuracy, latitude: this.position[1]}] : null;
     this.mapInstance.setLayerData('position', 'Point', coords);
     this.mapInstance.setLayerData('accuracy', 'Point', coords, props);
   }

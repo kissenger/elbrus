@@ -23,7 +23,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
 
   async onGuestClick() {
     await this.auth.login('guest', null);
-    const redirect = this.data.get('redirect', true);
+    const redirect = this.data.get('redirect');
     if ( redirect ) {
       this.router.navigate([redirect]);
     } else {
