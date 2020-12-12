@@ -414,7 +414,6 @@ app.post('/api/toggle-path-public/', auth.verifyToken, async (req, res) => {
 
     // query database path database to determine current status of path
     const result = await mongoModel(req.body.pathType).findOne({_id: req.body.pathId}, {isPublic: 1});
-    console.log(result);
     await mongoModel(req.body.pathType).updateOne( {_id: req.body.pathId}, {$set: {isPublic: !result.isPublic}} );
     res.status(201).json({isPathPublic: !result.isPublic});
 

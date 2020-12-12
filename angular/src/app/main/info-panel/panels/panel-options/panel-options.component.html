@@ -30,9 +30,9 @@
     <div class="ml-2">
 
 
-      <div *ngIf="allowMakePrivate()">
+      <div *ngIf="allowChangePublic()">
         <span *ngIf="auth.isGuestUser()" class="text-muted"> Make route {{isPathPublic ? 'private' : 'public'}}<br></span>
-        <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onMakePublicClick()"> Make route {{isPathPublic ? 'private' : 'public'}}<br></span>
+        <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onChangePublicClick()"> Make route {{isPathPublic ? 'private' : 'public'}}<br></span>
       </div>
 
       <div *ngIf="allowCopy()">
@@ -50,9 +50,9 @@
         <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onReverseClick()">Edit Route<br></span>
       </div>
 
-      <span *ngIf="isPathPublic" class="text-like-link" (click)="onShareClick()"> Get shareable link </span> <br>
+      <span *ngIf="isPathPublic" class="text-like-link" (click)="onShareClick()"> Get shareable link <br></span>
 
-      <span class="text-like-link" (click)="onExportGpxClick()"> Export to .gpx file </span> <br>
+      <span class="text-like-link" (click)="onExportGpxClick()"> Export to .gpx file <br></span>
 
     </div>
 </div>

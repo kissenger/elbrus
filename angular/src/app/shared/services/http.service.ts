@@ -104,7 +104,7 @@ export class HttpService {
     return this.http.post<any>(`${this.backendURL}/update-user-data/`, userData);
   }
 
-  makePathPublic(pathType: string, pathId: string) {
+  togglePathPublic(pathType: string, pathId: string) {
     return this.http.post<any>(`${this.backendURL}/toggle-path-public/`, {pathType, pathId});
   }
 

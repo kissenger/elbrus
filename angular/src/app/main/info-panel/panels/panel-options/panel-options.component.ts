@@ -100,9 +100,8 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   // Show option to toggle public/private its its a private path, or if its public and created by this user
-  allowMakePrivate() {
-    // return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
-    return !this.isPathPublic || this.createdBy === this.auth.getUser();
+  allowChangePublic() {
+    return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
   }
 
   allowCopy() {
@@ -113,13 +112,12 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   allowDelete() {
     // return this.createdBy === this.auth.getUser().userName;
-    return this.createdBy === this.auth.getUser();
+    return this.createdBy === this.auth.getUser().userName;
   }
 
 
   allowEdit() {
-    // return this.createdBy === this.auth.getUser().userName && this.nPoints < 3500;
-    return this.createdBy === this.auth.getUser() && this.nPoints < 3500;
+    return this.createdBy === this.auth.getUser().userName && this.nPoints < 3500;
   }
 
   onShareClick() {
@@ -140,8 +138,8 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   }
 
 
-  onMakePublicClick() {
-    this.httpSubscription = this.http.makePathPublic(this.pathType, this.pathId).subscribe( (result) => {
+  onChangePublicClick() {
+    this.httpSubscription = this.http.togglePathPublic(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
       this.router.navigate(['route/list']);
