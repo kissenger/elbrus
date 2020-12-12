@@ -32,7 +32,14 @@
 
       <div *ngIf="allowChangePublic()">
         <span *ngIf="auth.isGuestUser()" class="text-muted"> Make route {{isPathPublic ? 'private' : 'public'}}<br></span>
-        <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onChangePublicClick()"> Make route {{isPathPublic ? 'private' : 'public'}}<br></span>
+        <span *ngIf="auth.isRegisteredUser()"
+          class="text-like-link"
+          (click)="onChangePublicClick()"
+          data-toggle="tooltip"
+          data-placement="top"
+          title="Route must be public in order to get a shareable link">
+          Make route {{isPathPublic ? 'private' : 'public'}}<br>
+        </span>
       </div>
 
       <div *ngIf="allowCopy()">
