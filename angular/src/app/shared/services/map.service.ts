@@ -41,7 +41,7 @@ export class MapService {
   // newMap(location?: TsCoordinate, zoom?: number) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
-    return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
+    return new Promise<Array<TsCoordinate> | void>( (resolve, reject) => {
 
       let mapCentre: TsCoordinate;
       let mapZoom: number;
@@ -85,13 +85,13 @@ export class MapService {
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
       this.tsMap.on('moveend', () => {
-        console.log('map finished moving');
+        // console.log('map finished moving');
         this.data.set({mapView: this.getMapView()});
         this.data.mapBoundsEmitter.emit(this.getMapBounds());
       });
 
       this.tsMap.on('load', () => {
-        console.log('map finished loading');
+        // console.log('map finished loading');
         this.data.set({mapView: this.getMapView()});
         this.data.mapBoundsEmitter.emit(this.getMapBounds());
         resolve();
@@ -171,7 +171,7 @@ export class MapService {
 
   public add(pathAsGeoJSON: TsFeatureCollection, styleOptions?: TsLineStyle, plotOptions?: TsPlotPathOptions ) {
 
-    return new Promise( (resolve, reject) => {
+    return new Promise<void>( (resolve, reject) => {
 
       console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
       const path = new Path( pathAsGeoJSON );

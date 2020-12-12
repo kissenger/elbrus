@@ -19,7 +19,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   public user: TsUser;
   public isChanged = false;
   private httpSubscription: Subscription;
-  private CLEAR_KEY = true;
 
   constructor(
     private auth: AuthService,
@@ -39,7 +38,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   async ngOnInit() {
 
     this.user = this.auth.getUser();
-    const newLocation = this.data.get('newLocation', this.CLEAR_KEY);
+    const newLocation = this.data.get('newLocation');
+    this.data.clearKey('newLocation');  // TODO: needed?
     const oldLocation = this.user.homeLngLat; // needed in case new location cannot be saved, revert back to old
 
     if ( !!newLocation ) {
@@ -103,7 +103,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   onClose() {
-    const redirect = this.data.get('redirect', true);
+    const redirect = this.data.get('redirect');
     if (redirect) {
       this.router.navigate([redirect]);
     } else {
