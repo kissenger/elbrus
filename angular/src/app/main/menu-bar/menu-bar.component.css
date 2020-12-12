@@ -31,32 +31,27 @@
   background-color: rgb(218, 224, 229);
 }
 
-/* .btn-light:hover:disabled {
-  background-color: white;
-} */
-
-/* .disabled:hover {
-  background-color: white;
-  cursor: default;
-} */
-
 .clicky-btn:hover  {
   opacity: 1.0;
 }
 
 .radio-btns  {
-    border-radius: none;
+  border-radius: none;
+  /* cursor: pointer; */
 }
 
 .radio-btns:hover  {
-    opacity: 1.0;
+  opacity: 1.0;
+  cursor: pointer;
+  background-color: rgb(218, 224, 229);
+
 }
 
 
 /* Remove border effect from bootstrap btn */
 .btn-light:focus, .btn-light.focus {
-    box-shadow: none;
-  }
+  box-shadow: none;
+}
 
 
 

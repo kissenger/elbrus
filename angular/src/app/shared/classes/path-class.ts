@@ -1,4 +1,4 @@
-import { TsFeatureCollection, TsCoordinate, TsPosition, TsFeature, TsPoint, TsBoundingBox } from '../interfaces';
+import { TsFeatureCollection, TsPosition, TsBoundingBox } from '../interfaces';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import { Injector } from '@angular/core';
 
@@ -7,12 +7,21 @@ export class Path {
 
   private _geoJson: TsFeatureCollection;
   private geoJsonPipe: GeoJsonPipe;
+  public positionsList: Array<TsPosition>;
+  public firstPoint: TsPosition;
+  public lastPoint: TsPosition;
+  private nFeatures: number;
 
   constructor( geoJson: TsFeatureCollection ) {
 
     this._geoJson = geoJson;
     const injector = Injector.create({ providers: [ { provide: GeoJsonPipe, deps: [] } ] });
     this.geoJsonPipe = Object.getPrototypeOf(injector.get(GeoJsonPipe));
+
+    this.positionsList = this.getPositionsArray;
+    this.firstPoint = this.positionsList[0];
+    this.lastPoint = this.positionsList[this.positionsList.length - 1];
+    this.nFeatures = this._geoJson.features.length;
 
   }
 
@@ -24,26 +33,16 @@ export class Path {
 
   get boundingBox() {
 
-    const bb = this.coords.reduce( (bbox, point) => ({
-      minLng: Math.min(point.lng, bbox.minLng),
-      maxLng: Math.max(point.lng, bbox.maxLng),
-      minLat: Math.min(point.lat, bbox.minLat),
-      maxLat: Math.max(point.lat, bbox.maxLat)
+    const bb = this.positionsList.reduce( (bbox, point) => ({
+      minLng: Math.min(point[0], bbox.minLng),
+      maxLng: Math.max(point[0], bbox.maxLng),
+      minLat: Math.min(point[1], bbox.minLat),
+      maxLat: Math.max(point[1], bbox.maxLat)
     }), { minLng: 180, minLat: 90, maxLng: -180, maxLat: -90 });
 
     return <TsBoundingBox>[bb.minLng, bb.minLat, bb.maxLng, bb.maxLat];
   }
 
-
-
-  get firstPoint(): TsCoordinate {
-    return this.coords[0];
-  }
-
-
-  get lastPoint(): TsCoordinate {
-    return this.coords[this.coords.length - 1];
-  }
 
 
   /**
@@ -59,9 +58,12 @@ export class Path {
   }
 
 
-  get positions(): Array<TsPosition> {
+  /**
+   * Returns a single array listing all the corodinates from all features, with duplicate
+   * first/last coords removed
+   */
+  get getPositionsArray(): Array<TsPosition> {
 
-    // get list of coordinates from all features
     const coordsArray = [];
     this._geoJson.features.forEach( (feature, fi) => {
       feature.geometry.coordinates.forEach( (coord, ci) => {
@@ -78,17 +80,7 @@ export class Path {
   }
 
 
-  get coords(): Array<TsCoordinate> {
-    return this.positions.map(c => ({lng: c[0], lat: c[1]}));
-  }
-
-
-  get nFeatures() {
-    return this._geoJson.features.length;
-  }
-
-
-  getFeature(featureIndex) {
+  getFeature(featureIndex: number) {
     // returns the desired feature on the active path
     return this._geoJson.features[featureIndex];
   }
@@ -121,11 +113,10 @@ export class Path {
   /**
    * Returns a points geoJson of all the coordinates in the activePath - duplicate points
    * removed.
-   * If the activePath is empty and _firstPoint is set, return that.
    */
   get pointsGeoJson() {
 
-    return this.geoJsonPipe.transform(this.positions, 'Point');
+    return this.geoJsonPipe.transform(this.positionsList, 'Point');
 
   }
 
@@ -133,7 +124,7 @@ export class Path {
   get startEndPoints() {
 
     return this.geoJsonPipe.transform(
-      [this.positions[0], this.positions[this.positions.length - 1]], 'Point', [{title: 'start'}, {title: 'end'}]
+      [this.firstPoint, this.lastPoint], 'Point', [{title: 'start'}, {title: 'end'}]
     );
   }
 

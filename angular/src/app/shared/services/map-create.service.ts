@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MapService } from './map.service';
 import { HttpService } from './http.service';
 import { DataService } from './data.service';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsPosition, TsFeature, TsFeatureCollection } from 'src/app/shared/interfaces';
+import { TsLineStyle, TsPosition, TsFeatureCollection, TsSnapType } from 'src/app/shared/interfaces';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared/classes/path-history';
@@ -25,19 +25,19 @@ export class MapCreateService extends MapService {
 // export class MapCreateService {
 
   private history: PathHistory;
-  private _options = { snapProfile: 'driving' };
-  private plotOptions: TsPlotPathOptions = {
-    booResizeView: false,
-    booSaveToStore: true,
-    booPlotPoints: true
-  };
+  private snapType: TsSnapType = 'walking';
+  // private plotOptions: TsPlotPathOptions = {
+  //   booResizeView: false,
+  //   booSaveToStore: true,
+  //   booPlotPoints: true
+  // };
   private styleOptions: TsLineStyle = {};
   private selectedPointId: number;
   private selectedLineIds: Array<{featureIndex: number, coordIndex: number}>;
   private pathToEdit: TsFeatureCollection;
-  private pathName: string;
-  private pathDescription: string;
-  private activePathClone: TsFeatureCollection;
+  // private pathName: string;
+  // private pathDescription: string;
+  // private activePathClone: TsFeatureCollection;
 
   // keeping the active layers on the class helps with responsiveness when moving (editing) a point
   private line: TsFeatureCollection;
@@ -57,18 +57,10 @@ export class MapCreateService extends MapService {
   }
 
 
-  public set options(optionKey: string) {
-    // sets snap behaviours - called from routes-create component
-    this._options.snapProfile = optionKey;
-
-  }
-
-
 
   public createRoute() {
 
     this.pathToEdit = this.data.get('activePath');
-    this._options.snapProfile = 'driving';
     if ( this.pathToEdit ) {
       this.history = new PathHistory( new Path( this.pathToEdit ) );
     } else {
@@ -113,14 +105,13 @@ export class MapCreateService extends MapService {
 
 
 
-  private getPathFromBackend(coords: Array<TsCoordinate>, options: {simplify: boolean} = {simplify: false}) {
+  private getPathFromBackend(coords: Array<TsPosition>, options: {simplify: boolean} = {simplify: false}) {
 
     return new Promise<TsFeatureCollection>( (resolve, reject) => {
-
-      this.http.getPathFromPoints(coords, options).subscribe( (result) => {
-        resolve(result.hills);
-      }, error => reject(error));
-
+      this.http.getPathFromPoints(coords, options).subscribe(
+        result => resolve(result.hills),
+        error => reject(error)
+      );
     });
 
   }
@@ -129,24 +120,23 @@ export class MapCreateService extends MapService {
 
    /**
    * gets the coordinates for a given start and end point
-   * handling the snapProfile in here is useful as it abstracts it from the calling functions
+   * handling the snapType in here is useful as it abstracts it from the calling functions
    */
-  private getNextPathCoords(start: TsCoordinate, end: TsCoordinate) {
+  private getNextPathCoords(start: TsPosition, end: TsPosition) {
 
-    return new Promise<Array<TsCoordinate>>( (resolve, reject) => {
+    return new Promise<Array<TsPosition>>( (resolve, reject) => {
 
       // if we dont need to get directions, just return the supplied coords as an array
-      if (this._options.snapProfile === 'none') {
+      if (this.snapType === 'none') {
         resolve([start, end]);
 
       // otherwise, get coords from directions service
       } else {
 
-        this.http.mapboxDirectionsQuery(this._options.snapProfile, start, end).subscribe( (result) => {
+        this.http.mapboxDirectionsQuery(this.snapType, start, end).subscribe( (result) => {
 
           if (result.code === 'Ok') {
-            const coords = result.routes[0].geometry.coordinates.map( (c: TsPosition) => ({lat: c[1], lng: c[0]}) );
-            resolve(coords);
+            resolve(result.routes[0].geometry.coordinates);
 
           } else {
             reject('Mapbox directions query failed with error: ' + result.code);
@@ -176,8 +166,6 @@ export class MapCreateService extends MapService {
 
   public clear() {
 
-    console.log('how confusing');
-
     this.alert.showAsElement('Are you sure?', 'This action cannot be undone...', true, true)
       .subscribe( (alertBoxResponse: boolean) => {
 
@@ -193,14 +181,12 @@ export class MapCreateService extends MapService {
 
   public async reversePath() {
 
-    const n = this.history.nPoints;
-    const revCoords = this.history.coords.map( (c, i, arr) => arr[n - i - 1]);
-    const backendResult = await this.getPathFromBackend( revCoords );
+    const reversedCoords = this.history.coords.map( (c, i, arr) => arr[this.history.nPoints - i - 1]);
+    const backendResult = await this.getPathFromBackend( reversedCoords );
     this.history.add( new Path(backendResult) );
     this.updateMap();
 
   }
-
 
 
   async simplify() {
@@ -250,7 +236,7 @@ export class MapCreateService extends MapService {
 
     this.addLineLayer('0000line', lineStyleOptions );
     this.addPointsLayer('0000pts', {
-        'circle-radius': 8,
+        'circle-radius': 4,
         'circle-opacity': 0.3,
         'circle-stroke-width': 1,
         'circle-color':
@@ -289,7 +275,7 @@ export class MapCreateService extends MapService {
     if (!isClickedOnPoint) {
 
       this.spinner.showAsElement();
-      const clickedPoint: TsCoordinate = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+      const clickedPoint: TsPosition = [e.lngLat.lng, e.lngLat.lat];
 
       try {
 
@@ -319,7 +305,7 @@ export class MapCreateService extends MapService {
 
 
   // when the mouse move after being grabbed - set on by 'mousedown' event
-  private onMove = (e) => {
+  private onMove = (e: mapboxgl.MapLayerMouseEvent) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
 
@@ -335,22 +321,22 @@ export class MapCreateService extends MapService {
 
 
   // when cursor enters a point, change cursor style and highlight the point
-  private onMouseEnter = (e) => {
-    this.selectedPointId = e.features[0].id;
+  private onMouseEnter = (e: mapboxgl.MapLayerMouseEvent) => {
+    this.selectedPointId = <number>e.features[0].id;
     this.tsMap.getCanvas().style.cursor = 'pointer';
     this.tsMap.setFeatureState( {source: '0000pts', id: e.features[0].id}, {hover: true} );
   }
 
 
   // when cursor leaves a point, reset cursor style and remove highlighting
-  private onMouseLeave = (e) => {
+  private onMouseLeave = (e: mapboxgl.MapLayerMouseEvent) => {
     this.tsMap.getCanvas().style.cursor = 'crosshair';
     this.tsMap.removeFeatureState( {source: '0000pts'} );
   }
 
 
   // Delete a point on right-click
-  private onRightClick = async (e) => {
+  private onRightClick = async (e: mapboxgl.MapLayerMouseEvent) => {
 
     this.spinner.showAsElement();
 
@@ -374,11 +360,11 @@ export class MapCreateService extends MapService {
 
 
   // when mouse is clicked during hover event, grap the point and move with cursor
-  private onMouseDown = (e) => {
+  private onMouseDown = (e: mapboxgl.MapLayerMouseEvent) => {
 
     if (e.originalEvent.button === 0) { // only if its the left button
 
-      this.selectedPointId = e.features[0].id;
+      this.selectedPointId = <number>e.features[0].id;
       const pointCoords = this.history.coordsAtIndex(this.selectedPointId);
       this.selectedLineIds = this.history.matchFeature(pointCoords);
       // this.activePathClone = this.history.simpleGeo; // this enables the moving points to not affect the undo history
@@ -411,25 +397,25 @@ export class MapCreateService extends MapService {
       let backendResult: TsFeatureCollection;
 
       const linesAfterPoint = async (point: number) => {
-        let c: Array<TsCoordinate>;
-        c = await this.getNextPathCoords(e.lngLat, coords[point + 1]);
+        let c: Array<TsPosition>;
+        c = await this.getNextPathCoords([e.lngLat.lng, e.lngLat.lat], coords[point + 1]);
         return c.concat( coords.slice(point + 1) );
       };
 
       const linesBeforePoint = async (point: number) => {
-        let c: Array<TsCoordinate>;
+        let c: Array<TsPosition>;
         c = coords.slice(0, point - 1);
-        return c.concat( await this.getNextPathCoords(coords[point - 1], e.lngLat) );
+        return c.concat( await this.getNextPathCoords(coords[point - 1], [e.lngLat.lng, e.lngLat.lat]) );
       };
 
       try {
 
-        if (this._options.snapProfile === 'none') {
+        if (this.snapType === 'none') {
           backendResult = await this.getPathFromBackend(coords);
 
         } else {
 
-          let newCoords: Array<TsCoordinate>;
+          let newCoords: Array<TsPosition>;
 
           if (this.selectedPointId === 0) {                                 // first point
             newCoords = await linesAfterPoint(this.selectedPointId);

@@ -100,6 +100,12 @@ export interface TsElevationQuery {
 
 export type TsElevationResults = TsCoordinate[];
 
+export type TsSnapType = 'walking' | 'driving' | 'none';
+
+// export interface TsSnapProfile {
+//   snapProfile: 'walking' | 'driving' | 'none';
+// }
+
 /**
  * User details
  */

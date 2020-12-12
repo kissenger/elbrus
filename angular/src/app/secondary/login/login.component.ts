@@ -60,7 +60,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       const password = document.forms['login-form']['password'].value;
 
       await this.auth.login(userName, password);
-      const redirect = this.data.get('redirect', true);
+      const redirect = this.data.get('redirect');
+      this.data.clearKey('reDirect');
       if ( redirect ) {
         this.router.navigate([redirect]);
       } else {

@@ -1,6 +1,7 @@
+import { TsPosition } from './../interfaces';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { TsCoordinate, TsElevationQuery, TsUser } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsElevationQuery, TsSnapType, TsUser } from 'src/app/shared/interfaces';
 import { environment } from 'src/environments/environment';
 
 @Injectable()
@@ -21,10 +22,10 @@ export class HttpService {
   /********************************************************************************************
   *  Mapping queries
   ********************************************************************************************/
-  mapboxDirectionsQuery(profile: string, start: TsCoordinate, end: TsCoordinate) {
-    const coords = `${start.lng.toFixed(6)},${start.lat.toFixed(6)};${end.lng.toFixed(6)},${end.lat.toFixed(6)}`;
+  mapboxDirectionsQuery(snapType: TsSnapType, start: TsPosition, end: TsPosition) {
+    const coords = `${start[0].toFixed(6)},${start[1].toFixed(6)};${end[0].toFixed(6)},${end[1].toFixed(6)}`;
     const token = `geometries=geojson&access_token=${this.mapBoxAccessToken}`;
-    return this.http.get<any>(`https://api.mapbox.com/directions/v5/mapbox/${profile}/${coords}?${token}`);
+    return this.http.get<any>(`https://api.mapbox.com/directions/v5/mapbox/${snapType}/${coords}?${token}`);
   }
 
   /********************************************************************************************
@@ -82,7 +83,8 @@ export class HttpService {
       {responseType: 'blob' as 'json'});
   }
 
-  getPathFromPoints(coords: Array<TsCoordinate>, options: {simplify: boolean} = {simplify: false}) {
+  getPathFromPoints(positions: Array<TsPosition>, options: {simplify: boolean} = {simplify: false}) {
+    const coords = positions.map(p => ({lng: p[0], lat: p[1]}) );
     return this.http.post<any>(`${this.backendURL}/get-path-from-points/`, {coords, options});
   }
 

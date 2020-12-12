@@ -9,7 +9,7 @@
   export class PathHistory {
 
     private history: Array<Path>;
-    private _firstPoint: TsCoordinate = null;
+    private _firstPoint: TsPosition = null;
     private geoJsonPipe: GeoJsonPipe;
     private isBufferReached = false;
 
@@ -26,7 +26,7 @@
 
 
     // set the fist point
-    set firstPoint(point: TsCoordinate) {
+    set firstPoint(point: TsPosition) {
       this._firstPoint = point;
     }
 
@@ -62,7 +62,7 @@
     // return an array of the point coordinates for the last path in the undo history
     get coords() {
       if ( this.lastPath ) {
-        return this.lastPath.coords;
+        return this.lastPath.positionsList;
       } else {
         return [this._firstPoint];
       }
@@ -76,7 +76,7 @@
       if (this.lastPath) {
         return this.lastPath.pointsGeoJson;
       } else if (this.firstPoint) {
-        return this.geoJsonPipe.transform([[this.firstPoint.lng, this.firstPoint.lat]], 'Point');
+        return this.geoJsonPipe.transform([this.firstPoint], 'Point');
       } else {
         return this.geoJsonPipe.transform([], 'Point');
       }
@@ -98,15 +98,16 @@
       let props = [];
 
       if (this.lastPath) {
-        coords = [[this.lastPoint.lng, this.lastPoint.lat]];
+        coords = [this.lastPoint];
         props = [{title: 'end'}];
       }
 
       if (this.firstPoint) {
-        coords.unshift([this.firstPoint.lng, this.firstPoint.lat]);
+        coords.unshift([this.firstPoint]);
         props.unshift({title: 'start'});
       }
 
+      console.log(this.geoJsonPipe.transform(coords, 'Point', props));
       return this.geoJsonPipe.transform(coords, 'Point', props);
 
 
@@ -153,7 +154,7 @@
 
 
     get nPoints() {
-      return this.lastPath.coords.length;
+      return this.lastPath.positionsList.length;
     }
 
 
@@ -167,10 +168,10 @@
 
     // returns the coordinates of a given point on the last path
     coordsAtIndex(pointIndex: number): TsPosition {
-      if ( this.lastPath) {
-        return this.lastPath.positions[pointIndex];
+      if ( this.lastPath ) {
+        return this.lastPath.positionsList[pointIndex];
       } else if (this.firstPoint) {
-        return [this.firstPoint.lng, this.firstPoint.lat];
+        return this.firstPoint;
       }
     }
 

@@ -1,5 +1,5 @@
 import { AuthService } from './../../shared/services/auth.service';
-import { TsPosition, TsCoordinate } from './../../shared/interfaces';
+import { TsPosition, TsCoordinate, TsSnapType } from './../../shared/interfaces';
 import { Subscription } from 'rxjs';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
@@ -44,9 +44,8 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   }
 
 
-  onChangeOptions(option: {}) {
-    const optionKey = Object.keys(option)[0];
-    this.map.options = option[optionKey];
+  onChangeOptions(type: TsSnapType) {
+    this.map.snapType = type;
   }
 
   ngOnDestroy() {
