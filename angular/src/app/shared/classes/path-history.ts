@@ -2,7 +2,7 @@
   import { TsCoordinate, TsPosition } from 'src/app/shared/interfaces';
   import { Path } from './path-class';
   import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
-  import { Injector } from '@angular/core';
+  import { Injector, ɵCodegenComponentFactoryResolver } from '@angular/core';
 
   const UNDO_BUFFER = 5;
 
@@ -107,21 +107,8 @@
         props.unshift({title: 'start'});
       }
 
-      console.log(this.geoJsonPipe.transform(coords, 'Point', props));
       return this.geoJsonPipe.transform(coords, 'Point', props);
 
-
-      // if ( this.lastPath ) {
-      //   coords = [this.positions[0], this.positions[this.positions.length - 1]], 'Point', [{label: 'start'}, {label: 'end'}]
-      //   );
-      // } else if ( this.firstPoint ) {
-      //   return this.geoJsonPipe.transform(
-      //     [[this.firstPoint.lng, this.firstPoint.lat]], 'Point', [{label: 'start'}]);
-      // } else {
-      //   return this.geoJsonPipe.transform([], 'Point');
-      // }
-      // return this.geoJsonPipe.transform(
-      //   coords, 'Point', labels);
     }
 
 
@@ -178,7 +165,11 @@
 
     // returns the feature in the last path that contains the desired point
     matchFeature(pointCoord: TsPosition) {
-      return this.lastPath.matchFeature(pointCoord);
+      if (this.lastPath) {
+        return this.lastPath.matchFeature(pointCoord);
+      } else {
+        return null;
+      }
     }
 
 

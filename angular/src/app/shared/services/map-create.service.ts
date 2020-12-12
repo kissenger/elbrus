@@ -61,11 +61,8 @@ export class MapCreateService extends MapService {
   public createRoute() {
 
     this.pathToEdit = this.data.get('activePath');
-    if ( this.pathToEdit ) {
-      this.history = new PathHistory( new Path( this.pathToEdit ) );
-    } else {
-      this.history = new PathHistory();
-    }
+    this.history = this.pathToEdit ? new PathHistory( new Path( this.pathToEdit ) ) : new PathHistory();
+
     this.initialiseCreateMap(this.styleOptions);
     this.updateMap();
 
@@ -75,15 +72,7 @@ export class MapCreateService extends MapService {
   private updateMap() {
 
     this.tsMap.once('idle', (e) => {
-      // if (this.history.length > 0) { this.data.setPath(this.history.fullGeo, true); }
-      // emit the full geoJson to enable properties to be displayed in details
-      if (this.history.length === 0) {
-        this.data.setPath(null);
-      } else {
-
-        this.data.setPath(this.history.geoJson);
-
-      }
+      this.data.setPath(this.history.length === 0 ? null : this.history.geoJson);
     });
 
     this.line = this.history.geojsonClone;
@@ -216,6 +205,7 @@ export class MapCreateService extends MapService {
     try {
 
       const newCoords = await this.getNextPathCoords(this.history.lastPoint, this.history.firstPoint);
+      newCoords.splice(0, 1);
       const backendResult = await this.getPathFromBackend(this.history.coords.concat(newCoords));
       this.history.add( new Path(backendResult) );
       this.updateMap();
@@ -282,6 +272,7 @@ export class MapCreateService extends MapService {
         if (this.history.firstPoint) {
 
           const newCoords = await this.getNextPathCoords(this.history.lastPoint, clickedPoint);
+          newCoords.splice(0, 1);
           const backendResult = await this.getPathFromBackend(this.history.coords.concat(newCoords));
           this.history.add( new Path(backendResult) );
 
@@ -308,9 +299,13 @@ export class MapCreateService extends MapService {
   private onMove = (e: mapboxgl.MapLayerMouseEvent) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
-
     this.points.features[this.selectedPointId].geometry.coordinates = coords;
-    this.selectedLineIds.forEach( ids => this.line.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
+
+    if (this.selectedLineIds) {
+      // if there is a line plotted to move (ie not just the first point)
+      this.selectedLineIds.forEach( ids => this.line.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
+    }
+
     if (this.selectedPointId === 0 || this.selectedPointId === this.points.features.length - 1) {
       this.symbols.features[this.selectedPointId === 0 ? 0 : 1].geometry.coordinates = coords;
     }
@@ -363,7 +358,6 @@ export class MapCreateService extends MapService {
   private onMouseDown = (e: mapboxgl.MapLayerMouseEvent) => {
 
     if (e.originalEvent.button === 0) { // only if its the left button
-
       this.selectedPointId = <number>e.features[0].id;
       const pointCoords = this.history.coordsAtIndex(this.selectedPointId);
       this.selectedLineIds = this.history.matchFeature(pointCoords);
@@ -382,7 +376,7 @@ export class MapCreateService extends MapService {
 
 
   // when mouse is released, get the new path from the backend (only active during drag event)
-  private onMouseUp = async (e) => {
+  private onMouseUp = async (e: mapboxgl.MapLayerMouseEvent) => {
 
     if (e.originalEvent.button === 0) {
 
@@ -391,53 +385,63 @@ export class MapCreateService extends MapService {
       this.tsMap.off('mousemove', this.onMove);
 
       this.tsMap.getCanvas().style.cursor = 'pointer';
-      this.spinner.showAsElement();
 
-      const coords = this.history.coords;
-      let backendResult: TsFeatureCollection;
 
-      const linesAfterPoint = async (point: number) => {
-        let c: Array<TsPosition>;
-        c = await this.getNextPathCoords([e.lngLat.lng, e.lngLat.lat], coords[point + 1]);
-        return c.concat( coords.slice(point + 1) );
-      };
+      if (this.selectedLineIds) {
+        // we moved some lines
 
-      const linesBeforePoint = async (point: number) => {
-        let c: Array<TsPosition>;
-        c = coords.slice(0, point - 1);
-        return c.concat( await this.getNextPathCoords(coords[point - 1], [e.lngLat.lng, e.lngLat.lat]) );
-      };
+        this.spinner.showAsElement();
+        const coords = this.history.coords;
+        let backendResult: TsFeatureCollection;
 
-      try {
+        const linesAfterPoint = async (point: number) => {
+          let c: Array<TsPosition>;
+          c = await this.getNextPathCoords([e.lngLat.lng, e.lngLat.lat], coords[point + 1]);
+          return c.concat( coords.slice(point + 1) );
+        };
 
-        if (this.snapType === 'none') {
-          backendResult = await this.getPathFromBackend(coords);
+        const linesBeforePoint = async (point: number) => {
+          let c: Array<TsPosition>;
+          c = coords.slice(0, point - 1);
+          return c.concat( await this.getNextPathCoords(coords[point - 1], [e.lngLat.lng, e.lngLat.lat]) );
+        };
 
-        } else {
+        try {
 
-          let newCoords: Array<TsPosition>;
+          if (this.snapType === 'none') {
+            backendResult = await this.getPathFromBackend(coords);
 
-          if (this.selectedPointId === 0) {                                 // first point
-            newCoords = await linesAfterPoint(this.selectedPointId);
-          } else if (this.selectedPointId === this.history.coords.length - 1) {   // last point
-            newCoords = await linesBeforePoint(this.selectedPointId);
-          } else {                                                          // any other point
-            newCoords = (await linesBeforePoint(this.selectedPointId)).concat( await linesAfterPoint(this.selectedPointId) );
+          } else {
+
+            let newCoords: Array<TsPosition>;
+
+            if (this.selectedPointId === 0) {                                 // first point
+              newCoords = await linesAfterPoint(this.selectedPointId);
+            } else if (this.selectedPointId === this.history.coords.length - 1) {   // last point
+              newCoords = await linesBeforePoint(this.selectedPointId);
+            } else {                                                          // any other point
+              newCoords = (await linesBeforePoint(this.selectedPointId)).concat( await linesAfterPoint(this.selectedPointId) );
+            }
+
+            backendResult = await this.getPathFromBackend(newCoords);
+
           }
 
-          backendResult = await this.getPathFromBackend(newCoords);
-
+        } catch (error) {
+          console.log(error);
+          this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
         }
 
-      } catch (error) {
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
-      }
+        this.history.add( new Path(backendResult) );
+        this.updateMap();
+        this.spinner.removeElement();
+        this.tsMap.removeFeatureState( {source: '0000pts'} );
+      } else {
+        // we only moved the first point
 
-      this.history.add( new Path(backendResult) );
-      this.updateMap();
-      this.spinner.removeElement();
-      this.tsMap.removeFeatureState( {source: '0000pts'} );
+        this.history.firstPoint = [e.lngLat.lng, e.lngLat.lat];
+
+      }
 
     }
 

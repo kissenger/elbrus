@@ -87,7 +87,7 @@ export class Path {
 
 
   /**
-   * Returns the feature and coordinate indices of a given coordinate as a TsPosition
+   * Returns the feature and coordinate **indices** of a given coordinate as a TsPosition
    */
   matchFeature(pointCoord: TsPosition) {
 
