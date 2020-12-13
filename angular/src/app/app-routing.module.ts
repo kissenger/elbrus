@@ -20,6 +20,7 @@ const appRoutes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
   { path: 'profile/select-home', component: MapSelectLocationComponent, canActivate: [AuthGuard]},
   { path: ':pathType/list', component: RoutesListComponent, canActivate: [AuthGuard]},
+  // note the following route is redirected in AuthGuard
   { path: ':pathType/list/:pathId', component: RoutesListComponent, canActivate: [AuthGuard]},
   { path: ':pathType/create', component: RoutesCreateComponent, canActivate: [AuthGuard], data: <TsCallingPage>{callingPage: 'create'}},
   { path: ':pathType/edit', component: RoutesCreateComponent, canActivate: [AuthGuard], data: <TsCallingPage>{callingPage: 'edit'}},

@@ -16,6 +16,7 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
 
   // bind to property in parent to determine which page called the info panel
   @Input() callingPage: string;
+  @Input() displayedPath: {pathId: string, isPublic: boolean};
 
   public tabsArray: TsTabsArray;
   public icon = '-';

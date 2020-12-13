@@ -10,6 +10,7 @@ export class PanelsInjectorComponent implements OnInit {
   @ViewChild('AppInfoPanel', {static: true, read: ViewContainerRef}) infoPanel: any;
   @Input() tabName: string;
   @Input() callingPage: string;
+  @Input() displayedPath: {pathId: string, isPublic: boolean};
 
   constructor(
     private factoryResolver: ComponentFactoryResolver,
@@ -22,6 +23,7 @@ export class PanelsInjectorComponent implements OnInit {
     const newComponent = this.infoPanel.createComponent(factory);
     newComponent.instance.callingPage = this.callingPage;
     newComponent.instance.tabName = this.tabName;
+    newComponent.instance.displayedPath = this.displayedPath;
   }
 
 }

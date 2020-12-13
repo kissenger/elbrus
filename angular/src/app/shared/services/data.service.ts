@@ -27,7 +27,10 @@ export class DataService {
   // components know that a new route is available
   public setPath(geoJson: TsFeatureCollection) {
     this.set({activePath: geoJson});
-    this.pathIdEmitter.emit(geoJson ? geoJson.properties.pathId : '0000');
+    this.pathIdEmitter.emit({
+      pathId: geoJson ? geoJson.properties.pathId : '0000',
+      isPublic: geoJson.properties.info.isPublic
+    });
   }
 
 
@@ -44,7 +47,8 @@ export class DataService {
     redirect?: string,
     isPosition?: boolean,
     activePath?: TsFeatureCollection,
-    newLocation?: TsCoordinate
+    newLocation?: TsCoordinate,
+    pathId?: string   // used by authguard to set the pathId when shared route
   }) {
     Object.keys(data).forEach( key => {
       this.dataStore[key] = data[key];

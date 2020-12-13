@@ -15,8 +15,6 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 import { Router } from '@angular/router';
 import { ListItems } from 'src/app/shared/classes/list-items';
 
-const PRIVATE = false;
-const PUBLIC = true;
 const LIST_ITEM_HEIGHT = 37;
 const LIST_HEIGHT_CORRECTION = 300;  // higher number results in fewer routes loaded
 
@@ -35,7 +33,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
   private mapUpdateListener: Subscription;
   private newUnitsListener: Subscription;
   private newPathListener: Subscription;
-
   public isLoading = false;
 
   // class containing methods for manipulation of lists
@@ -51,20 +48,20 @@ export class PanelListComponent implements OnInit, OnDestroy {
     }
   };
 
-  private sharedPath = {
-    _pid: '',
-    get valid() { return this._pid.length > 10; },
-    get idFromUrl() { return this._pid; },
-    set param(p: string) { this._pid = p; },
-    clear() { this._pid = ''; }
-  };
+  // private sharedPath = {
+  //   _pid: '',
+  //   get valid() { return this._pid.length > 10; },
+  //   get idFromUrl() { return this._pid; },
+  //   set param(p: string) { this._pid = p; },
+  //   clear() { this._pid = ''; }
+  // };
 
   // keep track of the number of routes available compared to the number loades
   public nAvailableRoutes: number;
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
-  public isPublicOrPrivate = PUBLIC;   // state of the dropdown box
+  public isPublicDropDown = true;   // state of the dropdown box
   private boundingBox: TsBoundingBox = null;    // current view
 
   // keep track of user and preferences
@@ -86,35 +83,46 @@ export class PanelListComponent implements OnInit, OnDestroy {
     this.limit = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
 
     // check url for pathId; state is stored in the psuedo class and picked up again after list is updated
-    this.sharedPath.param = this.router.url.split('/').slice(-1)[0];
+    // this.sharedPath.param = this.router.url.split('/').slice(-1)[0];
 
     // do some set up
     this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
-    if ( this.isRegisteredUser && !this.sharedPath.valid ) {
-      this.isPublicOrPrivate = PRIVATE;
-    }
+    // console.log(this.displayedPath)
+    // if ( this.isRegisteredUser && !this.displayedPath ) {
+    //   this.isPublicOrPrivate = PRIVATE;
+    // }
 
     // subscribe to change in map view
-    this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
-      this.boundingBox = bounds;
-      this.offset = 0;
-      this.listItems.removeInactive();
-      this.addPathsToList();
-    });
+    // this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
+    //   console.log('hewjfrefw')
+
+    //   this.boundingBox = bounds;
+    //   this.offset = 0;
+    //   this.listItems.removeInactive();
+    //   this.addPathsToList();
+    // });
 
     // in case units are changed while viewing the list
     this.newUnitsListener = this.data.unitsUpdateEmitter.subscribe( () => {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
-    console.log(this.callingPage);
+    // this.isPublicDropDown = false;
     // if overlay mode, listen for a change in active route, and reset - also triggered when map finishes loading
     // only do this for list - if create then load anyway
+
+
     if ( this.callingPage === 'list' && this.tabName === 'overlay' ) {
-      this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
+      this.newPathListener = this.data.pathIdEmitter.subscribe( (pathInfo: {pathId: string, isPublic: boolean}) => {
+
+        console.log('here', pathInfo)
+        // console.log('here', this.isPublicDropDown, pathInfo.isPublic)
+
         this.listItems.clear();
         this.highlightColours.reset();
-        this.addPathsToList();
+        this.isPublicDropDown = false;
+
+        this.addPathsToList(false);
       });
     }
 
@@ -123,7 +131,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
 
 
-  addPathsToList() {
+  addPathsToList(isPublic?: boolean) {
+    if (isPublic) {
+      console.log('they')
+      this.isPublicDropDown = isPublic;
+    }
 
     // dont do anything if in overlay mode and there is no active path selected
     if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath()) {
@@ -131,7 +143,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     } else {
       this.isLoading = true;
-      this.listListener = this.http.getPathsList('route', this.isPublicOrPrivate, this.offset, this.limit, this.boundingBox)
+      this.listListener = this.http.getPathsList('route', this.isPublicDropDown, this.offset, this.limit, this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
           this.listItems.merge(result.list);
@@ -139,10 +151,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
           this.isLoading = false;
 
-          if (this.sharedPath.valid) {
-            this.listItems.setActive(this.sharedPath.idFromUrl, null);
-            this.sharedPath.clear();
-          }
+          // if (this.displayedPath) {
+          //   this.listItems.setActive(this.displayedPath.pathId, null);
+          //   this.displayedPath = null;
+          //   // this.sharedPath.clear();
+          // }
 
       }, (error) => {
         this.isLoading = false;

@@ -60,20 +60,20 @@
             Guest User: Not shown -->
       <div
         *ngIf="auth.isRegisteredUser() && (!isPathPublic || createdBy === auth.getUser().userName)"
-        (click)="onChangePublicClick()"
+        class='text-like-link'
         data-toggle="tooltip"
         data-html="true"
         data-placement="top"
-        title="{{isPathPublic ? '' : 'Make route public to share with other users'}}" >
+        title="{{isPathPublic ? '' : 'Make route public to share with other users'}}"
+        (click)="onChangePublicClick()">
         Make route {{isPathPublic ? 'private' : 'public'}}
       </div>
 
 
-      <!-- COPY A PUBLIC ROUTE INTO PRIVATE ROUTES
+      <!-- COPY A ROUTE
             Registered User: shown if path is public (ie can make copies of your own public routes)
             Guest User: Deactivated -->
       <div
-        *ngIf="isPathPublic"
         [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
         data-toggle="tooltip"
         data-placement="top"
@@ -95,16 +95,16 @@
 
 
       <!-- EDIT ROUTE
-            Registered User: Shown if the route is created by the current user
-            Guest user: Shown deactivated -->
-       <div
-         *ngIf="createdBy === auth.getUser().userName || auth.isGuestUser()"
-         [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
-         data-toggle="tooltip"
-         data-placement="top"
-         title="{{auth.isRegisteredUser() ? '' : 'Log in to access this feature'}}"
-         (click)="onEditClick()">
-         Edit route
+           Registered User: Shown if the route is created by the current user
+           Guest user: Shown deactivated -->
+      <div
+        *ngIf="createdBy === auth.getUser().userName || auth.isGuestUser()"
+        [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="{{auth.isRegisteredUser() ? '' : 'Log in to access this feature'}}"
+        (click)="onEditClick()">
+        Edit route
       </div>
 
 

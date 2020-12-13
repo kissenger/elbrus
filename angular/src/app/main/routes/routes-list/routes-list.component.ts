@@ -1,3 +1,4 @@
+import { AuthService } from './../../../shared/services/auth.service';
 import { TsPosition, TsFeatureCollection } from 'src/app/shared/interfaces';
 /**
  * Listens for request from panel-list component, makes the backend request and uses
@@ -27,6 +28,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private httpListener: Subscription;
   private chartPointListener: Subscription;
   public tsMap;
+  public displayedPath: {pathId: string, isPublic: boolean} = {pathId: 'ff',isPublic: true};
 
   constructor(
     private data: DataService,
@@ -35,7 +37,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     private router: Router,
     // private spinner: SpinnerService,
     private alert: AlertService,
-    private location: LocationService
+    private location: LocationService,
+    private auth: AuthService
     ) { }
 
 
@@ -44,21 +47,29 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.map.isMap()) { this.map.kill(); }
 
+    // look for a stored pathId - if present we need to display it.  PathId is set in stored by AuthGuard
+    const idFromStore = this.data.get('pathId');
 
-    // look for a path id in the url
-    const idFromUrl = this.router.url.split('/').slice(-1)[0];
-    if ( idFromUrl.length > 10 ) {
-      const path = await this.getPath(idFromUrl);
+    if (idFromStore) {
+      this.data.clearKey('pathId');
+      const path = await this.getPath(idFromStore);
 
-      if (path.properties.info.isPublic) {
+      // allow if createdBy this user, or if public
+      if (path.properties.info.isPublic || this.auth.getUser().userName === path.properties.info.createdBy) {
+        // this.displayedPath = {pathId: idFromStore, isPublic: path.properties.info.isPublic};
+        this.data.setPath(path);
+        // this.data.pathIdEmitter.emit(idFromStore);
+        console.log(this.displayedPath);
         await this.map.newMap(null, null, path.bbox );
         this.addPathToMap(path, {}, {booEmit: true, booResizeView: false});
 
       } else {
-        this.alert.showAsElement('Error: Path not found', 'Could not find the requested path.', true, false).subscribe( () => {});
+        this.alert.showAsElement('Error: Path not found', 'Couldn\'t find requested path, or not authorised', true, false)
+          .subscribe( () => {});
       }
-    } else {
 
+    } else {
+      // if no data in store, then launch a blank map
       await this.map.newMap();
 
     }

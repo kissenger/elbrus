@@ -73,10 +73,10 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   onCopyClick() {
     if (!this.auth.isRegisteredUser()) { return; }
-    this.httpListener = this.http.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
+    this.httpListener = this.http.copyPath(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
-      this.router.navigate(['route/list']);
+      this.router.navigate(['route/list/' + result.pathId]);
     });
   }
 

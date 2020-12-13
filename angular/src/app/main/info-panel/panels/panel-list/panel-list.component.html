@@ -2,10 +2,10 @@
 <div class="p-2 h-100 d-flex flex-column">
 
   <!-- PUBLIC/PRIVATE DROPDOWN -->
-  <form>
+  <!-- <form>
 
     <div class="form-group m-0 p-0">
-      <select [(ngModel)]="isPublicOrPrivate" [ngModelOptions]="{standalone: true}"
+      <select [(ngModel)]="isPublicDropDown" [ngModelOptions]="{standalone: true}"
         (change)="onSelectMenuChange()" class="custom-select custom-select-sm my-1">
         <option *ngIf="!isRegisteredUser" disabled value=false>My routes</option>
         <option *ngIf="isRegisteredUser" value=false>My routes</option>
@@ -13,9 +13,20 @@
       </select>
     </div>
 
+  </form> -->
+
+  {{isPublicDropDown}}
+  <form>
+
+    <!-- <div class="form-group m-0 p-0"> -->
+      <select [(ngModel)]="isPublicDropDown" name="gordon"
+        (ngModelChange)="onSelectMenuChange()" class="form-control">
+        <option [value]=false>My routes</option>
+        <option [value]=true>Public routes</option>
+      </select>
+    <!-- </div> -->
+
   </form>
-
-
 
   <!-- EMPTY ROUTE LIST -->
   <div *ngIf="tabName === 'overlay' && nAvailableRoutes === 0" class="w-100 text-center flex-grow-1">
@@ -29,11 +40,11 @@
       No routes found.
     </div>
 
-    <div *ngIf="!isPublicOrPrivate" class="small mt-3 text-center mt-auto">
+    <div *ngIf="!isPublicDropDown" class="small mt-3 text-center mt-auto">
       Use the 'Options' tab to load or create a route, or use the dropdown above to view shared routes.
     </div>
 
-    <div *ngIf="isPublicOrPrivate" class="small mt-3 text-center mt-auto">
+    <div *ngIf="isPublicDropDown" class="small mt-3 text-center mt-auto">
       Only routes in the current map view are listed.  Try moving the map to find routes.
     </div>
 

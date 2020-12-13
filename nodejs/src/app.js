@@ -429,23 +429,26 @@ app.post('/api/toggle-path-public/', auth.verifyToken, async (req, res) => {
 
 
 /*****************************************************************
- * Copies a public path into private database
+ * Copies a path into private database
  *****************************************************************/
 
-app.post('/api/copy-public-path/', auth.verifyToken, async (req, res) => {
+app.post('/api/copy-path/', auth.verifyToken, async (req, res) => {
 
   try {
 
-    const document = await mongoModel(req.body.pathType).findOne({_id: req.body.pathId});
+    const document = await mongoModel(req.body.pathType).findOne({_id: req.body.pathId}, {_id:0});
     const newDate = new Date(Date.now());
     document.userId = req.userId;
+    document.info.name = "Copy of " + document.info.name;
     document.creationDate = newDate,
     document.lastEditDate = newDate,
     document.isPublic = false;
     document.info.createdBy = req.userName;
+    document._id = mongoose.Types.ObjectId();
+    document.isNew = true;
     
-    await mongoModel(req.body.pathType).create(document);
-    res.status(201).json({success: 'success'});
+    const newDoc = await mongoModel(req.body.pathType).create(document);
+    res.status(201).json({pathId: newDoc._id});
 
   } catch (error) {
 
