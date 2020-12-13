@@ -5,73 +5,142 @@
 
   <div class="flex-grow-1">
 
+    <!-- GUEST USER CAN
+      - plot a route
+      - export a public route to gpx
+      - get shareable link (for public routes)
+      - only view public routes or play with the create tool, but not save
+      GUEST USER CAN NOT:
+      - save a route
+      - move routes between public and private
+      - delete route
+      - import/export
+      - edit
+      -->
+
     <div class="h6 pb-1 mb-2 border-bottom text-left">
       New Routes
     </div>
 
-    <div class="ml-2">
-      <span *ngIf="auth.isGuestUser()" class="text-muted"> Load from .gpx file<br> </span>
-      <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onLoadFileClick()"> Load from .gpx file <br></span>
-      <span class="text-like-link" (click)="onCreateClick()"> Create a new route </span> <br>
-    </div>
+    <!-- IMPORT FROM GPX
+      Registered User: Shown
+      Guest user: Shown Deactivated -->
+      <div
+        [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="{{auth.isRegisteredUser() ? '' : 'Log in to access this feature'}}"
+        (click)="onImportGpxClick()">
+        Load from .gpx file
+      </div>
+
+    <!-- IMPORT FROM GPX
+      Registered User: Shown
+      Guest user: Shown -->
+      <div
+        class="text-like-link"
+        (click)="onCreateClick()">
+        Create a new route
+      </div>
+
+
+
     <!-- </div> -->
 
     <div class="spacer"></div>
 
     <div *ngIf="!!pathId">
 
-
-      <!-- <div class="h6 py-1 my-2 border-bottom text-left">
-        Active Route Options
-      </div> -->
       <div class="h6 pb-1 mb-2 border-bottom text-left">
         Active Route Options
       </div>
-    <div class="ml-2">
 
-
-      <div *ngIf="allowChangePublic()">
-        <span *ngIf="auth.isGuestUser()" class="text-muted"> Make route {{isPathPublic ? 'private' : 'public'}}<br></span>
-        <span *ngIf="auth.isRegisteredUser()"
-          class="text-like-link"
-          (click)="onChangePublicClick()"
-          data-toggle="tooltip"
-          data-placement="top"
-          title="Route must be public in order to get a shareable link">
-          Make route {{isPathPublic ? 'private' : 'public'}}<br>
-        </span>
+      <!-- MAKE ROUTE PUBLIC/PRIVATE
+            Registered User: path is private OR if path was created by the current user (public and private)
+            Guest User: Not shown -->
+      <div
+        *ngIf="auth.isRegisteredUser() && (!isPathPublic || createdBy === auth.getUser().userName)"
+        (click)="onChangePublicClick()"
+        data-toggle="tooltip"
+        data-html="true"
+        data-placement="top"
+        title="{{isPathPublic ? '' : 'Make route public to share with other users'}}" >
+        Make route {{isPathPublic ? 'private' : 'public'}}
       </div>
 
-      <div *ngIf="allowCopy()">
-        <span *ngIf="auth.isGuestUser()" class="text-muted" > Copy into private routes<br></span>
-        <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onMakeCopyClick()"> Copy into private routes<br></span>
+
+      <!-- COPY A PUBLIC ROUTE INTO PRIVATE ROUTES
+            Registered User: shown if path is public (ie can make copies of your own public routes)
+            Guest User: Deactivated -->
+      <div
+        *ngIf="isPathPublic"
+        [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="{{auth.isRegisteredUser() ? '' : 'Log in to access this feature'}}"
+        (click)="onCopyClick()">
+        Copy this route
       </div>
 
-      <span *ngIf="allowDelete()" class="text-like-link" (click)="onDeleteClick()"> Delete route <br></span>
 
-      <span *ngIf="auth.isGuestUser()" class="text-muted" >Reverse route<br></span>
-      <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onMakeCopyClick()">Reverse route<br></span>
-
-      <div *ngIf="allowEdit()">
-        <span *ngIf="auth.isGuestUser()" class="text-muted">Edit Route<br></span>
-        <span *ngIf="auth.isRegisteredUser()" class="text-like-link" (click)="onReverseClick()">Edit Route<br></span>
+    <!-- PERMANENTLY DELETE A ROUTE
+            Registered User: Shown if the route was created by the current user - applies to public and private routes
+            Guest user: Not shown (guest can never be the creator of a route so condition will never be satisfied) -->
+      <div
+        *ngIf="createdBy === auth.getUser().userName"
+        class='text-like-link'
+        (click)="onDeleteClick()">
+        Delete route
       </div>
 
-      <span *ngIf="isPathPublic" class="text-like-link" (click)="onShareClick()"> Get shareable link <br></span>
 
-      <span class="text-like-link" (click)="onExportGpxClick()"> Export to .gpx file <br></span>
+      <!-- EDIT ROUTE
+            Registered User: Shown if the route is created by the current user
+            Guest user: Shown deactivated -->
+       <div
+         *ngIf="createdBy === auth.getUser().userName || auth.isGuestUser()"
+         [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
+         data-toggle="tooltip"
+         data-placement="top"
+         title="{{auth.isRegisteredUser() ? '' : 'Log in to access this feature'}}"
+         (click)="onEditClick()">
+         Edit route
+      </div>
+
+
+      <!-- GET A SHAREABLE LINK
+            Registered User: Shown if the route is public
+            Guest user: Shown deactivated -->
+      <div
+        *ngIf="isPathPublic"
+        [ngClass]="auth.isRegisteredUser() ? 'text-like-link' : 'text-muted'"
+        data-toggle="tooltip"
+        data-placement="top"
+        title="{{auth.isRegisteredUser() ? '' : 'Log in to access this feature'}}"
+        (click)="onShareClick()">
+        Get a shareable link
+      </div>
+
+
+      <!-- EXPORT TO GPX
+            Registered User: Shown
+            Guest user: Shown  -->
+      <div
+        class="text-like-link"
+        (click)="onExportGpxClick()">
+        Export to .gpx file
+      </div>
 
     </div>
-</div>
 
-      <!-- <a [routerLink]="['/route/create']">Create on map</a><br> -->
 
-      <!-- This is a hidden element activated by the 'Load from file' link above -->
-      <div class="file-selector">
-        <form id="file_form">
-          <input type="file" id="file-select-single" (change)="onFilePickedImport($event, false, 'route')" single>
-        </form>
-      </div>
+
+    <!-- This is a hidden element activated by the 'Load from file' link above -->
+    <div class="file-selector">
+      <form id="file_form">
+        <input type="file" id="file-select-single" (change)="onFilePickedImport($event, false, 'route')" single>
+      </form>
+    </div>
 
 
   </div>

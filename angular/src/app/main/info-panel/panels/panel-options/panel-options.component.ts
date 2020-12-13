@@ -15,13 +15,12 @@ import { environment } from 'src/environments/environment';
 })
 export class PanelOptionsComponent implements OnInit, OnDestroy {
 
-  private activePathSubscription: Subscription;
-  private httpSubscription: Subscription;
+  private pathListener: Subscription;
+  private httpListener: Subscription;
   public isPathPublic: boolean;
   public createdBy: string;
   public pathId: string;
   private pathType: string;
-  // private geoJson: TsFeatureCollection;
   private nPoints: number;
 
   constructor(
@@ -35,7 +34,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.activePathSubscription = this.data.pathIdEmitter.subscribe( () => {
+    this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
       const geoJson = this.data.getPath();
 
@@ -50,14 +49,40 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   }
 
 
-
   /** virtually clicks the hidden form element to launch the select file dialogue */
-  onLoadFileClick() {
+  onImportGpxClick() {
+    if (!this.auth.isRegisteredUser()) { return; }
     document.getElementById('file-select-single').click();
   }
 
-  onDeleteClick() {
 
+  onCreateClick() {
+    this.data.setPath(null);
+    this.router.navigate(['/route/create']);
+  }
+
+
+  onChangePublicClick() {
+    this.httpListener = this.http.togglePathPublic(this.pathType, this.pathId).subscribe( (result) => {
+      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+      this.router.onSameUrlNavigation = 'reload';
+      this.router.navigate(['route/list']);
+    });
+  }
+
+
+  onCopyClick() {
+    if (!this.auth.isRegisteredUser()) { return; }
+    this.httpListener = this.http.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
+      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+      this.router.onSameUrlNavigation = 'reload';
+      this.router.navigate(['route/list']);
+    });
+  }
+
+
+  onDeleteClick() {
+    if (!this.auth.isRegisteredUser()) { return; }
     this.alert.showAsElement('Are you sure?', 'Cannot undo delete!', true, true).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
         this.http.deletePath(this.pathId).subscribe( () => {
@@ -65,23 +90,37 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
         });
       }
     });
-
   }
 
 
+  onEditClick() {
+    if (!this.auth.isRegisteredUser()) { return; }
+    this.router.navigate(['/route/edit']);
+  }
 
 
-
+  onShareClick() {
+    if (!this.auth.isRegisteredUser()) { return; }
+    const link = `${environment.PROTOCOL}://${environment.FRONTEND_URL}/route/list/${this.pathId}`;
+    navigator.clipboard.writeText(link)
+      .then( () => {
+        this.alert
+          .showAsElement('Success', `Link copied to clipboard\r\n${link}`, false, true)
+          .subscribe( () => {} );
+      })
+      .catch( (err) => {
+        this.alert
+          .showAsElement('Something went wrong :(', `Couldn't copy link to clipboard\r\n${link}`, false, true)
+          .subscribe( () => {} );
+      });
+  }
 
   /**
    * Export a path to a .gpx file, getting the active geoJSON from the dataStore
    */
   onExportGpxClick() {
 
-    // const pathId = this.data.getFromStore('activePath', false).properties.pathId;
-    // const pathType = 'route';
-
-    this.httpSubscription = this.http.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
+    this.httpListener = this.http.exportToGpx(this. pathType, this.pathId).subscribe( (fname) => {
 
       // this was the original attempt which does not work with authentication injection, so needed a new approach
       // window.location.href = 'http://localhost:3000/download';
@@ -99,85 +138,6 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   }
 
 
-  // Show option to toggle public/private its its a private path, or if its public and created by this user
-  allowChangePublic() {
-    return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
-  }
-
-  allowCopy() {
-    // return !this.isPathPublic || this.createdBy === this.auth.getUser().userName;
-    return !this.isPathPublic;
-  }
-
-
-  allowDelete() {
-    // return this.createdBy === this.auth.getUser().userName;
-    return this.createdBy === this.auth.getUser().userName;
-  }
-
-
-  allowEdit() {
-    return this.createdBy === this.auth.getUser().userName && this.nPoints < 3500;
-  }
-
-  onShareClick() {
-
-    const link = `${environment.PROTOCOL}://${environment.FRONTEND_URL}/route/list/${this.pathId}`;
-    navigator.clipboard.writeText(link)
-      .then( () => {
-        this.alert
-          .showAsElement('Success', `Link copied to clipboard\r\n${link}`, false, true)
-          .subscribe( () => {} );
-      })
-      .catch( (err) => {
-        this.alert
-          .showAsElement('Something went wrong :(', `Couldn't copy link to clipboard\r\n${link}`, false, true)
-          .subscribe( () => {} );
-      });
-
-  }
-
-
-  onChangePublicClick() {
-    this.httpSubscription = this.http.togglePathPublic(this.pathType, this.pathId).subscribe( (result) => {
-      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-      this.router.onSameUrlNavigation = 'reload';
-      this.router.navigate(['route/list']);
-    });
-  }
-
-
-  onMakeCopyClick() {
-    this.httpSubscription = this.http.copyPublicPath(this.pathType, this.pathId).subscribe( (result) => {
-      this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-      this.router.onSameUrlNavigation = 'reload';
-      this.router.navigate(['route/list']);
-    });
-  }
-
-
-  onReverseClick() {
-    this.httpSubscription = this.http.reverseRoute(this.pathType, this.pathId).subscribe( (result) => {
-      const pathAsGeoJSON = result.hills;
-      this.data.setPath(pathAsGeoJSON);
-      this.spinner.removeElement();
-      this.router.navigate(['route/review/']);
-    });
-  }
-
-
-  onCreateClick() {
-    this.data.setPath(null);
-    this.router.navigate(['/route/create']);
-  }
-
-
-  onEditClick() {
-    this.router.navigate(['/route/edit']);
-  }
-
-
-
   /** runs when file is selected */
   onFilePickedImport(event: Event, moreThanOneFile: boolean, pathType: string) {
 
@@ -189,7 +149,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     const fileData = new FormData();
     fileData.append('filename', files[0], files[0].name);
 
-    this.httpSubscription = this.http.importRoute(fileData).subscribe( (result) => {
+    this.httpListener = this.http.importRoute(fileData).subscribe( (result) => {
       const pathAsGeoJSON = result.hills;
       this.data.setPath(pathAsGeoJSON);
       this.spinner.removeElement();
@@ -205,15 +165,17 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   }
 
+
   reloadListComponent() {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.router.onSameUrlNavigation = 'reload';
     this.router.navigate(['route/list']);
   }
 
+
   ngOnDestroy() {
-    if (this.httpSubscription) { this.httpSubscription.unsubscribe(); }
-    if (this.activePathSubscription) { this.activePathSubscription.unsubscribe(); }
+    if (this.httpListener) { this.httpListener.unsubscribe(); }
+    if (this.pathListener) { this.pathListener.unsubscribe(); }
   }
 
 }
