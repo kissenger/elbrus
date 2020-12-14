@@ -56,10 +56,9 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
       // allow if createdBy this user, or if public
       if (path.properties.info.isPublic || this.auth.getUser().userName === path.properties.info.createdBy) {
-        // this.displayedPath = {pathId: idFromStore, isPublic: path.properties.info.isPublic};
         this.data.setPath(path);
-        // this.data.pathIdEmitter.emit(idFromStore);
-        console.log(this.displayedPath);
+        this.data.set({startPath: true}); // tells panel-list that we are showing a shared path
+
         await this.map.newMap(null, null, path.bbox );
         this.addPathToMap(path, {}, {booEmit: true, booResizeView: false});
 
@@ -69,7 +68,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       }
 
     } else {
-      // if no data in store, then launch a blank map
+      // must set the path even if there isnt one because panel-list is waiting for it
+      // this.data.setPath(null);
       await this.map.newMap();
 
     }

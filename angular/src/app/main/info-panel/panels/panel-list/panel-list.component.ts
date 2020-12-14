@@ -48,21 +48,15 @@ export class PanelListComponent implements OnInit, OnDestroy {
     }
   };
 
-  // private sharedPath = {
-  //   _pid: '',
-  //   get valid() { return this._pid.length > 10; },
-  //   get idFromUrl() { return this._pid; },
-  //   set param(p: string) { this._pid = p; },
-  //   clear() { this._pid = ''; }
-  // };
 
   // keep track of the number of routes available compared to the number loades
   public nAvailableRoutes: number;
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
-  public isPublicDropDown = true;   // state of the dropdown box
+  public isPublicDropDown = null;   // state of the dropdown box
   private boundingBox: TsBoundingBox = null;    // current view
+  private startPathId: string;
 
   // keep track of user and preferences
   public isRegisteredUser = this.auth.isRegisteredUser();
@@ -79,50 +73,40 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // determine the number of list items we can fit in the current view height
     this.limit = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
-
-    // check url for pathId; state is stored in the psuedo class and picked up again after list is updated
-    // this.sharedPath.param = this.router.url.split('/').slice(-1)[0];
-
-    // do some set up
     this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
-    // console.log(this.displayedPath)
-    // if ( this.isRegisteredUser && !this.displayedPath ) {
-    //   this.isPublicOrPrivate = PRIVATE;
-    // }
-
-    // subscribe to change in map view
-    // this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
-    //   console.log('hewjfrefw')
-
-    //   this.boundingBox = bounds;
-    //   this.offset = 0;
-    //   this.listItems.removeInactive();
-    //   this.addPathsToList();
-    // });
-
-    // in case units are changed while viewing the list
     this.newUnitsListener = this.data.unitsUpdateEmitter.subscribe( () => {
       this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
     });
 
-    // this.isPublicDropDown = false;
-    // if overlay mode, listen for a change in active route, and reset - also triggered when map finishes loading
-    // only do this for list - if create then load anyway
+    // Map view has changed, need to update list
+    // Applies to both list and overlay mode
+    this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
+      console.log(this.tabName)
 
+      if (this.data.get('startPath')) {
+        // check for start path, if yes then we need list to tell us which path is displayed
+        this.data.clearKey('startPath');
+        this.startPathId = this.data.getPath().properties.pathId;
+        this.isPublicDropDown = this.data.getPath().properties.info.isPublic;
+      } else {
+        // if there is no startPath, need some logic to set the dropdown  (if already set, dont change it)
+        this.isPublicDropDown = !this.isPublicDropDown && this.isRegisteredUser ? false : true;
+      }
 
+      this.boundingBox = bounds;
+      this.offset = 0;
+      this.listItems.removeInactive();
+      this.addPathsToList();
+
+    });
+
+    // In overlay mode only, when the active path has changed we need to reset the overlaid paths
     if ( this.callingPage === 'list' && this.tabName === 'overlay' ) {
-      this.newPathListener = this.data.pathIdEmitter.subscribe( (pathInfo: {pathId: string, isPublic: boolean}) => {
-
-        console.log('here', pathInfo)
-        // console.log('here', this.isPublicDropDown, pathInfo.isPublic)
-
-        this.listItems.clear();
+      this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
+        // reset the list
+        this.listItems.setAllInactive();
         this.highlightColours.reset();
-        this.isPublicDropDown = false;
-
-        this.addPathsToList(false);
       });
     }
 
@@ -130,12 +114,11 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-
   addPathsToList(isPublic?: boolean) {
-    if (isPublic) {
-      console.log('they')
-      this.isPublicDropDown = isPublic;
-    }
+    // if (isPublic) {
+    //   console.log('they')
+    //   this.isPublicDropDown = isPublic;
+    // }
 
     // dont do anything if in overlay mode and there is no active path selected
     if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath()) {
@@ -143,6 +126,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     } else {
       this.isLoading = true;
+      console.log(this.isPublicDropDown)
       this.listListener = this.http.getPathsList('route', this.isPublicDropDown, this.offset, this.limit, this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
@@ -151,11 +135,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
           this.isLoading = false;
 
-          // if (this.displayedPath) {
-          //   this.listItems.setActive(this.displayedPath.pathId, null);
-          //   this.displayedPath = null;
-          //   // this.sharedPath.clear();
-          // }
+          if (this.startPathId) {
+            this.listItems.setActive(this.startPathId, null);
+            this.startPathId = null;
+          }
 
       }, (error) => {
         this.isLoading = false;

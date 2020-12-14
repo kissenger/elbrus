@@ -40,7 +40,7 @@
       <div #div *ngFor="let tab of tabsArray" [ngClass]="getTabsClass(tab)" id={{tab.name}}
         role="tabpanel" class="w-100 flex-grow-1 tab-panel bg-white position-relative">
         <div class="position-absolute content-inner">
-          <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}} displayedPath={{displayedPath}}></app-panels-injector>
+          <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
         </div>
       </div>
 

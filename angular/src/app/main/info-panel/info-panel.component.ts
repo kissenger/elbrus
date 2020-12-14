@@ -16,7 +16,6 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
 
   // bind to property in parent to determine which page called the info panel
   @Input() callingPage: string;
-  @Input() displayedPath: {pathId: string, isPublic: boolean};
 
   public tabsArray: TsTabsArray;
   public icon = '-';
@@ -35,13 +34,14 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
 
       // enable disabled tabs when we have data
-      if ( this.data.get('activePath') ) {
+      // if ( this.data.getPath() ) {
+        console.log(this.data.getPath(), !this.data.getPath())
         this.tabsArray.forEach( tab => {
           if ( tab.name === 'details' || tab.name === 'overlay') {
-            tab.disabled = false;
+            tab.disabled = !this.data.getPath();
           }
         });
-      }
+      // }
 
       // if on narrow screen, minimise panel
       if (window.screen.width < globals.narrowScreenThreshold) {
