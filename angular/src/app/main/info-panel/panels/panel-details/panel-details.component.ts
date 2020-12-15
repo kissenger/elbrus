@@ -1,3 +1,4 @@
+import { AutoNamePipe } from './../../../../shared/pipes/auto-name.pipe';
 
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as globals from 'src/app/shared/globals';
@@ -59,7 +60,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private alert: AlertService,
     private unitConvertPipe: UnitsConvertPipe,
-    private unitLongNamePipe: UnitsLongNamePipe
+    private unitLongNamePipe: UnitsLongNamePipe,
+    private autoNamePipe: AutoNamePipe
 
   ) {}
 
@@ -221,10 +223,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.data.getPath();
-    const pathName = !!this.givenPathName ? this.givenPathName : this.pathName;
+    const pathName = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
-    // if (newPath.properties.pathId === '0000') {    // pathId for created route is set to 0000 in the backend
     if ( this.callingPage === 'create' || this.callingPage === 'edit' ) {
 
       const sendObj = {
@@ -235,9 +236,11 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         description: this.pathDescription
       };
 
-      this.httpService.saveRoute( sendObj ).subscribe( () => {
-        this.router.navigate(['/route/list/']);
-      }, (error) => {
+      console.log(sendObj);
+
+      this.httpService.saveRoute( sendObj ).subscribe(
+        (response) => { this.router.navigate(['/route/list/' + response.pathId]); },
+        (error) => {
         console.log(error);
         this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       });

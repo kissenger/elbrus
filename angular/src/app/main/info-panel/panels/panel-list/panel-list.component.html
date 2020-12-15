@@ -15,13 +15,12 @@
 
   </form> -->
 
-  {{isPublicDropDown}}
   <form>
 
     <!-- <div class="form-group m-0 p-0"> -->
       <select [(ngModel)]="isPublicDropDown" name="gordon"
-        (ngModelChange)="onSelectMenuChange()" class="form-control">
-        <option [value]=false>My routes</option>
+        (ngModelChange)="onSelectMenuChange()" class="custom-select custom-select-sm my-1">
+        <option *ngIf="isRegisteredUser" [value]=false>My routes</option>
         <option [value]=true>Public routes</option>
       </select>
     <!-- </div> -->

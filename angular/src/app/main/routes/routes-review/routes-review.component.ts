@@ -1,3 +1,4 @@
+import { TsPlotPathOptions } from 'src/app/shared/interfaces';
 import { Component, OnInit } from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -30,7 +31,7 @@ export class RoutesReviewComponent implements OnInit {
 
       this.map.newMap(cog)
         .then( () => {
-          const plotOptions = {booReplaceExisting: false, resizeView: true, booSaveToStore: true};
+          const plotOptions: TsPlotPathOptions = {resizeView: true};
           this.map.add(geoJSON, {}, plotOptions);
         })
         .catch( e => {
