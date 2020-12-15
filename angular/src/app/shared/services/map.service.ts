@@ -180,8 +180,12 @@ export class MapService {
 
       // map listener will fire only once when the data has finished loading
       this.tsMap.once('idle', (e) => {
-        if (plotOptions.booResizeView) { this.bounds = pathAsGeoJSON.bbox; }
-        this.data.setPath(pathAsGeoJSON);
+        if (plotOptions.resizeView) {
+          this.bounds = pathAsGeoJSON.bbox;
+        }
+        if (plotOptions.plotType !== 'overlay') {
+          this.data.setPath(pathAsGeoJSON);
+        }
         resolve();
       });
 

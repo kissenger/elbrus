@@ -30,7 +30,7 @@ export class RoutesReviewComponent implements OnInit {
 
       this.map.newMap(cog)
         .then( () => {
-          const plotOptions = {booReplaceExisting: false, booResizeView: true, booSaveToStore: true};
+          const plotOptions = {booReplaceExisting: false, resizeView: true, booSaveToStore: true};
           this.map.add(geoJSON, {}, plotOptions);
         })
         .catch( e => {

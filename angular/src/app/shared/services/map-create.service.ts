@@ -26,11 +26,6 @@ export class MapCreateService extends MapService {
 
   private history: PathHistory;
   private snapType: TsSnapType = 'walking';
-  // private plotOptions: TsPlotPathOptions = {
-  //   booResizeView: false,
-  //   booSaveToStore: true,
-  //   booPlotPoints: true
-  // };
   private styleOptions: TsLineStyle = {};
   private selectedPointId: number;
   private selectedLineIds: Array<{featureIndex: number, coordIndex: number}>;

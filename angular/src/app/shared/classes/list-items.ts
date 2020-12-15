@@ -22,7 +22,7 @@ export class ListItems {
     return this._listItems.length;
   }
 
-  setInactive(pathId: string) {
+  unselect(pathId: string) {
     const indx = this._listItems.findIndex(item => item.pathId === pathId);
     const colour = this._listItems[indx].colour;
     this._listItems[indx].isActive = false;
@@ -31,13 +31,13 @@ export class ListItems {
     return colour;
   }
 
-  setActive(pathId: string, colour: string) {
+ select(pathId: string, colour: string) {
     const indx = this._listItems.findIndex(item => item.pathId === pathId);
     this._listItems[indx].isActive = true;
     this._listItems[indx].colour = colour;
   }
 
-  setAllInactive() {
+  unselectAll() {
     this._listItems.forEach( item => {
       item.isActive = false;
       item.colour = null;
@@ -52,7 +52,7 @@ export class ListItems {
     return this._listItems.find(item => item.pathId === pathId);
   }
 
-  isActive(pathId: string) {
+  isSelected(pathId: string) {
     return !!this._listItems.find(item => item.pathId === pathId).isActive;
   }
 

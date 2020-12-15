@@ -9,10 +9,9 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsBoundingBox, TsCoordinate, TsListItem } from 'src/app/shared/interfaces';
+import { TsUnits, TsBoundingBox, TsCoordinate, TsListItem, TsMapRequest } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
-import { Router } from '@angular/router';
 import { ListItems } from 'src/app/shared/classes/list-items';
 
 const LIST_ITEM_HEIGHT = 37;
@@ -34,8 +33,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
   private newUnitsListener: Subscription;
   private newPathListener: Subscription;
   public isLoading = false;
-
-  // class containing methods for manipulation of lists
   public listItems: ListItems = new ListItems();
 
   // define the colours to highlight overlays
@@ -67,8 +64,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private data: DataService,
     private auth: AuthService,
-    private alert: AlertService,
-    private router: Router
+    private alert: AlertService
   ) {}
 
   ngOnInit() {
@@ -82,7 +78,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // Map view has changed, need to update list
     // Applies to both list and overlay mode
     this.mapUpdateListener = this.data.mapBoundsEmitter.subscribe( (bounds: TsBoundingBox) => {
-      console.log(this.tabName)
 
       if (this.data.get('startPath')) {
         // check for start path, if yes then we need list to tell us which path is displayed
@@ -102,10 +97,10 @@ export class PanelListComponent implements OnInit, OnDestroy {
     });
 
     // In overlay mode only, when the active path has changed we need to reset the overlaid paths
+    // Work is only done in the overlay tab, when a route is clicked in the routes tab (inititating the path emit)
     if ( this.callingPage === 'list' && this.tabName === 'overlay' ) {
-      this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
-        // reset the list
-        this.listItems.setAllInactive();
+      this.newPathListener = this.data.pathIdEmitter.subscribe( (plotType: string) => {
+        this.listItems.unselectAll();
         this.highlightColours.reset();
       });
     }
@@ -114,19 +109,15 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  addPathsToList(isPublic?: boolean) {
-    // if (isPublic) {
-    //   console.log('they')
-    //   this.isPublicDropDown = isPublic;
-    // }
+  addPathsToList() {
 
     // dont do anything if in overlay mode and there is no active path selected
-    if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath()) {
+    // if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath()) {
       // do nothing
 
-    } else {
+    // } else {
+
       this.isLoading = true;
-      console.log(this.isPublicDropDown)
       this.listListener = this.http.getPathsList('route', this.isPublicDropDown, this.offset, this.limit, this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
@@ -136,7 +127,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.isLoading = false;
 
           if (this.startPathId) {
-            this.listItems.setActive(this.startPathId, null);
+            this.listItems.select(this.startPathId, null);
             this.startPathId = null;
           }
 
@@ -145,7 +136,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
         console.log(error);
         this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       });
-    }
+    // }
   }
 
 
@@ -164,30 +155,31 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   async listAction(idFromClick: string) {
 
-    const command = {command: '', id: idFromClick, emit: false, colour: null };
+    const command: TsMapRequest = { command: null, pathId: idFromClick, plotType: null, colour: null };
 
     if ( this.tabName === 'routes' ) {
       // reclicking an active item in routes anything displayed on map and replaces with clicked route
       command.command = 'replace';
-      command.emit = true;
-      this.listItems.setAllInactive();
+      command.plotType = 'active';
+      this.listItems.unselectAll();
       this.highlightColours.reset();
-      this.listItems.setActive(idFromClick, null);
+      this.listItems.select(idFromClick, null);
 
-    } else {
-      // tabName==='overlay'
+    } else {  // tabName==='overlay'
 
-      if ( this.listItems.isActive(idFromClick) ) {
+      if ( this.listItems.isSelected(idFromClick) ) {
         // reclicking an active item in overlay mode clears only that path
         command.command = 'rem';
-        const colour = this.listItems.setInactive(idFromClick);
+        command.plotType = 'overlay';
+        const colour = this.listItems.unselect(idFromClick);
         this.highlightColours.colours.unshift( colour );
 
       } else {
         // clicking a new item in overlay mode just adds new overlay to map
         command.command = 'add';
+        command.plotType = 'overlay';
         command.colour = this.highlightColours.colours.shift();
-        this.listItems.setActive(idFromClick, command.colour);
+        this.listItems.select(idFromClick, command.colour);
       }
     }
 
@@ -204,7 +196,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     if ( name === 'highlight' ) {
 
-      if ( this.listItems.isActive(id) ) {
+      if ( this.listItems.isSelected(id) ) {
 
         if ( this.tabName === 'overlay' ) {
           styles['border-left'] = `7px ${this.listItems.getItemById(id).colour + this.highlightColours.opacity} solid`;

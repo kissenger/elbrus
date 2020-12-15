@@ -10,22 +10,20 @@ export interface TsCallingPage {
   callingPage: TsCallingPageType;
 }
 
-// export interface TsCallingPage {
-//   callingPage: 'list' | 'create' | 'edit';
-// }
 
-// export type TsCallingPage = 'list' | 'create' | 'edit';
-// exportInterface
+export interface TsMapRequest {
+  command: 'replace' | 'add' | 'rem';
+  pathId: string;
+  plotType: 'active' | 'overlay';
+  colour: string;
+}
 
 /**
  * Map display options
  */
 export interface TsPlotPathOptions {
-    booResizeView?: boolean;
-    booSaveToStore?: boolean;
-    // booPlotMarkers?: boolean;
-    booPlotPoints?: boolean;
-    booEmit?: boolean;
+    resizeView?: boolean;
+    plotType?: 'active' | 'overlay';
 }
 
 export interface TsLineStyle {

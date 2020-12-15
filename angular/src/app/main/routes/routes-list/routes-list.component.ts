@@ -1,5 +1,5 @@
 import { AuthService } from './../../../shared/services/auth.service';
-import { TsPosition, TsFeatureCollection } from 'src/app/shared/interfaces';
+import { TsPosition, TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
 /**
  * Listens for request from panel-list component, makes the backend request and uses
  * map-service to make the desired changes to the plot
@@ -28,14 +28,11 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private httpListener: Subscription;
   private chartPointListener: Subscription;
   public tsMap;
-  public displayedPath: {pathId: string, isPublic: boolean} = {pathId: 'ff',isPublic: true};
 
   constructor(
     private data: DataService,
     public map: MapService,
     private http: HttpService,
-    private router: Router,
-    // private spinner: SpinnerService,
     private alert: AlertService,
     private location: LocationService,
     private auth: AuthService
@@ -56,15 +53,17 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
       // allow if createdBy this user, or if public
       if (path.properties.info.isPublic || this.auth.getUser().userName === path.properties.info.createdBy) {
+
         this.data.setPath(path);
         this.data.set({startPath: true}); // tells panel-list that we are showing a shared path
-
         await this.map.newMap(null, null, path.bbox );
-        this.addPathToMap(path, {}, {booEmit: true, booResizeView: false});
+        this.map.add(path, {}, {plotType: 'active'});
 
       } else {
         this.alert.showAsElement('Error: Path not found', 'Couldn\'t find requested path, or not authorised', true, false)
           .subscribe( () => {});
+      await this.map.newMap();
+
       }
 
     } else {
@@ -96,20 +95,19 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     // listen for command from panel-list asking for map changes
     this.pathIdListener = this.data.pathCommandEmitter.subscribe(
-      async ( request: {command?: string, id?: string, colour?: string, emit: false, resize: false} ) => {
+      async ( request: TsMapRequest ) => {
 
         if ( request.command === 'add' ) {
-          const path = await this.getPath(request.id);
-          this.addPathToMap(path, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
+          const path = await this.getPath(request.pathId);
+          this.map.add(path, {lineColour: request.colour}, {plotType: request.plotType, resizeView: false} );
 
         } else if ( request.command === 'rem' ) {
-          this.map.remove(request.id);
+          this.map.remove(request.pathId);
 
         } else if ( request.command === 'replace' ) {
           this.map.clear();
-          const path = await this.getPath(request.id);
-          this.addPathToMap(path, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
-
+          const path = await this.getPath(request.pathId);
+          this.map.add(path, {lineColour: request.colour}, {plotType: request.plotType, resizeView: false} );
         }
     });
   }
@@ -150,10 +148,10 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
   }
 
-  addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
-    this.map.add(pathAsGeojson, style, options );
+  // addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
+  //   this.map.add(pathAsGeojson, style, options );
 
-  }
+  // }
 
 
 

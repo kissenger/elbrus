@@ -5,7 +5,7 @@ import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { HttpService } from 'src/app/shared/services/http.service';
-import { TsPlotPathOptions, TsCallingPage, TsFeatureCollection, TsLineStyle, TsPosition } from 'src/app/shared/interfaces';
+import { TsPlotPathOptions, TsCallingPage, TsFeatureCollection, TsLineStyle, TsPosition, TsMapRequest } from 'src/app/shared/interfaces';
 import { ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/shared/services/alert.service';
 
@@ -50,14 +50,14 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
     // listen for command from panel-list asking for map changes
     this.pathIdListener = this.data.pathCommandEmitter.subscribe(
-      async ( request: {command?: string, id?: string, colour?: string, emit: false, resize: false} ) => {
+      async ( request: TsMapRequest ) => {
 
         if ( request.command === 'add' ) {
-          const path = await this.getPath(request.id);
-          this.addPathToMap(path, {lineColour: request.colour}, {booEmit: request.emit, booResizeView: request.resize} );
+          const path = await this.getPath(request.pathId);
+          this.addPathToMap(path, {lineColour: request.colour}, {} );
 
         } else if ( request.command === 'rem' ) {
-          this.map.remove(request.id);
+          this.map.remove(request.pathId);
 
         }
     });

@@ -24,7 +24,7 @@ export class DataService {
   // private _path: {geoJson: TsFeatureCollection, isSet: boolean} = {geoJson: null, isSet: false};
 
 
-  // set path is a wrapper for set function for storing path data - also emits the pathId to let
+  // set path is a wrapper for set function for storing path data - also emits nothing to let
   // components know that a new route is available
   public setPath(geoJson: TsFeatureCollection) {
     this.set({_path: geoJson});
