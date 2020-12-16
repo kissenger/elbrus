@@ -18,6 +18,7 @@ export class MapService {
 
   private mapboxToken: string = environment.MAPBOX_TOKEN;
   private mapboxStyle: string = environment.MAPBOX_STYLE;
+  private isDev = !environment.production;
 
   public tsMap: mapboxgl.Map;
   public layers: ActiveLayers;
@@ -38,7 +39,6 @@ export class MapService {
 
 
   newMap(startPosition?: TsCoordinate, startZoom?: number, boundingBox?: TsBoundingBox) {
-  // newMap(location?: TsCoordinate, zoom?: number) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
     return new Promise<Array<TsCoordinate> | void>( (resolve, reject) => {
@@ -173,7 +173,7 @@ export class MapService {
 
     return new Promise<void>( (resolve, reject) => {
 
-      console.log(pathAsGeoJSON);    // always useful to see the active geoJson in the console
+      if (this.isDev) { console.log(pathAsGeoJSON); }
       const path = new Path( pathAsGeoJSON );
       const pathId = pathAsGeoJSON.properties.pathId;
       const bbox: TsBoundingBox = pathAsGeoJSON.bbox;
@@ -235,7 +235,6 @@ export class MapService {
   public setLayerData(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>, properties?: Array<Object>) {
 
     const _data = this.geoJsonPipe.transform(data, dataType, properties ? properties : undefined);
-    // console.log(_data);
     (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);
   }
 

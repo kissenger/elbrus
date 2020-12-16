@@ -38,11 +38,13 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
       const geoJson = this.data.getPath();
 
-      this.isPathPublic = geoJson.properties.info.isPublic;
-      this.createdBy = geoJson.properties.info.createdBy;
-      this.pathId = geoJson.properties.pathId;
-      this.pathType = geoJson.properties.info.pathType;
-      this.nPoints = geoJson.properties.stats.nPoints;
+      if (geoJson) {
+        this.isPathPublic = geoJson.properties.info.isPublic;
+        this.createdBy = geoJson.properties.info.createdBy;
+        this.pathId = geoJson.properties.pathId;
+        this.pathType = geoJson.properties.info.pathType;
+        this.nPoints = geoJson.properties.stats.nPoints;
+      }
 
     });
 
@@ -58,7 +60,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   onCreateClick() {
     this.data.setPath(null);
-    this.router.navigate(['/route/create']);
+    this.router.navigate(['/routes/create']);
   }
 
 
@@ -66,7 +68,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     this.httpListener = this.http.togglePathPublic(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
-      this.router.navigate(['route/list']);
+      this.router.navigate(['routes/list']);
     });
   }
 
@@ -76,7 +78,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     this.httpListener = this.http.copyPath(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
-      this.router.navigate(['route/list/' + result.pathId]);
+      this.router.navigate(['routes/list/' + result.pathId]);
     });
   }
 
@@ -102,7 +104,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   onShareClick() {
     if (!this.auth.isRegisteredUser()) { return; }
-    const link = `${environment.PROTOCOL}://${environment.FRONTEND_URL}/route/list/${this.pathId}`;
+    const link = `${environment.PROTOCOL}://${environment.FRONTEND_URL}/routes/list/${this.pathId}`;
     navigator.clipboard.writeText(link)
       .then( () => {
         this.alert
@@ -154,7 +156,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
       const pathAsGeoJSON = result.hills;
       this.data.setPath(pathAsGeoJSON);
       this.spinner.removeElement();
-      this.router.navigate(['route/review/']);
+      this.router.navigate(['routes/review/']);
 
     }, (error) => {
       console.log(error);
@@ -170,7 +172,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   reloadListComponent() {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.router.onSameUrlNavigation = 'reload';
-    this.router.navigate(['route/list']);
+    this.router.navigate(['routes/list']);
   }
 
 

@@ -19,7 +19,7 @@ export class RoutesReviewComponent implements OnInit {
 
   ngOnInit() {
 
-    const geoJSON = this.data.getPath().pathAsGeoJSON;
+    const geoJSON = this.data.getPath();
 
     if (typeof geoJSON === 'undefined') {
       this.router.navigate(['routes/list']);

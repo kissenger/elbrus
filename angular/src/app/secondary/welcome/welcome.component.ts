@@ -27,7 +27,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     if ( redirect ) {
       this.router.navigate([redirect]);
     } else {
-      this.router.navigate(['route/list']);
+      this.router.navigate(['routes/list']);
     }
   }
 

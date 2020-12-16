@@ -12,7 +12,6 @@ export class ActiveLayers {
 
   public add(pathId: string, bbox: TsBoundingBox) {
     this._layers.push({pathId, bbox});
-    console.log(this._layers);
   }
 
   public clear() {

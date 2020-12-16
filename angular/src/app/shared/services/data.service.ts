@@ -67,9 +67,6 @@ export class DataService {
   public get(keyName: string) {
     // if (keyName in this.dataStore) {
       return this.dataStore[keyName];
-    // } else {
-    //   console.log('WARNING: attempted to get un-set data');
-    // }
   }
 
 

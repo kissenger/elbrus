@@ -1,6 +1,7 @@
 import { TsPosition } from './../interfaces';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,6 @@ export class LocationService {
 
   private mapInstance;
   private navHandler: any;
-  private geoLocation = null;
   private watchOptions: {
     enableHighAccuracy: false,
     timeout: 5000,
@@ -18,6 +18,8 @@ export class LocationService {
   };
   private position: TsPosition;
   private accuracy: number;
+  private isDev = !environment.production;
+
 
   constructor(
     private data: DataService
@@ -36,7 +38,7 @@ export class LocationService {
     (pos) => {
       this.position = [pos.coords.longitude, pos.coords.latitude];
       this.accuracy = pos.coords.accuracy;
-      this.data.locationEmitter.emit(this.position);
+      this.data.locationEmitter.emit(this.position); // enables menu btns if location is available
       this.updateMap();
     },
     (error) => {
@@ -54,8 +56,7 @@ export class LocationService {
 
   updateMap() {
 
-    // keep this log - useful feedback
-    console.log(this.geoLocation);
+    if (this.isDev) { console.log({position: this.position, accuracy: this.accuracy}); }
 
     const coords = this.position ? [this.position] : null;
     const props = this.position ? [{accuracy: this.accuracy, latitude: this.position[1]}] : null;

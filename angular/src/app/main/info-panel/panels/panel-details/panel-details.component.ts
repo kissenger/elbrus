@@ -66,17 +66,16 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log(this.callingPage);
 
     this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
 
     // subscribe to any changes in the minimised status of the panel
     this.minimisePanelListener = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
       this.isMinimised = minimise;
-      if (this.isMinimised) {
-        // TODO: dont thisk this is ever set??
-        this.nRoutes = this.data.get('nRoutes');
-      }
+      // if (this.isMinimised) {
+      //   // TODO: dont thisk this is ever set??
+      //   this.nRoutes = this.data.get('nRoutes');
+      // }
     });
 
     this.data.unitsUpdateEmitter.subscribe( () => {
@@ -239,12 +238,14 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       console.log(sendObj);
 
       this.httpService.saveRoute( sendObj ).subscribe(
-        (response) => { this.router.navigate(['/route/list/' + response.pathId]); },
+        (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
         (error) => {
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
-      });
+          console.log(error);
+          this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        }
+      );
 
+    // path created during import
     } else {
 
       const sendObj = {
@@ -253,18 +254,23 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         name: pathName,
         description: this.pathDescription
       };
-      this.httpService.saveImportedPath(sendObj).subscribe( () => {this.router.navigate(['/route/list/']); });
+      this.httpService.saveImportedPath(sendObj).subscribe(
+        (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
+        (error) => {
+          console.log(error);
+          this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        }
+      );
     }
 
   }
 
+
+
   onCancel() {
-    this.router.navigate(['/route/list/']);
+    this.router.navigate(['/routes/list/']);
   }
 
-
-
-  // TIDY UP
 
   ngOnDestroy() {
     if (this.pathListener) { this.pathListener.unsubscribe(); }

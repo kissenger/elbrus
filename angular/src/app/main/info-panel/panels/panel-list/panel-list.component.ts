@@ -134,7 +134,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
       }, (error) => {
         this.isLoading = false;
         console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        this.alert.showAsElement(`${error.name}: ${error.statusText} `, error.message, true, false).subscribe( () => {});
       });
     // }
   }

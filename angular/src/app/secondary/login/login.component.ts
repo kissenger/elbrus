@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       if ( redirect ) {
         this.router.navigate([redirect]);
       } else {
-        this.router.navigate(['route/list']);
+        this.router.navigate(['routes/list']);
       }
 
 
@@ -105,7 +105,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       try {
         await this.auth.register(user);
-        this.router.navigate(['route/list']);
+        this.router.navigate(['routes/list']);
 
       } catch (error) {
         console.log(error);
