@@ -55,7 +55,7 @@ export class DataService {
     _path?: TsFeatureCollection,
     startPath?: boolean,
     newLocation?: TsCoordinate,
-    pathId?: string   // used by authguard to set the pathId when shared route
+    pathId?: string                   // used by authguard to set the pathId when shared route
   }) {
     Object.keys(data).forEach( key => {
       this.dataStore[key] = data[key];

@@ -98,7 +98,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   onEditClick() {
     if (!this.auth.isRegisteredUser()) { return; }
-    this.router.navigate(['/route/edit']);
+    this.router.navigate(['/routes/edit']);
   }
 
 

@@ -10,7 +10,6 @@ import { AlertService } from './alert.service';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import * as mapboxgl from 'mapbox-gl';
-// import { mapboxgl } from ''
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +21,6 @@ import * as mapboxgl from 'mapbox-gl';
  * a benign bug - need to ensure if a create route is cancelled, we clear history as class is not reinstantiated
  */
 export class MapCreateService extends MapService {
-// export class MapCreateService {
 
   private history: PathHistory;
   private snapType: TsSnapType = 'walking';
@@ -30,15 +28,9 @@ export class MapCreateService extends MapService {
   private selectedPointId: number;
   private selectedLineIds: Array<{featureIndex: number, coordIndex: number}>;
   private pathToEdit: TsFeatureCollection;
-  // private pathName: string;
-  // private pathDescription: string;
-  // private activePathClone: TsFeatureCollection;
-
-  // keeping the active layers on the class helps with responsiveness when moving (editing) a point
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
   private symbols: TsFeatureCollection;
-
 
   constructor(
     http: HttpService,
@@ -55,7 +47,7 @@ export class MapCreateService extends MapService {
 
   public createRoute() {
 
-    this.pathToEdit = this.data.get('activePath');
+    this.pathToEdit = this.data.getPath();
     this.history = this.pathToEdit ? new PathHistory( new Path( this.pathToEdit ) ) : new PathHistory();
 
     this.initialiseCreateMap(this.styleOptions);
@@ -74,6 +66,7 @@ export class MapCreateService extends MapService {
     this.points = this.history.activePoints;
     this.symbols = this.history.startEndPoints;
 
+    if (this.isDev) { console.log(this.history.geojsonClone); }
     this.updateMapSource();
 
   }
@@ -356,7 +349,6 @@ export class MapCreateService extends MapService {
       this.selectedPointId = <number>e.features[0].id;
       const pointCoords = this.history.coordsAtIndex(this.selectedPointId);
       this.selectedLineIds = this.history.matchFeature(pointCoords);
-      // this.activePathClone = this.history.simpleGeo; // this enables the moving points to not affect the undo history
 
       this.tsMap.off('mouseleave', '0000pts', this.onMouseLeave);
       this.tsMap.off('mouseenter', '0000pts', this.onMouseEnter);

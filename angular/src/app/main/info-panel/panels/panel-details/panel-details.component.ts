@@ -44,14 +44,12 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   // geoJson variables
   public geoJson: TsFeatureCollection;
   public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
-  public givenPathName: string;     // name given to the path in the details form; overrides the default nam
+  public givenPathName: string;     // name given to the path in the details form; overrides the default name
   public pathDescription = '';
   public isElevations: boolean;
-  // public isData = false;
   public units: TsUnits;
   public pathType: string;
   public pathDirection: string;
-  public nRoutes = 0;
 
   constructor(
     private data: DataService,
@@ -72,10 +70,6 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // subscribe to any changes in the minimised status of the panel
     this.minimisePanelListener = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
       this.isMinimised = minimise;
-      // if (this.isMinimised) {
-      //   // TODO: dont thisk this is ever set??
-      //   this.nRoutes = this.data.get('nRoutes');
-      // }
     });
 
     this.data.unitsUpdateEmitter.subscribe( () => {
@@ -86,37 +80,55 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
       this.geoJson = this.data.getPath();
+      console.log(this.geoJson)
 
-      // this.isData = this.geoJson.features[0].geometry.coordinates.length > 1;
+      // if (this.callingPage === 'edit') {
+        if (!this.givenPathName) {
+          this.givenPathName = this.geoJson?.properties?.info?.name ? this.geoJson.properties.info.name :
+            this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+        }
+      // }
+
 
       if (this.geoJson) {
-        this.isElevations = this.geoJson.properties.info.isElevations && !this.geoJson.properties.info.isLong;
-        this.chartData = [];
-
-        this.geoJson.features.forEach( (feature: TsFeature) => {
-
-          const localData =  [];
-          for (let i = 0; i < feature.properties.params.elev.length; i++) {
-            localData.push({
-              x: this.unitConvertPipe.transform(feature.properties.params.cumDistance[i], 'distance', this.units.distance),
-              y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
-            });
-          }
-
-          this.chartData.push({
-            data: localData,
-            borderColor: feature.properties.lineColour,
-            ...this.localChartOptions
-          });
-
-        });
-
-        this.chartOptions = this.globalChartOptions;
-        this.chartLegend = false;
+        this.updateChart();
       }
+
     });
 
   }
+
+
+  updateChart() {
+
+    this.isElevations = this.geoJson.properties.info.isElevations && !this.geoJson.properties.info.isLong;
+    this.chartData = [];
+
+    this.geoJson.features.forEach( (feature: TsFeature) => {
+
+      // Get data for each feature/segment of graph...
+      const localData =  [];
+      for (let i = 0; i < feature.properties.params.elev.length; i++) {
+        localData.push({
+          x: this.unitConvertPipe.transform(feature.properties.params.cumDistance[i], 'distance', this.units.distance),
+          y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
+        });
+      }
+
+      // ... and push into new array of objects that will define the graph
+      this.chartData.push({
+        data: localData,
+        borderColor: feature.properties.lineColour,
+        ...this.localChartOptions
+      });
+
+    });
+
+    this.chartOptions = this.globalChartOptions;
+    this.chartLegend = false;
+
+  }
+
 
   onChartClick(e) {
     const featureIndex = e.active[0]._datasetIndex;
@@ -222,7 +234,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.data.getPath();
-    const pathName = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+    const pathName = this.givenPathName ? this.givenPathName :
+      this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if ( this.callingPage === 'create' || this.callingPage === 'edit' ) {

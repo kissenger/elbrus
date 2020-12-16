@@ -18,7 +18,7 @@ export class MapService {
 
   private mapboxToken: string = environment.MAPBOX_TOKEN;
   private mapboxStyle: string = environment.MAPBOX_STYLE;
-  private isDev = !environment.production;
+  public isDev = !environment.production;
 
   public tsMap: mapboxgl.Map;
   public layers: ActiveLayers;
@@ -104,7 +104,7 @@ export class MapService {
 
 
   public fitViewOne() {
-    this.bounds = this.data.get('activePath').bbox;
+    this.bounds = this.data.getPath().bbox;
   }
 
 

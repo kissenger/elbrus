@@ -13,7 +13,6 @@
     <!-- ROUTE SELECTED -->
 
     <div *ngIf="geoJson" class="row no-gutters text-center">
-      <i>Active route and {{nRoutes-1}} overlays plotted.</i>
       <div class="col-6 m-0 text-left">
         {{geoJson.properties.info.name | shortName: 16}}
       </div>
@@ -63,7 +62,6 @@
     <div *ngIf="geoJson" class="d-flex flex-column flex-grow-1">
 
 
-
       <!-- NAME & DESCRIPTION only for list page -->
       <div *ngIf="callingPage==='list'; else showForm" class="pb-2 border-bottom text-center">
 
@@ -75,6 +73,8 @@
 
       </div>
 
+      <!-- placeholder="{{geoJson.properties.info.name | autoName: geoJson.properties.info.category: geoJson.properties.info.pathType}}" -->
+      <!-- value="{{geoJson.properties.info.name}}" [(ngModel)]="givenPathName"> -->
 
 
       <!-- FORM INPUTS only if create page -->
@@ -82,8 +82,7 @@
 
         <div class="input-group input-group-sm my-1">
             <input class='form-control' type='text'
-            placeholder="{{geoJson.properties.info.name | autoName: geoJson.properties.info.category: geoJson.properties.info.pathType}}"
-            [(ngModel)]="givenPathName" name="first">
+            [(ngModel)]="givenPathName">
         </div>
 
         <div class="input-group input-group-sm my-1">
