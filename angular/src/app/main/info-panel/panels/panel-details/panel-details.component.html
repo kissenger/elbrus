@@ -7,14 +7,19 @@
 
     <!-- NO ROUTE SELECTED -->
     <div *ngIf="!geoJson" class="my-2 text-center">
-      Expand panel to select a route.
+      <div *ngIf="callingPage==='create'">
+        Click on the map to start creating.
+      </div>
+      <div *ngIf="callingPage==='list'">
+        Expand panel to select a route.
+      </div>
     </div>
 
     <!-- ROUTE SELECTED -->
 
     <div *ngIf="geoJson" class="row no-gutters text-center">
       <div class="col-6 m-0 text-left">
-        {{geoJson.properties.info.name | shortName: 16}}
+        {{givenName | shortName: 15}}
       </div>
       <div class="col-3 m-0 text-center">
         {{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}
@@ -74,7 +79,7 @@
       </div>
 
       <!-- placeholder="{{geoJson.properties.info.name | autoName: geoJson.properties.info.category: geoJson.properties.info.pathType}}" -->
-      <!-- value="{{geoJson.properties.info.name}}" [(ngModel)]="givenPathName"> -->
+      <!-- value="{{geoJson.properties.info.name}}" [(ngModel)]="givenName"> -->
 
 
       <!-- FORM INPUTS only if create page -->
@@ -82,7 +87,7 @@
 
         <div class="input-group input-group-sm my-1">
             <input class='form-control' type='text'
-            [(ngModel)]="givenPathName">
+            [(ngModel)]="givenName">
         </div>
 
         <div class="input-group input-group-sm my-1">

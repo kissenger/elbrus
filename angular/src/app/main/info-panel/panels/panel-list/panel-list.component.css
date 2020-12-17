@@ -54,7 +54,7 @@
 
 
 
-/* @media only screen and (min-width: 900px) { */
+@media only screen and (min-width: 900px) {
   .highlight:hover {
     /* background-color: var(--ts-grey-background); */
     /* box-shadow: 5px 10px; */
@@ -64,6 +64,7 @@
     padding-left: 0px;
 
   }
+}
 
   .highlight {
     /* border-left: 0px; */

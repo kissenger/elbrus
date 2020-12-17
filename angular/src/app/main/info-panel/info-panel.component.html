@@ -13,8 +13,9 @@
 
 
     <!-- MINIMISED VIEW -->
+    <!-- Is there a better way to do this than to reuse the entire details panel? -->
     <div [ngClass]="isMinimised ? '' : 'hidden-view'" class="bg-white border-top">
-      <app-panel-details></app-panel-details>
+      <app-panel-details callingPage="{{callingPage}}"></app-panel-details>
     </div>
 
 

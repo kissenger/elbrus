@@ -108,6 +108,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
           this.map.clear();
           const path = await this.getPath(request.pathId);
           this.map.add(path, {lineColour: request.colour}, {plotType: request.plotType, resizeView: false} );
+        } else if ( request.command === 'clear' ) {
+          this.map.clear();
         }
     });
   }

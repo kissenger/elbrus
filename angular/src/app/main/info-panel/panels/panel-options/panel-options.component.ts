@@ -68,7 +68,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     this.httpListener = this.http.togglePathPublic(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
-      this.router.navigate(['routes/list']);
+      this.router.navigate(['routes/list/' + this.pathId]);
     });
   }
 

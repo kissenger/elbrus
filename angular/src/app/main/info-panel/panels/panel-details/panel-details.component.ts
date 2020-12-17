@@ -42,7 +42,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   // geoJson variables
   public geoJson: TsFeatureCollection;
   public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
-  public givenPathName: string;     // name given to the path in the details form; overrides the default name
+  public givenName: string = null;     // name given to the path in the details form; overrides the default name
   public pathDescription = '';
   public isElevations: boolean;
   public units: TsUnits;
@@ -79,12 +79,19 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
       this.geoJson = this.data.getPath();
 
-      if (!this.givenPathName) {
-        this.givenPathName = this.geoJson?.properties?.info?.name ? this.geoJson.properties.info.name :
-          this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
-      }
-
       if (this.geoJson) {
+
+        if (this.callingPage === 'edit') {
+          if (!this.givenName) {
+            this.givenName = this.geoJson.properties.info.name;
+          }
+        } else if (this.callingPage === 'create') {
+          this.givenName =
+            this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+        } else {
+          this.givenName = this.geoJson.properties.info.name;
+        }
+
         this.updateChart();
       }
 
@@ -228,7 +235,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.data.getPath();
-    const pathName = this.givenPathName ? this.givenPathName :
+    const pathName = this.givenName ? this.givenName :
       this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs

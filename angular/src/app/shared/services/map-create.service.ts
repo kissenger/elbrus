@@ -59,9 +59,9 @@ export class MapCreateService extends MapService {
   private updateMap() {
 
     this.tsMap.once('idle', (e) => {
-      if (this.history.length !== 0) {
+      // if (this.history.length !== 0) {
         this.data.setPath(this.history.geoJson);
-      }
+      // }
     });
 
     this.line = this.history.geojsonClone;

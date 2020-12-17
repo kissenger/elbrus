@@ -301,7 +301,7 @@ export class MapService {
     }
 
     this.layers.clear();
-    this.data.setPath(globals.emptyGeoJson);
+    this.data.setPath(null);
 
   }
 

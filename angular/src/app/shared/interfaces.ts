@@ -12,7 +12,7 @@ export interface TsCallingPage {
 
 
 export interface TsMapRequest {
-  command: 'replace' | 'add' | 'rem';
+  command: 'replace' | 'add' | 'rem' | 'clear';
   pathId: string;
   plotType: 'active' | 'overlay';
   colour: string;

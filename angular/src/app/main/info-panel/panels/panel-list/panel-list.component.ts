@@ -148,7 +148,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   onSelectMenuChange() {
     this.offset = 0;
-    this.listItems.removeInactive();
+    this.listItems.clear();
+    this.data.pathCommandEmitter.emit({ command: 'clear' });
+    this.highlightColours.reset();
     this.addPathsToList();
   }
 
