@@ -17,7 +17,6 @@ export class Path {
     this._geoJson = geoJson;
     const injector = Injector.create({ providers: [ { provide: GeoJsonPipe, deps: [] } ] });
     this.geoJsonPipe = Object.getPrototypeOf(injector.get(GeoJsonPipe));
-
     this.positionsList = this.getPositionsArray;
     this.firstPoint = this.positionsList[0];
     this.lastPoint = this.positionsList[this.positionsList.length - 1];

@@ -29,7 +29,7 @@ export class DataService {
   public setPath(geoJson: TsFeatureCollection) {
     this.set({_path: geoJson});
     // this.pathIdEmitter.emit(geoJson ? geoJson.properties.pathId : '0000');
-    this.pathIdEmitter.emit();
+    this.pathIdEmitter.emit(null);
   }
 
 

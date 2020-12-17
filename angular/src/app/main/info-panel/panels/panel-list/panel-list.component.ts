@@ -99,7 +99,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // In overlay mode only, when the active path has changed we need to reset the overlaid paths
     // Work is only done in the overlay tab, when a route is clicked in the routes tab (inititating the path emit)
     if ( this.callingPage === 'list' && this.tabName === 'overlay' ) {
-      this.newPathListener = this.data.pathIdEmitter.subscribe( (plotType: string) => {
+      this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
         this.listItems.unselectAll();
         this.highlightColours.reset();
       });

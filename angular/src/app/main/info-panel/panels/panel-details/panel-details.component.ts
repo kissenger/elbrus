@@ -1,5 +1,4 @@
 import { AutoNamePipe } from './../../../../shared/pipes/auto-name.pipe';
-
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -14,7 +13,6 @@ import { ChartDataSets, ChartOptions } from 'chart.js';
 import 'chartjs-plugin-zoom';
 import { UnitsConvertPipe } from 'src/app/shared/pipes/units-convert.pipe';
 import { UnitsLongNamePipe } from 'src/app/shared/pipes/units-longname.pipe';
-import { readBuilderProgram } from 'typescript';
 
 @Component({
   selector: 'app-panel-details',
@@ -53,7 +51,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private data: DataService,
-    private httpService: HttpService,
+    private http: HttpService,
     private router: Router,
     private auth: AuthService,
     private alert: AlertService,
@@ -80,15 +78,11 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     this.pathListener = this.data.pathIdEmitter.subscribe( () => {
 
       this.geoJson = this.data.getPath();
-      console.log(this.geoJson)
 
-      // if (this.callingPage === 'edit') {
-        if (!this.givenPathName) {
-          this.givenPathName = this.geoJson?.properties?.info?.name ? this.geoJson.properties.info.name :
-            this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
-        }
-      // }
-
+      if (!this.givenPathName) {
+        this.givenPathName = this.geoJson?.properties?.info?.name ? this.geoJson.properties.info.name :
+          this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+      }
 
       if (this.geoJson) {
         this.updateChart();
@@ -248,9 +242,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         description: this.pathDescription
       };
 
-      console.log(sendObj);
-
-      this.httpService.saveRoute( sendObj ).subscribe(
+      this.http.saveRoute( sendObj ).subscribe(
         (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
         (error) => {
           console.log(error);
@@ -267,7 +259,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         name: pathName,
         description: this.pathDescription
       };
-      this.httpService.saveImportedPath(sendObj).subscribe(
+      this.http.saveImportedPath(sendObj).subscribe(
         (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
         (error) => {
           console.log(error);
