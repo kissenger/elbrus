@@ -20,6 +20,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   private pathIdListener: Subscription;
   private callingPageListener: Subscription;
   private httpListener: Subscription;
+  private chartPointListener: Subscription;
 
   public callingPage: TsCallingPage;
 
@@ -61,6 +62,22 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
         }
     });
+
+    // listen for coordinate from chart and plot on map
+    this.map.addPointsLayer('pointHighlighter', {
+      'circle-radius': 8,
+      'circle-opacity': 0.3,
+      'circle-stroke-width': 1,
+      'circle-color': '#FF0000',
+    });
+    this.chartPointListener = this.data.chartPointEmitter.subscribe( (data) => {
+      if (data.action === 'show') {
+        this.map.setLayerData('pointHighlighter', 'Point', data.point);
+      } else if (data.action === 'centre') {
+        this.map.goto(data.point[0]);
+      }
+    });
+
   }
 
 
@@ -94,6 +111,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     if ( this.pathIdListener ) { this.pathIdListener.unsubscribe(); }
     if ( this.callingPageListener ) { this.callingPageListener.unsubscribe(); }
     if ( this.httpListener ) { this.httpListener.unsubscribe(); }
+    if ( this.chartPointListener ) { this.chartPointListener.unsubscribe(); }
   }
 
 

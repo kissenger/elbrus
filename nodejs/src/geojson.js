@@ -11,8 +11,10 @@
 const PathWithStats = require('./path-class').PathWithStats;
 const debugMsg = require('./debug').debugMsg;
 
+
+// const ROUTE_COLOUR =  require('./globals').ROUTE_COLOUR;
+
 const FLAT_COLOUR =   require('./globals').FLAT_COLOUR;
-const ROUTE_COLOUR =  require('./globals').ROUTE_COLOUR;
 const UP_COLOUR =     require('./globals').UP_COLOUR;
 const DOWN_COLOUR =   require('./globals').DOWN_COLOUR;
 
@@ -64,12 +66,14 @@ class GeoJSON {
 
   // returns a 'normal' geoJSON feature collection with a single feature
   toBasic() {
-    this._features = [this._feature(this._lngLats, this._elevs, ROUTE_COLOUR)];
+    this._features = [this._feature(this._lngLats, this._elevs, this._properties.params.cumDistance, FLAT_COLOUR)];
     return this._featureCollection();
   }
 
 
   // returns a geoJSON feature collection with features coloured depending on hill
+  // TODO: Hill detection should be in _getHillSegments - makes the intent of this route easier to understand - should
+  // return just a flat segment if that is appropriate.
   toGeoHills() {
     
     let isHills = false;
@@ -87,7 +91,7 @@ class GeoJSON {
         this._features.push(this._feature(coords, elevs, cumDist, segment.colour));
       });
     } else {
-      this._features = [ this._feature(this._lngLats, this._elevs, ROUTE_COLOUR) ];
+      this._features = [ this._feature(this._lngLats, this._elevs, this._properties.params.cumDistance, FLAT_COLOUR) ];
     }
 
     return this._featureCollection();

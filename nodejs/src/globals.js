@@ -43,5 +43,5 @@ module.exports = {
   UP_COLOUR: '#FF0000',
   DOWN_COLOUR: '#00FF00',
   FLAT_COLOUR: '#0000FF',
-  ROUTE_COLOUR: '#0000FF',
+  // ROUTE_COLOUR: '#0000FF',
 }

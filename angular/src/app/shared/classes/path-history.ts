@@ -1,10 +1,10 @@
 
-  import { TsCoordinate, TsPosition } from 'src/app/shared/interfaces';
+  import { TsPosition } from 'src/app/shared/interfaces';
   import { Path } from './path-class';
   import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
-  import { Injector, ɵCodegenComponentFactoryResolver } from '@angular/core';
+  import { Injector } from '@angular/core';
 
-  const UNDO_BUFFER = 5;
+  const UNDO_BUFFER = 20;
 
   export class PathHistory {
 
