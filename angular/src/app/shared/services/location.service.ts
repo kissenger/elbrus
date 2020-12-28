@@ -86,7 +86,7 @@ export class LocationService {
             0, 0,
             22, ['/', ['get', 'accuracy'], ['*', 0.019, ['cos', ['/', ['*', ['get', 'latitude'], ['pi']], 180]]]]
       ],
-      'circle-opacity': 0.2,
+      'circle-opacity': 0.1,
       'circle-stroke-width': 1,
       'circle-stroke-color': '#523209',
       'circle-stroke-opacity': 0.5,

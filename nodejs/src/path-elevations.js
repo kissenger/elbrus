@@ -19,9 +19,6 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   * filter hills array in postprocessing to remove aveGrad < thresh
   * Also detect adjacent hill with few points or small drop between and combine (or better algorithm in the first place)
   *
-  * This is run in the context of the calling class, which makes testing difficult. Would be better to have a wrapper
-  * that takes the required class data and calls lower level functions, which can then be tested without needing to
-  * instantiate the class.
   */
  function analyseElevations(path) {
 
@@ -35,7 +32,6 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   // const elevations = this.getParamFromPoints('elev');
   const smoothedElevations = getSmoothedElevations(path.pathData.params.elev);
   const grads = smoothedElevations.map( (e, i, eArr) => i === 0 ? 0 : (e - eArr[i-1]) / dDistance[i] * 100 );
-  
 
   // initilise loop variables
   let de = 0;                 // cumulative change in elevation
@@ -90,7 +86,8 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   }
   
   // get stats for each hill in the list
-  const hills = hillsArr.map( hill => ({
+  const hills = hillsArr.map( hill => 
+    ({
       dHeight: smoothedElevations[hill[1]] - smoothedElevations[hill[0]],
       dDist: cumDistance[hill[1]] - cumDistance[hill[0]],
       maxGrad: Math.max( ...grads.slice(hill[0], [hill[1]+1]).map( g => Math.abs(g) ) ),

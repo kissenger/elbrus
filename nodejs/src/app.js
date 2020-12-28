@@ -372,7 +372,7 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
     let coords;
     if (req.body.options.simplify) {
-      coords = geoFunctions.simplifyPath(req.body.coords, 10).points;
+      coords = geoFunctions.simplifyPath(req.body.coords, 5).points;
       console.log(coords);
     } else {
       coords = req.body.coords;

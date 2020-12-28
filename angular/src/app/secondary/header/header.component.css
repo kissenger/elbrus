@@ -65,7 +65,7 @@
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
   display: block;
-  right: 1000;
+  /* right: 1000; */
 }
 
 /* Change style color of the dropdown button when the dropdown content is shown */

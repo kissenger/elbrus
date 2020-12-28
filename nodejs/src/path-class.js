@@ -43,7 +43,6 @@ class PathWithStats extends Path{
     const deltaDistance = this.deltaDistance;
     this.points = this.pointLikes;
     
-
     //note that geometry is incorrectly on properties - this is fixed in geoJson but would be nice to 
     // do it properly in the first place...
     this.pathData = {
@@ -99,10 +98,15 @@ class PathWithStats extends Path{
       if (isElevationsProvided) {
         path.addParam('elev', elev);
       };
-      
+
       if (path.length > SHORT_PATH_THRESHOLD) {
+        // path is not 'short' so simplify
         path.simplify(SIMPLIFICATION_FACTOR_PASS_1);
         debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 1`);
+      } else {
+        // path is 'short', but simplify with low threshold to remove any duplicates
+        path.simplify(0.1);
+        debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 0`);
       }
 
       // if the path is still long, be a bit more agressive
@@ -113,8 +117,13 @@ class PathWithStats extends Path{
 
       if (path.length < LONG_PATH_THRESHOLD) {
         if (!isElevationsProvided) {
+          console.log(path.pointLikes)
           jael.getElevs( {points: path.pointLikes} )
-            .then(elev => resolve( {lngLat: path.lngLats, elev: elev.map(e => e.elev)} ))
+            .then(elev => {
+              console.log({lngLat: path.lngLats, elev: elev.map(e => e.elev)});
+              resolve( {lngLat: path.lngLats, elev: elev.map(e => e.elev)} )
+            })
+  
             .catch(error => reject(error))
         } else {
           resolve( {lngLat: path.lngLats, elev: path.getParam('elev')} );
