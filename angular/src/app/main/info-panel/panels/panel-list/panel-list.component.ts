@@ -160,12 +160,18 @@ export class PanelListComponent implements OnInit, OnDestroy {
     const command: TsMapRequest = { command: null, pathId: idFromClick, plotType: null, colour: null };
 
     if ( this.tabName === 'routes' ) {
-      // reclicking an active item in routes anything displayed on map and replaces with clicked route
-      command.command = 'replace';
-      command.plotType = 'active';
-      this.listItems.unselectAll();
-      this.highlightColours.reset();
-      this.listItems.select(idFromClick, null);
+      // reclicking an active item removes it and all overlays
+      if (this.listItems.isSelected(idFromClick)) {
+        command.command = 'clear';
+        this.listItems.unselectAll();
+        this.highlightColours.reset();
+      } else {
+        command.command = 'replace';
+        command.plotType = 'active';
+        this.listItems.unselectAll();
+        this.highlightColours.reset();
+        this.listItems.select(idFromClick, null);
+      }
 
     } else {  // tabName==='overlay'
 
