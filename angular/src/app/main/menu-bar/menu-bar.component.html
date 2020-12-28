@@ -1,7 +1,69 @@
 
 <div class="btn-group-vertical menu-bar position-absolute pb-1 border">
 
+
+  <!-- VIEW -->
+
   <div class="w-100 px-1 pt-0 pb-1">
+    <div class="w-100 p-1 border-bottom">
+      Views
+    </div>
+  </div>
+
+  <button
+    (click)="map.fitViewOne()"
+    [disabled]="!isData"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Fit active path</small>
+  </button>
+
+  <button
+    (click)="map.fitViewAll()"
+    [disabled]="!isData"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Fit all paths</small>
+  </button>
+
+  <button
+    (click)="map.goto(homeLngLat)"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Go to Home</small>
+  </button>
+
+  <button
+    (click)="map.goto(position)"
+    [disabled]="!position"
+    type="button"
+    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+    <small>Where am I?</small>
+  </button>
+
+
+  <!-- MAP TYPE -->
+
+  <div class="w-100 p-1">
+    <div class="w-100 p-1 border-bottom">
+      Map Type
+    </div>
+  </div>
+
+  <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
+    <label (click)="onMapTypeSelect('terrain')" class="active btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+      <input type="radio" name="map-type" id="roads" autocomplete="off" checked> <small>Terrain</small>
+    </label>
+    <label (click)="onMapTypeSelect('satellite')" class="btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+      <input type="radio" name="map-type" id="paths" autocomplete="off"> <Small>Satellite</Small>
+    </label>
+  </div>
+
+
+
+  <!-- Actions -->
+
+  <div *ngIf="callingPage!=='list'" class="w-100 p-1">
     <div class="w-100 p-1 border-bottom">
       Actions
     </div>
@@ -52,57 +114,28 @@
     <small>Simplify</small>
   </button>
 
-  <button
-    (click)="map.fitViewOne()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Fit active path</small>
-  </button>
-
-  <button
-    (click)="map.fitViewAll()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Fit all paths</small>
-  </button>
-
-  <button
-    (click)="map.goto(homeLngLat)"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Go to Home</small>
-  </button>
-
-  <button
-    (click)="map.goto(position)"
-    [disabled]="!position"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Where am I?</small>
-  </button>
 
 
+  <!-- Snap Options -->
 
   <div *ngIf="callingPage!=='list'" class="w-100">
-    <div class="w-100 px-1 pt-2 pb-1">
+    <div class="w-100 p-1">
       <div class="w-100 p-1 border-bottom">
-        Options
+        Snap
       </div>
     </div>
 
     <!-- <div class="w-100  -->
 
     <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
-      <label (click)="onChangeOptions('driving')" class="btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
-        <input type="radio" name="options" id="roads" autocomplete="off" checked> <small>Follow Roads</small>
+      <label (click)="onSnapSelect('driving')" class="btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="snap-type" id="roads" autocomplete="off"> <small>Follow Roads</small>
       </label>
-      <label (click)="onChangeOptions('walking')" class="active btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
-        <input type="radio" name="options" id="paths" autocomplete="off"> <Small>Follow Paths</Small>
+      <label (click)="onSnapSelect('walking')" class="active btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="snap-type" id="paths" autocomplete="off" checked> <Small>Follow Paths</Small>
       </label>
-      <label (click)="onChangeOptions('none')" class="btn btn-light btn-sm text-left radio-btns p-0 pl-2 rounded-0">
-        <input type="radio" name="options" id="none" autocomplete="off"> <Small> Don't Follow</Small>
+      <label (click)="onSnapSelect('none')" class="btn btn-light btn-sm text-left radio-btns p-0 pl-2 rounded-0">
+        <input type="radio" name="snap-type" id="none" autocomplete="off"> <Small> Don't Follow</Small>
       </label>
     </div>
   </div>

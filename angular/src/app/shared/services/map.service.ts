@@ -3,10 +3,10 @@ import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition, TsMapType } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
-import { ActiveLayers } from '../classes/active-layers';
+import { ActivePathLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 
@@ -17,11 +17,15 @@ import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 export class MapService {
 
   private mapboxToken: string = environment.MAPBOX_TOKEN;
-  private mapboxStyle: string = environment.MAPBOX_STYLE;
+  private mapboxStyles = {
+    terrain: environment.MAPBOX_STYLE_TERRAIN,
+    satellite: environment.MAPBOX_STYLE_SATELLITE
+  };
   public isDev = !environment.production;
 
   public tsMap: mapboxgl.Map;
-  public layers: ActiveLayers;
+  public mapDefaultType: TsMapType = 'terrain';
+  public pathLayers: ActivePathLayers;
   private marker: mapboxgl.Marker;
   private padding = {
     wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
@@ -71,7 +75,7 @@ export class MapService {
 
       this.tsMap = new mapboxgl.Map({
         container: 'map',
-        style: this.mapboxStyle,
+        style: this.mapboxStyles[this.mapDefaultType],
         center: mapCentre,
         zoom: mapZoom
       });
@@ -80,7 +84,7 @@ export class MapService {
         this.bounds = boundingBox;
       }
 
-      this.layers = new ActiveLayers();
+      this.pathLayers = new ActivePathLayers();
 
       this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
@@ -103,6 +107,34 @@ export class MapService {
 
 
 
+  // Sets the basemap style to either 'terrain' or 'satellite'
+  // Mapbox helpfully removes all layers when the style is applied, so this function gets the current layers and sources first and
+  // reapplies them after the style is loaded
+  public setType(type: TsMapType) {
+
+    // get the current map style (incl layers and sources)
+    const style = this.tsMap.getStyle();
+    // console.log(this.tsMap.getStyle());
+
+    // set up listener to run reapply the sources and layers when the style changes
+    this.tsMap.once('sourcedata', () => {
+      Object.keys(style.sources).forEach( (key) => {
+        if (key !== 'composite' && key !== 'mapbox://mapbox.satellite') {
+          this.tsMap.addSource(key, style.sources[key]);
+          this.tsMap.addLayer(style.layers.find(layer => layer.id === key));
+        }
+      });
+    });
+
+    // apply the new style
+    this.tsMap.setStyle(this.mapboxStyles[type]);
+
+  }
+
+
+
+
+
   public fitViewOne() {
     this.bounds = this.data.getPath().bbox;
   }
@@ -110,8 +142,8 @@ export class MapService {
 
 
   public fitViewAll() {
-    if (this.layers.length > 0) {
-      this.bounds = this.layers.outerBoundingBox;
+    if (this.pathLayers.length > 0) {
+      this.bounds = this.pathLayers.outerBoundingBox;
     } else {
       // fall back to fitOne if there are no layers (create route mode)
       this.fitViewOne();
@@ -189,7 +221,7 @@ export class MapService {
         resolve();
       });
 
-      this.layers.add(pathId, bbox);
+      this.pathLayers.add(pathId, bbox);
       this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
       this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
 
@@ -233,7 +265,6 @@ export class MapService {
   }
 
   public setLayerData(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>, properties?: Array<Object>) {
-
     const _data = this.geoJsonPipe.transform(data, dataType, properties ? properties : undefined);
     (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);
   }
@@ -241,7 +272,7 @@ export class MapService {
 
   public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
 
-    data = data ? data :  this.geoJsonPipe.transform([], 'Point');
+    data = data ? data : this.geoJsonPipe.transform([], 'Point');
 
     this.tsMap.addSource(layerId, {type: 'geojson', data } );
     this.tsMap.addLayer({
@@ -263,20 +294,12 @@ export class MapService {
 
 
   public remove(pathId: string) {
-    // return new Promise( (resolve, reject) => {
-
-      // this.tsMap.once('idle', (e) => {
-      //   this.data.pathIdEmitter.emit(pathId);
-      //   resolve();
-      // });
 
       this.removeLayer(pathId, 'line');
       this.removeLayer(pathId, 'sym');
       this.removeLayer(pathId, 'pts');
 
-      this.layers.remove( pathId );
-
-    // });
+      this.pathLayers.remove( pathId );
 
   }
 
@@ -296,11 +319,11 @@ export class MapService {
   public clear() {
 
     // remove each active layer
-    if ( this.layers ) {
-      this.layers.get.forEach( layer => { this.remove(layer.pathId); });
+    if ( this.pathLayers ) {
+      this.pathLayers.get.forEach( layer => { this.remove(layer.pathId); });
     }
 
-    this.layers.clear();
+    this.pathLayers.clear();
     this.data.setPath(null);
 
   }

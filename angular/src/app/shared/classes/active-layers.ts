@@ -2,7 +2,7 @@ import { TsBoundingBox } from './../interfaces';
 
 
 
-export class ActiveLayers {
+export class ActivePathLayers {
 
   private _layers: Array<{pathId: string, bbox: TsBoundingBox}>;
 

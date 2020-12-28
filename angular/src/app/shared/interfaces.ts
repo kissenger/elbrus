@@ -37,6 +37,7 @@ export interface TsMapView {
   zoom: number;
 }
 
+
 /**
  * Used to populate list of paths
  */
@@ -99,6 +100,7 @@ export interface TsElevationQuery {
 export type TsElevationResults = TsCoordinate[];
 
 export type TsSnapType = 'walking' | 'driving' | 'none';
+export type TsMapType = 'terrain' | 'satellite';
 
 // export interface TsSnapProfile {
 //   snapProfile: 'walking' | 'driving' | 'none';
