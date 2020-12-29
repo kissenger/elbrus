@@ -55,7 +55,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
         if ( request.command === 'add' ) {
           const path = await this.getPath(request.pathId);
-          this.addPathToMap(path, {lineColour: request.colour}, {} );
+          this.map.add(path, {lineColour: request.colour}, {plotType: request.plotType, resizeView: false} );
 
         } else if ( request.command === 'rem' ) {
           this.map.remove(request.pathId);
