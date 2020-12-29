@@ -61,7 +61,7 @@ export class AuthService {
 
   login( userName: string, password: string ) {
 
-    return new Promise( (res, rej) => {
+    return new Promise<void>( (res, rej) => {
 
       this.http.login( {userName, password} ).subscribe( (result) => {
 
@@ -82,7 +82,7 @@ export class AuthService {
 
   register(user) {
 
-    return new Promise( (res, rej) => {
+    return new Promise<void>( (res, rej) => {
 
 
       this.http.register(user).subscribe( (result) => {

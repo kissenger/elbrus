@@ -24,7 +24,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
   constructor(
     private data: DataService,
-    private auth: AuthService
+    public auth: AuthService
    ) { }
 
   ngOnInit() {

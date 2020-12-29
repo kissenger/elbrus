@@ -28,9 +28,10 @@
 
   <button
     (click)="map.goto(homeLngLat)"
+    [disabled]="!auth.isRegisteredUser()"
     type="button"
     class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Go to Home</small>
+    <small>Home</small>
   </button>
 
   <button
@@ -38,7 +39,7 @@
     [disabled]="!position"
     type="button"
     class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Where am I?</small>
+    <small>Current location</small>
   </button>
 
 
