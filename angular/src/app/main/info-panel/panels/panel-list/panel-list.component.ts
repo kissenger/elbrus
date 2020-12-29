@@ -229,8 +229,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       // if overlay, disable the listitem that is stored in data (selected in routes)
       if ( this.tabName === 'overlay' ) {
-        const activePath = this.data.getPath();
-        if ( activePath ) {
+        if (this.data.isPath()) {
+          const activePath = this.data.getPath();
           if ( activePath.properties.pathId === id) {
             styles['color'] = 'lightgrey';
             styles['cursor'] = 'auto';

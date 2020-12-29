@@ -28,8 +28,12 @@ export class DataService {
   // components know that a new route is available
   public setPath(geoJson: TsFeatureCollection) {
     this.set({_path: geoJson});
-    // this.pathIdEmitter.emit(geoJson ? geoJson.properties.pathId : '0000');
     this.pathIdEmitter.emit(null);
+  }
+
+  // returns true if saved path is linestring, false or not set
+  public isPath() {
+    return this.get('_path')?.features[0].geometry.type === 'LineString';
   }
 
 

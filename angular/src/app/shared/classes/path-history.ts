@@ -133,6 +133,8 @@
 
       if ( this.lastPath ) {
         return this.lastPath.geoJson;
+      } else if (this.firstPoint) {
+        return this.geoJsonPipe.transform([this.firstPoint], 'Point');
       } else {
         return null;
       }

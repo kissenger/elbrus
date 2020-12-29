@@ -6,7 +6,7 @@
   <div *ngIf="isMinimised">
 
     <!-- NO ROUTE SELECTED -->
-    <div *ngIf="!geoJson" class="my-2 text-center">
+    <div *ngIf="!data.isPath()" class="my-2 text-center">
       <div *ngIf="callingPage==='create'">
         Click on the map to start creating.
       </div>
@@ -17,7 +17,7 @@
 
     <!-- ROUTE SELECTED -->
 
-    <div *ngIf="geoJson" class="row no-gutters text-center">
+    <div *ngIf="data.isPath()" class="row no-gutters text-center">
       <div class="col-6 m-0 text-left">
         {{givenName | shortName: 15}}
       </div>
@@ -38,7 +38,7 @@
   <div *ngIf="!isMinimised" class="maximised-container d-flex flex-column p-2 ">
 
     <!-- NO DATA -->
-    <div *ngIf="!geoJson" class="w-100 text-center d-flex flex-column flex-grow-1 ">
+    <div *ngIf="!data.isPath()" class="w-100 text-center d-flex flex-column flex-grow-1 ">
 
       <div *ngIf="callingPage==='create'; else list">
         <div class="text-center m-3">
@@ -64,7 +64,7 @@
 
 
     <!-- DATA -->
-    <div *ngIf="geoJson" class="d-flex flex-column flex-grow-1">
+    <div *ngIf="data.isPath()" class="d-flex flex-column flex-grow-1">
 
 
       <!-- NAME & DESCRIPTION only for list page -->
@@ -77,9 +77,6 @@
         </div>
 
       </div>
-
-      <!-- placeholder="{{geoJson.properties.info.name | autoName: geoJson.properties.info.category: geoJson.properties.info.pathType}}" -->
-      <!-- value="{{geoJson.properties.info.name}}" [(ngModel)]="givenName"> -->
 
 
       <!-- FORM INPUTS only if create page -->
@@ -202,7 +199,7 @@
 
       <!-- BUTTONS -->
       <div *ngIf="callingPage !== 'list'" class="buttons d-flex mb-2 mt-2 justify-content-center" >
-        <button (click)="onSave()" [disabled]="!geoJson" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
+        <button (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
         <button (click)="onCancel()" type="button" class="btn btn-secondary btn-sm ml-1 mt-1" type="cancel">Cancel</button>
       </div>
 

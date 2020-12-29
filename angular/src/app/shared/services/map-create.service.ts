@@ -58,17 +58,17 @@ export class MapCreateService extends MapService {
 
   private updateMap() {
 
+    // update the map with the last path in the history class
     this.tsMap.once('idle', (e) => {
-      // if (this.history.length !== 0) {
-        this.data.setPath(this.history.geoJson);
-      // }
+      const geoJson = this.history.geoJson;
+      this.data.setPath(geoJson);  // send regardless of whether geojson is valid, as a null will disable menu bar items
+      if (this.isDev) { console.log(geoJson); }
     });
 
+    // save the current line, points and symbols because...
     this.line = this.history.geojsonClone;
     this.points = this.history.activePoints;
     this.symbols = this.history.startEndPoints;
-
-    if (this.isDev) { console.log(this.line); }
 
     this.updateMapSource();
 
