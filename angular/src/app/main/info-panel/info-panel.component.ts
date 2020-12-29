@@ -34,8 +34,9 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
 
       // enable disabled tabs when we have data
+      console.log(this.callingPage)
       this.tabsArray.forEach( tab => {
-        if ( tab.name === 'details' || tab.name === 'overlay') {
+        if ( (tab.name === 'details' || tab.name === 'overlay') && this.callingPage !== 'create') {
           tab.disabled = !this.data.getPath();
         }
       });
