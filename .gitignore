@@ -1,5 +1,18 @@
+# NOTE that nodejs/ and aangular/ have their own .gitignore files
+# allhidden files except whats below
+.*
+
+# development
+!.vscode
+
+# deployment
+!.bash_aliases
+!.bash_logout
+!.gitignore
+!.profile
+certbot-info
+cron.log
 data
 dhparam
-certbot-info
-.*
-!.gitignore
+snap
+usr

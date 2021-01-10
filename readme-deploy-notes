@@ -1,0 +1,64 @@
+Correct "Error starting userland proxy" Error
+---------------------------------------------
+If you get the following error when trying to bring up docker-compose:
+Error starting userland proxy: listen tcp 0.0.0.0:443: bind: address already in use
+
+Run the following to identify and kill the blokcing processes:
+$ sudo lsof -i tcp:{{blocking port}}
+$ sudo kill -9 {{process id}}
+
+
+About volumes and bind mounts
+-----------------------------
+
+A named volume is created by the following:
+       volumes:
+         - my-volume:/var/lib/db
+
+This will map '/var/lib/db' onto the container, so go to that path to see the requested data
+
+
+A bind mount is created by the following:
+        volumes:
+          - ./data/ASTGTMV003:/data
+
+This will map make the contents of the host directory './data/ASTGTMV003' available at the path '/data' in the docker container. This can be confirmed using the command:
+        sudo docker exec -it {{container_id}} ls -a /data
+
+Note:
+- binding of mounts and volumes happens when the docker-compose is pulled up, so changes will be reflected without needing to delete containers/images
+- tested bind mounts and shown that files update live - change to host is immediately reflected in the container
+
+
+About Auto-renewing certificates
+--------------------------------
+
+Use the command:
+$ sudo certbot renew --dry-run
+
+to test the renewl process.  this only works if the nginx server is not running, so the service needs ot be brought down when renewing certificates.
+
+If you get the following error of running certbot:
+"another-instance-of-certbot-is-already-running"
+
+Then:
+Find and kill the certbot processes:
+$ sudo ps -waef | grep certb
+$ sudo kill -9 {{certbot prcess ids}}
+
+Then need to clean up the lock files - first line to view only, second to also delete:
+$ sudo find / -type f -name ".certbot.lock"
+$ sudo find / -type f -name ".certbot.lock" -exec rm {} \;
+
+Another useful command is to check the logs for renewal attempts:
+$ sudo grep "random delay" /var/log/letsencrypt/letsencrypt.log
+
+To Edit Renewal Schedule
+------------------------
+The scheduling is done by crontab, edit using:
+$ crontab -e
+
+Note - DO NOT use sudo, it sets upa  different scheduler.
+
+crontab currently calls the following script: ~/scripts/certbot-renew.sh
+and logs the result to ~/cron.log

@@ -9,10 +9,19 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx-conf/prod:/etc/nginx/conf.d
+# this is a fix, it maps contents of the static nginx root folder, to a docker container with the
+# same path with challenge at the end.  this along with settings in the ./nginx-conf/prod/default.conf
+# file allow the acme certbot challenge to work correctly
+      - /usr/share/nginx/html:/usr/share/nginx/html/challenge
+# this maps the nginx configuration file to the correct location in the container
+      - ./nginx:/etc/nginx/conf.d
+# this maps the local ssl certificated to the correct location in the container
       - ./dhparam:/etc/ssl/certs
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+# these named volumes are not working, but dont know why - so redone as bind mounts below
+#      - certbot-etc:/etc/letsencrypt
+#      - certbot-var:/var/lib/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
       
   nodejs:
     build: nodejs
@@ -23,6 +32,6 @@ services:
     ports:
       - "8080:8080"
 
-volumes:
-    certbot-etc:
-    certbot-var:
+# volumes:
+#   certbot-etc:
+#   certbot-var:
