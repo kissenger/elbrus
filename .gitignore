@@ -14,5 +14,6 @@ certbot-info
 cron.log
 data
 dhparam
+env
 snap
 usr
