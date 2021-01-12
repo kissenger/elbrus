@@ -62,3 +62,12 @@ Note - DO NOT use sudo, it sets upa  different scheduler.
 
 crontab currently calls the following script: ~/scripts/certbot-renew.sh
 and logs the result to ~/cron.log
+
+
+Deployment
+----------
+git fetch --all
+git reset --hard origin/master
+sudo docker-compose down
+sudo docker system prune -a
+sudo docker-compose up --build --detach
