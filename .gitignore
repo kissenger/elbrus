@@ -1,4 +1,6 @@
-# NOTE that nodejs/ and aangular/ have their own .gitignore files
+# SO post showing how to update archive after gitignore update
+# https://stackoverflow.com/questions/6030530/git-ignore-not-working-in-a-directory
+
 # allhidden files except whats below
 .*
 
