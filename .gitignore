@@ -5,6 +5,15 @@
 # development
 !.vscode
 
+/angular/node_modules
+/angular/dist
+/angular/tmp
+/angular/out-tsc
+/angular/src/environments
+
+/nodejs/node_modules
+/nodejs.env
+
 # deployment
 !.bash_aliases
 !.bash_logout
