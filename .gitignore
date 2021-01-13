@@ -9,7 +9,7 @@
 /angular/dist
 /angular/tmp
 /angular/out-tsc
-/angular/src/environments
+/angular/src/environmentss
 
 /nodejs/node_modules
 /nodejs.env
