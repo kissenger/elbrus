@@ -71,3 +71,21 @@ git reset --hard origin/master
 sudo docker-compose down
 sudo docker system prune -a
 sudo docker-compose up --build --detach
+
+
+*******
+STORAGE 
+*******
+
+Mounting a persistent disk to VM
+--------------------------------
+follow instructions here: https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting
+** important: the disk should be attached as read/write in the google console  - check this in case of **
+** error "cant mount read only disk" **
+to list available disks: sudo lsblk
+to mount the disk: sudo mount -o discard,defaults /dev/sdb ./data
+
+Copying ASTGTM files from Google Cloud Storage to VM Storage
+-----------------------------------------------------------
+go to destination and type (from https://cloud.google.com/storage/docs/gsutil/commands/cp):
+sudo gsutil cp -r gs://trailscape-geotiffs .

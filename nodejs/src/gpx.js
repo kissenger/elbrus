@@ -228,9 +228,6 @@ function gpxWrite(writeObject){
     const filePath = './downloads/'
     const fileName = writeObject.name + ' ' + (new Date()).getMilliseconds() + '.gpx';
 
-    console.log(fileName)
-
-
     const file = createWriteStream(filePath + fileName);
     const s = '   ';
     const eol = '\r\n'
