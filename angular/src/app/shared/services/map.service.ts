@@ -73,33 +73,40 @@ export class MapService {
 
       }
 
-      this.tsMap = new mapboxgl.Map({
-        container: 'map',
-        style: this.mapboxStyles[this.mapDefaultType],
-        center: mapCentre,
-        zoom: mapZoom
-      });
+      if (!mapboxgl.supported()) {
 
-      if ( boundingBox ) {
-        this.bounds = boundingBox;
+        alert('Your browser does not support Mapbox GL');
+
+      } else {
+
+        this.tsMap = new mapboxgl.Map({
+          container: 'map',
+          style: this.mapboxStyles[this.mapDefaultType],
+          center: mapCentre,
+          zoom: mapZoom
+        });
+
+        if ( boundingBox ) {
+          this.bounds = boundingBox;
+        }
+
+        this.pathLayers = new ActivePathLayers();
+
+        this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+
+        this.tsMap.on('moveend', () => {
+          // console.log('map finished moving');
+          this.data.set({mapView: this.getMapView()});
+          this.data.mapBoundsEmitter.emit(this.getMapBounds());
+        });
+
+        this.tsMap.on('load', () => {
+          // console.log('map finished loading');
+          this.data.set({mapView: this.getMapView()});
+          this.data.mapBoundsEmitter.emit(this.getMapBounds());
+          resolve();
+        });
       }
-
-      this.pathLayers = new ActivePathLayers();
-
-      this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
-
-      this.tsMap.on('moveend', () => {
-        // console.log('map finished moving');
-        this.data.set({mapView: this.getMapView()});
-        this.data.mapBoundsEmitter.emit(this.getMapBounds());
-      });
-
-      this.tsMap.on('load', () => {
-        // console.log('map finished loading');
-        this.data.set({mapView: this.getMapView()});
-        this.data.mapBoundsEmitter.emit(this.getMapBounds());
-        resolve();
-      });
 
     });
 

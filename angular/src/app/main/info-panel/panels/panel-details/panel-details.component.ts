@@ -283,6 +283,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
 
   onCancel() {
+    // clear any path we have stored as no longer relevant
+    this.data.clearPath();
     this.router.navigate(['/routes/list/']);
   }
 
