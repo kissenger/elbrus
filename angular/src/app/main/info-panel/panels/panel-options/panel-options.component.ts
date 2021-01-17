@@ -108,12 +108,12 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     navigator.clipboard.writeText(link)
       .then( () => {
         this.alert
-          .showAsElement('Success', `Link copied to clipboard\r\n${link}`, false, true)
+          .showAsElement('Success', `Link copied to clipboard\r\n${link}`, true, false)
           .subscribe( () => {} );
       })
       .catch( (err) => {
         this.alert
-          .showAsElement('Something went wrong :(', `Couldn't copy link to clipboard\r\n${link}`, false, true)
+          .showAsElement('Something went wrong :(', `Couldn't copy link to clipboard\r\n${link}`, true, false)
           .subscribe( () => {} );
       });
   }
