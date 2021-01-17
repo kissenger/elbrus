@@ -64,7 +64,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private data: DataService,
     private auth: AuthService,
-    private alert: AlertService
+    // private alert: AlertService
   ) {}
 
   ngOnInit() {
@@ -133,8 +133,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
       }, (error) => {
         this.isLoading = false;
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.statusText} `, error.message, true, false).subscribe( () => {});
+        // console.log(error);
+        // this.alert.showAsElement(`${error.name}: ${error.statusText} `, error.message, true, false).subscribe( () => {});
       });
     // }
   }

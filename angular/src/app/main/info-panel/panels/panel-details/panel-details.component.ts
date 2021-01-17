@@ -53,7 +53,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     public data: DataService,
     private http: HttpService,
     private router: Router,
-    private auth: AuthService,
+    public auth: AuthService,
     private alert: AlertService,
     private unitConvertPipe: UnitsConvertPipe,
     private unitLongNamePipe: UnitsLongNamePipe,
@@ -255,8 +255,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       this.http.saveRoute( sendObj ).subscribe(
         (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
         (error) => {
-          console.log(error);
-          this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+          // console.log(error);
+          // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
         }
       );
 
@@ -272,8 +272,8 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       this.http.saveImportedPath(sendObj).subscribe(
         (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
         (error) => {
-          console.log(error);
-          this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+          // console.log(error);
+          // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
         }
       );
     }

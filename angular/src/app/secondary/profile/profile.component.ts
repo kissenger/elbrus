@@ -94,8 +94,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       (error) => {
         this.spinner.removeElement();
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        // console.log(error);
+        // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
         resolve(false);
       });
     });

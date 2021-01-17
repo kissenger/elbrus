@@ -66,6 +66,7 @@ function getRouteInstance(name, description, lngLat, elevs) {
     } catch (error) {
 
       console.log(error);
+      reject(error)
     
     }
 

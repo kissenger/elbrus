@@ -141,8 +141,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
       }, (error) => {
         reject();
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        // console.log(error);
+        // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
 
       });
 

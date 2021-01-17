@@ -1,3 +1,4 @@
+import { AuthService } from './../../../shared/services/auth.service';
 import { LocationService } from 'src/app/shared/services/location.service';
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -30,7 +31,8 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
     private alert: AlertService,
-    private location: LocationService
+    private location: LocationService,
+    private auth: AuthService
     ) { }
 
   async ngOnInit() {
@@ -43,11 +45,13 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     // initialise the map and launch create route
     await this.map.newMap();
     this.map.createRoute();
-
-
-    // get device location
     this.location.watch(this.map);
 
+    if ( this.auth.isGuestUser() ) {
+      this.alert.showAsElement(`Warning: Route will not be saved`,
+      'Routes created as using guest account cannot be saved.  If you wish to save your route, please log in.'
+      , true, false).subscribe( () => {});
+    }
 
     // listen for command from panel-list asking for map changes
     this.pathIdListener = this.data.pathCommandEmitter.subscribe(
@@ -86,15 +90,14 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
     return new Promise<TsFeatureCollection>( (resolve, reject) => {
 
-      this.httpListener = this.http.getPathById('route', pathId).subscribe( async (result) => {
-        resolve(result.hills);
-
-      }, (error) => {
-        reject();
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
-
-      });
+      this.httpListener = this.http.getPathById('route', pathId).subscribe(
+        async (result) => { resolve(result.hills); },
+        (error) => {
+          reject();
+          // console.log(error);
+          // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        }
+      );
 
     });
 

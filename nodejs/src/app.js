@@ -368,7 +368,7 @@ app.get('/api/download-file/:fname', auth.verifyToken, async (req, res) => {
  *****************************************************************/
 app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
-  // try {
+
 
     let coords;
     if (req.body.options.simplify) {
@@ -381,6 +381,7 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
     // TODO: is it really needed to convert from {lat:, lng:} to lngLat?
     const lngLats = coords.map(coord => [coord.lng, coord.lat]);
 
+  try {
     let routeInstance;
     if (process.env.USE_THREADS) {
       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', null, null, lngLats, null);
@@ -393,12 +394,13 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
         basic: new GeoJSON().fromPath(routeInstance).toBasic()
       });
 
-  // } catch (error) {
+  } catch (error) {
 
-  //   debugMsg('ERROR: ' + error);
-  //   res.status(401).send(error.message);
+    debugMsg('ERROR: ' + error);
+    res.status(400).send(error.message);
 
-  // }
+  }
+
 })
 
 

@@ -199,7 +199,7 @@
 
       <!-- BUTTONS -->
       <div *ngIf="callingPage !== 'list'" class="buttons d-flex mb-2 mt-2 justify-content-center" >
-        <button (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
+        <button *ngIf="auth.isRegisteredUser()" (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm mt-1" type="submit">Save</button>
         <button (click)="onCancel()" type="button" class="btn btn-secondary btn-sm ml-1 mt-1" type="cancel">Cancel</button>
       </div>
 

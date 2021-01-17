@@ -37,6 +37,7 @@ import { AuthService } from './shared/services/auth.service';
 import { TokenInterceptorService } from './shared/services/token-interceptor.service';
 import { LocationService } from './shared/services/location.service';
 import { AuthGuard } from './auth.guard';
+import { ErrorService } from './shared/services/error.service';
 
 // Pipes
 import { UnitsStringPipe } from './shared/pipes/units-string.pipe';
@@ -87,6 +88,7 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
   ],
   providers: [
     HttpService,
+    ErrorService,
     MapCreateService,
     MapService,
     AlertService,

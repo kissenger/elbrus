@@ -152,15 +152,18 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     const fileData = new FormData();
     fileData.append('filename', files[0], files[0].name);
 
-    this.httpListener = this.http.importRoute(fileData).subscribe( (result) => {
-      const pathAsGeoJSON = result.hills;
-      this.data.setPath(pathAsGeoJSON);
-      this.spinner.removeElement();
-      this.router.navigate(['routes/review/']);
+    this.httpListener = this.http.importRoute(fileData).subscribe(
 
-    }, (error) => {
-      console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name}`, error.message, true, false).subscribe( () => {} );
+      (result) => {
+        const pathAsGeoJSON = result.hills;
+        this.data.setPath(pathAsGeoJSON);
+        this.spinner.removeElement();
+        this.router.navigate(['routes/review/']);
+      },
+
+      (error) => {
+        // console.log(error);
+        // this.alert.showAsElement(`${error.name}: ${error.name}`, error.message, true, false).subscribe( () => {} );
         // reset the form otherwise if you do the same action again, the change event wont fire
         (<HTMLFormElement>document.getElementById('file_form')).reset();
         this.spinner.removeElement();

@@ -71,8 +71,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     } catch (error) {
 
-      console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+      // console.log(error);
+      // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
 
     }
 
@@ -108,8 +108,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.router.navigate(['routes/list']);
 
       } catch (error) {
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        // console.log(error);
+        // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
       }
 
     }

@@ -121,8 +121,8 @@ class PathWithStats extends Path{
             .then(elev => {
               resolve( {lngLat: path.lngLats, elev: elev.map(e => e.elev)} )
             })
-  
             .catch(error => reject(error))
+            
         } else {
           resolve( {lngLat: path.lngLats, elev: path.getParam('elev')} );
         }

@@ -116,9 +116,11 @@ export class MapCreateService extends MapService {
         this.http.mapboxDirectionsQuery(this.snapType, start, end).subscribe( (result) => {
 
           if (result.code === 'Ok') {
+
             resolve(result.routes[0].geometry.coordinates);
 
           } else {
+
             reject('Mapbox directions query failed with error: ' + result.code);
 
           }
@@ -181,9 +183,6 @@ export class MapCreateService extends MapService {
 
     } catch (error) {
 
-      console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
-
     }
   }
 
@@ -202,8 +201,6 @@ export class MapCreateService extends MapService {
       this.updateMap();
 
     } catch (error) {
-      console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
     }
 
     this.spinner.removeElement();
@@ -277,8 +274,7 @@ export class MapCreateService extends MapService {
         this.updateMap();
 
       } catch (error) {
-        console.log(error);
-        this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+
       }
 
       this.spinner.removeElement();
@@ -336,8 +332,7 @@ export class MapCreateService extends MapService {
       this.tsMap.removeFeatureState( {source: '0000pts'} );
 
     } catch (error) {
-      console.log(error);
-      this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+
     }
 
     this.spinner.removeElement();
@@ -418,8 +413,7 @@ export class MapCreateService extends MapService {
           }
 
         } catch (error) {
-          console.log(error);
-          this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+
         }
 
         this.history.add( new Path(backendResult) );
