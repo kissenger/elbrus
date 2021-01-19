@@ -1,49 +1,43 @@
 
 
-<div class="h-100 w-100 d-flex flex-column welcome-container">
+<div class="d-flex flex-column welcome-container position-absolute">
 
-  <div class="row no-gutters flex-grow-1 welcome-main">
+  <div class="d-flex flex-wrap h-100 justify-content-center">
 
-    <!-- use of media class helps vertical alignment of image //  justify-content-center achieves the horz alignment-->
-    <!-- col-lg: just use column > large breakpoint; below that use the col-10 and offset -->
-    <div class="col-lg col-10 offset-1 media justify-content-center img-container">
-      <img class="img-fluid align-self-center" src="../../assets/images/welcome-page-image.svg" alt="">
-    </div>
+    <div class="d-inline-flex flex-wrap flex-lg-nowrap">
 
-    <div class="col-lg d-flex align-items-center">
+      <!-- IMAGE -->
+      <img class="mx-auto" src="../../assets/images/welcome-page-image.svg" alt="">
 
-      <div class="text-center text-lg-left px-2">
 
-        <div class="welcome-text-box">
+      <!-- TEXT -->
+      <div class="text-center text-lg-left w-100 px-2 my-auto">
+
           <span class="welcome-heading">Create</span> <br>
-          <span class="welcome-text">Unique route planning tools to plan your next adventure</span>
-        </div>
+          <span class="welcome-text">Unique route planning tools to plan your next adventure</span><br>
 
-        <div class="my-2 welcome-text-box">
           <span class="welcome-heading">Discover</span> <br>
-          <span class="welcome-text">Search for new routes on your favourite trails</span>
-        </div>
+          <span class="welcome-text">Search for new routes on your favourite trails</span><br>
 
-        <div class="welcome-text-box">
           <span class="welcome-heading">Share</span> <br>
-          <span class="welcome-text">Quickly share routes with other trail lovers </span>
-        </div>
+          <span class="welcome-text">Quickly share routes with other trail lovers </span><br>
 
       </div>
 
     </div>
 
-  </div>
-
-  <div class="welcome-footer h-25 mt-3 " >
-    <div class="d-flex justify-content-center">
-      <button class="btn btn mr-2 btn-outline-secondary" type="button" (click)="onGuestClick()">Continue as Guest</button>
-      <button class="btn btn ml-2 btn-primary" type="button" (click)="onLoginClick()">Login or Register</button>
+    <!-- BUTTONS -->
+    <div class="d-flex w-100 justify-content-center">
+      <div class="col-6 col-md-3 m-0 p-1">
+        <button class="btn w-100 btn-outline-secondary" type="button" (click)="onGuestClick()">Continue as Guest</button>
+      </div>
+      <div class="col-6 col-md-3 m-0 p-1">
+        <button class="btn w-100 btn-primary" type="button" (click)="onLoginClick()">Login or Register</button>
+      </div>
     </div>
+
+    </div>
+
   </div>
-
-
-</div>
-
 
 

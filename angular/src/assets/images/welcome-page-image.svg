@@ -7,9 +7,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="93.661041mm"
-   height="78.691071mm"
-   viewBox="0 0 93.661041 78.69107"
+   width="86.661041mm"
+   height="71.691071mm"
+   viewBox="0 0 86.661041 71.69107"
    version="1.1"
    id="svg9033"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
@@ -196,7 +196,8 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:snap-nodes="false" />
+     inkscape:snap-nodes="false"
+     lock-margins="true" />
   <metadata
      id="metadata9030">
     <rdf:RDF>
@@ -222,9 +223,10 @@
        x="55.80373"
        y="134.32568"
        ry="13.105549"
-       transform="matrix(0.35909662,0.0162471,-0.01631443,0.36058476,1.934786,-50.409262)" />
+       transform="matrix(0.35909662,0.0162471,-0.01631443,0.36058476,-1.7693807,-53.055097)" />
     <g
-       id="g12101">
+       id="g12101"
+       transform="translate(-3.7041668,-2.6458334)">
       <g
          id="g14691-8-8-5-7-5"
          clip-path="url(#clipPath14693-2-1-4-8-3)"
@@ -413,7 +415,7 @@
     </g>
     <g
        id="g12315"
-       transform="translate(0,1.0112324)">
+       transform="translate(-3.7041668,-1.634601)">
       <rect
          style="fill:#000000;fill-opacity:0.393574;stroke:none;stroke-width:0.988245;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter14734-1-6-6-0)"
          id="rect4554-7-2-0-8-55-3-9-8-6-6-2"
@@ -613,7 +615,8 @@
       </g>
     </g>
     <g
-       id="g12440">
+       id="g12440"
+       transform="translate(-3.7041668,-2.6458334)">
       <rect
          style="fill:#000000;fill-opacity:0.393574;stroke:none;stroke-width:0.988245;stroke-miterlimit:4;stroke-dasharray:none;filter:url(#filter14734-53-0-1-7)"
          id="rect4554-7-2-0-8-55-3-9-0-6-6-7"

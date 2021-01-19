@@ -1,55 +1,26 @@
-/* div { border: 1px red dashed; } */
 
-/* .welcome-container {
+/* div { border: 1px red solid; } */
+
+
+.welcome-container {
+  background-color: rgba(255,255,255,1.0);
+  position: absolute;
   top: 0px;
+  bottom: 0px;
   left: 0px;
-  background-color: rgba(255,255,255,1.0);
-  pointer-events: visible;
-} */
-
-.welcome-panel {
-  background-color: rgba(255,255,255,1.0);
-  margin-top: auto;
-  margin-bottom: auto;
-}
-/*
-.welcome-header {
-  font-family: verdana;
-  font-size: xx-large;
-} */
-
-.welcome-main {
-  background-color: rgba(255,255,255,1.0);
+  right: 0px;
 }
 
-.welcome-footer {
-  background-color: rgba(255,255,255,1.0);
-}
-
-/* @media screen and (max-width: 600px) {
-  img { display: none; }
-  } */
-
-/* img {
-  width: 500px;
-  height: auto;
-} */
-
-/* .img-container {
-  height: 50px;
-  border: 1px red solid;
-} */
-.welcome-text-box {
-  font-family: verdana;
-  /* border: 1px red solid; */
-}
 
 .welcome-heading {
+  font-family: verdana;
   font-size: 20px;
 }
 
 .welcome-text {
+  font-family: verdana;
   font-size: 14px;
 }
+
 
 

@@ -1,13 +1,13 @@
-/* #info {
-  display: block;
-  position: relative;
-  margin: 0px auto;
-  width: 50%;
-  padding: 10px;
-  border: none;
-  border-radius: 3px;
-  font-size: 12px;
-  text-align: center;
-  color: #222;
-  background: #fff;
-} */
+
+/* this is needed for safari - h-100 will not work as parent is a flex element without explcit set height
+     see - https://stackoverflow.com/questions/33636796/chrome-safari-not-filling-100-height-of-flex-parent
+*/
+
+.map-div {
+  /* border: 1px red solid; */
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
