@@ -42,23 +42,6 @@
 
   <div *ngIf="nAvailableRoutes > 0" class="m-0 p-0 h-100 d-flex flex-column">
 
-    <!-- <div class="m-0 p-0 d-flex flex-column active-route-holder">
-      <div class="m-1">
-        <i>Active Route:</i>
-      </div>
-
-      <app-panel-list-item *ngIf="nSelectedRoutes > 0" [item]="listItems[0]" class="my-auto list-item"
-        (click)="onListClick(listItems[0].pathId)" [ngStyle]="getCssStyle(listItems[0].pathId, 0)">
-      </app-panel-list-item>
-
-      <div *ngIf="nSelectedRoutes === 0" class="w-100 text-center my-auto">No route selected.</div>
-    </div>
-
-    <div *ngIf="nSelectedRoutes === 0" class="m-1 p-0"><i>Select a route to view:</i></div>
-    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView <= 1" class="my-1 p-0"><i>No more routes to show.</i></div>
-    <div *ngIf="nSelectedRoutes > 0 && nRoutesInView > 1" class="my-1 p-0"><i>Select routes to overlay:</i></div>
- -->
-
     <div class=" flex-grow-1 position-relative">
       <div class=" d-flex flex-column position-absolute routes-list overflow-auto">
 

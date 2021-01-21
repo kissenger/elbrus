@@ -5,18 +5,21 @@
   cursor: text;
 }
 
-.inner {
-  /* border: 1px red dotted; */
-  overflow-y: auto;
-  overflow-x: hidden;
-  cursor: default;
-}
-
-.maximised-container {
+.absolute-container {
   position: absolute;
   top: 0px;
   bottom: 0px;
   left: 0px;
   right: 0px;
-  overflow: auto;
+  /* overflow: auto; */
+}
+
+.btn {
+  width: 80px;
+}
+
+.stats-pane {
+  overflow-x: hidden;
+  overflow-y: auto;
+
 }
