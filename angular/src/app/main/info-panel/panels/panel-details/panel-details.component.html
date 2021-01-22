@@ -64,7 +64,7 @@
 
 
     <!-- DATA -->
-    <div *ngIf="data.isPath()" class="absolute-container d-flex flex-column p-2">
+    <div *ngIf="isData" class="absolute-container d-flex flex-column p-2">
 
       <!-- NAME & DESCRIPTION only for list page -->
       <div *ngIf="callingPage==='list'; else showForm" class="pb-2 border-bottom text-center">
@@ -81,15 +81,20 @@
       <!-- FORM INPUTS only if create page -->
       <ng-template #showForm>
 
+        <!-- Safari needs the form tags -->
         <form>
 
           <div class="input-group input-group-sm my-1">
-              <input class='form-control' type='text'
-              [(ngModel)]="givenName">
+              <input class='form-control' type='text' [(ngModel)]="givenName" name="path_name">
           </div>
 
           <div class="input-group input-group-sm my-1">
-              <textarea class='form-control' placeholder='Give your route a description' [(ngModel)]="geoJson.properties.info.description"></textarea>
+              <textarea
+                class='form-control'
+                placeholder='Give your route a description'
+                [(ngModel)]="geoJson.properties.info.description"
+                name="description">
+              </textarea>
           </div>
 
         </form>
