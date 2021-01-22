@@ -92,7 +92,7 @@ app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), asyn
       const gpxData = gpxRead(bufferString);
       routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);  
     }
-    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
+    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
 
   } catch (error) {

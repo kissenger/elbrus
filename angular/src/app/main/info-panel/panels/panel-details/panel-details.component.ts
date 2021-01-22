@@ -92,8 +92,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         } else if (this.callingPage === 'create') {
           this.givenName =
             this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
-        } else {
-          this.givenName = this.geoJson.properties.info.name;
+        } else { // review
+          this.givenName =
+            this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
         }
 
         this.updateChart();
@@ -263,7 +264,6 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
     // path created during import
     } else {
-
       const sendObj = {
         pathId: newPath.properties.pathId,
         pathType: newPath.properties.info.pathType,
@@ -272,10 +272,7 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
       };
       this.http.saveImportedPath(sendObj).subscribe(
         (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },
-        (error) => {
-          // console.log(error);
-          // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
-        }
+        (error) => { }
       );
     }
 
@@ -284,7 +281,14 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
 
   onCancel() {
-    // clear any path we have stored as no longer relevant
+
+    if (this.callingPage==="review") {
+      this.data.getPath().properties.pathId;
+      this.http.deletePath(this.data.getPath().properties.pathId).subscribe(
+        (response) => { console.log(response)},
+        (error) => {}
+      );
+    }
     this.data.clearPath();
     this.router.navigate(['/routes/list/']);
   }

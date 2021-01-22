@@ -5,7 +5,7 @@ export interface TsUnits {
     elevation: 'm' | 'ft';
 }
 
-export type TsCallingPageType = 'list' | 'create' | 'edit';
+export type TsCallingPageType = 'list' | 'create' | 'edit' | 'review';
 export interface TsCallingPage {
   callingPage: TsCallingPageType;
 }
