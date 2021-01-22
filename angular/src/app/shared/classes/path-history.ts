@@ -121,8 +121,6 @@
         props.unshift({title: 'start'});
       }
 
-      console.log(coords, props)
-
       return this.geoJsonPipe.transform(coords, 'Point', props);
 
     }

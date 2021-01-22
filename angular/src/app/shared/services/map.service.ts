@@ -279,7 +279,6 @@ export class MapService {
 
   public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
 
-    console.log(data)
     data = data ? data : this.geoJsonPipe.transform([], 'Point');
 
     this.tsMap.addSource(layerId, {type: 'geojson', data } );

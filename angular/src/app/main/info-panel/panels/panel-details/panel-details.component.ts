@@ -282,10 +282,9 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
 
   onCancel() {
 
-    if (this.callingPage==="review") {
-      this.data.getPath().properties.pathId;
+    if (this.callingPage === 'review') {
       this.http.deletePath(this.data.getPath().properties.pathId).subscribe(
-        (response) => { console.log(response)},
+        (response) => { console.log(response); },
         (error) => {}
       );
     }
