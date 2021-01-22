@@ -117,9 +117,11 @@
       }
 
       if (this.firstPoint) {
-        coords.unshift([this.firstPoint]);
+        coords.unshift(this.firstPoint);
         props.unshift({title: 'start'});
       }
+
+      console.log(coords, props)
 
       return this.geoJsonPipe.transform(coords, 'Point', props);
 
