@@ -31,9 +31,23 @@
     }
 
 
+
     // return the first point of the last path in the undo history
     get firstPoint() {
-      return this._firstPoint ? this._firstPoint : null;
+
+      // first try to return the first point of the last path - in case route has been reversed
+      if (this.lastPath) {
+        return this.lastPath.firstPoint;
+
+      // if that doesnt work, try to return _firstpoint
+      } else if (this._firstPoint) {
+        return this._firstPoint;
+
+      // if none of that works, return null
+      } else {
+        return null;
+      }
+
     }
 
 
@@ -188,6 +202,7 @@
       this.history.push(path);
 
     }
+
 
     // remove the last item in the history, but keep track of whether the buffer limit is reached as the
     // behaviour slightly changes
