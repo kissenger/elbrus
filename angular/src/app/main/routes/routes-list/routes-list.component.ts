@@ -62,8 +62,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       } else {
         this.alert.showAsElement('Error: Path not found', 'Couldn\'t find requested path, or not authorised', true, false)
           .subscribe( () => {});
-      await this.map.newMap();
-
+        await this.map.newMap();
       }
 
     } else {
@@ -76,6 +75,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     // get device location
     this.location.watch(this.map);
+    this.map.addHomeMarker();
+
 
     // listen for coordinate from chart and plot on map
     this.map.addPointsLayer('pointHighlighter', {

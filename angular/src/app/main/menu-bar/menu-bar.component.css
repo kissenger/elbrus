@@ -21,6 +21,13 @@
   color: rgb(110, 110, 110);
 }
 
+/* remove hover effect on small screens */
+@media only screen and (min-width: 900px) {
+  .collapse-btn:hover {
+    cursor: pointer;
+    background: white;
+  }
+}
 
 .hidden-view {
   display: none;

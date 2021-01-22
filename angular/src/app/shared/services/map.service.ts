@@ -27,6 +27,7 @@ export class MapService {
   public mapDefaultType: TsMapType = 'terrain';
   public pathLayers: ActivePathLayers;
   private marker: mapboxgl.Marker;
+  private homeMarker: mapboxgl.Marker;
   private padding = {
     wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
     narrowScreen: {top: 10, left: 10, bottom: 10, right: 10}
@@ -92,6 +93,12 @@ export class MapService {
 
         this.pathLayers = new ActivePathLayers();
 
+        // console.log(this.auth.getUser().homeLngLat);
+
+
+        // htmlElement.style.backgroundPositionY = 'bottom 25px';
+
+
         this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
         this.tsMap.on('moveend', () => {
@@ -113,6 +120,25 @@ export class MapService {
   }
 
 
+  public addHomeMarker() {
+
+    const htmlElement = document.createElement('div');
+    htmlElement.className = 'marker';
+    htmlElement.style.backgroundImage = 'url(assets/images/home-marker.svg)';
+    htmlElement.style.backgroundSize = 'cover';
+    htmlElement.style.width = '40px';
+    htmlElement.style.height = '80px';
+
+    this.homeMarker = new mapboxgl.Marker(htmlElement)
+      .setLngLat(this.auth.getUser().homeLngLat)
+      .addTo(this.tsMap);
+
+  }
+
+  public repositionHomeMarker(newPosition: TsCoordinate) {
+    this.homeMarker.setLngLat(newPosition);
+
+  }
 
   // Sets the basemap style to either 'terrain' or 'satellite'
   // Mapbox helpfully removes all layers when the style is applied, so this function gets the current layers and sources first and
@@ -355,16 +381,10 @@ export class MapService {
 
     this.tsMap.getCanvas().style.cursor = 'crosshair';
 
-    // return new Promise<TsCoordinate>( (resolve, reject) => {
-      this.tsMap.on('click', (e) => {
-        const location = { lat: e.lngLat.lat, lng: e.lngLat.lng };
-        this.plotMarker({ lat: e.lngLat.lat, lng: e.lngLat.lng });
-        this.data.clickedCoordsEmitter.emit(location);
-
-        // this.tsMap.getCanvas().style.cursor = 'pointer';
-        // resolve({ lat: e.lngLat.lat, lng: e.lngLat.lng });
-      });
-    // });
+    this.tsMap.on('click', (e) => {
+      const location: TsCoordinate = { lat: e.lngLat.lat, lng: e.lngLat.lng };
+      this.data.clickedCoordsEmitter.emit(location);
+    });
 
   }
 
