@@ -83,18 +83,11 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
         this.geoJson = this.data.getPath();
         this.isData = true;
 
-      // if (this.geoJson) {
-
-        if (this.callingPage === 'edit') {
-          if (!this.givenName) {
-            this.givenName = this.geoJson.properties.info.name;
-          }
-        } else if (this.callingPage === 'create') {
+        if (this.geoJson?.properties?.info?.name) {
+          this.givenName = this.geoJson.properties.info.name;
+        } else {
           this.givenName =
-            this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
-        } else { // review
-          this.givenName =
-            this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+          this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
         }
 
         this.updateChart();
