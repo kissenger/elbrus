@@ -38,30 +38,37 @@
   <div *ngIf="!isMinimised" class="absolute-container p-2">
 
     <!-- NO DATA -->
-    <div *ngIf="!data.isPath()" class="text-center">
+    <div *ngIf="!data.isPath()" class="h-100 d-flex flex-column">
 
-      <div *ngIf="callingPage==='create'; else list">
-        <div class="text-center m-3">
-          Click on the map to begin.
+      <div class="text-center flex-grow-1">
+
+        <div *ngIf="callingPage==='create'; else list">
+          <div class="text-center m-3">
+            Click on the map to begin.
+          </div>
+
+          <div class="small mt-auto text-center">
+            Data will show here when the route is at least two points long.
+          </div>
         </div>
 
-        <div class="small mt-auto text-center">
-          Data will show here when the route is at least two points long.
-        </div>
+        <ng-template #list>
+          <div class="text-center m-3">
+            No routes selected.
+          </div>
+
+          <div class="small mt-auto text-center">
+            Use the 'List' tab find and select routes.
+          </div>
+        </ng-template>
+
       </div>
 
-      <ng-template #list>
-        <div class="text-center m-3">
-          No routes selected.
-        </div>
-
-        <div class="small mt-auto text-center">
-          Use the 'List' tab find and select routes.
-        </div>
-      </ng-template>
+      <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
+        <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
+      </div>
 
     </div>
-
 
     <!-- DATA -->
     <div *ngIf="isData" class="absolute-container d-flex flex-column p-2">
@@ -108,20 +115,20 @@
 
           <div class="row no-gutters">
 
-            <div class="col-6 px-1">Distance</div>
-            <div class="col-6 px-1">{{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}</div>
+            <div class="col-5 px-1">Distance</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}</div>
 
-            <div class="col-6 px-1">Points</div>
-            <div class="col-6 px-1">{{geoJson.properties.stats.nPoints | number: '1.0-0'}}</div>
+            <div class="col-5 px-1">Points</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.nPoints | number: '1.0-0'}}</div>
 
-            <div class="col-6 px-1">Category</div>
-            <div class="col-6 px-1">{{geoJson.properties.info.category}}</div>
+            <div class="col-5 px-1">Category</div>
+            <div class="col-7 px-1">{{geoJson.properties.info.category}}</div>
 
-            <div class="col-6 px-1">Direction</div>
-            <div class="col-6 px-1">{{geoJson.properties.info.direction}}</div>
+            <div class="col-5 px-1">Direction</div>
+            <div class="col-7 px-1">{{geoJson.properties.info.direction}}</div>
 
-            <div class="col-6 px-1">Public</div>
-            <div class="col-6 px-1">{{geoJson.properties.info.isPublic}}</div>
+            <div class="col-5 px-1">Public</div>
+            <div class="col-7 px-1">{{geoJson.properties.info.isPublic}}</div>
 
             <div *ngIf="geoJson.properties.info.isPublic" class="col-6 px-1">Created by</div>
             <div *ngIf="geoJson.properties.info.isPublic" class="col-6 px-1">{{geoJson.properties.info.createdBy}}</div>
@@ -136,20 +143,20 @@
 
             <div class="row no-gutters">
 
-              <div class="col-6 px-1">Ascent</div>
-              <div class="col-6 px-1">{{geoJson.properties.stats.elevations.ascent | unitsString: 'elevation': units.elevation}}</div>
+              <div class="col-5 px-1">Ascent</div>
+              <div class="col-7 px-1">{{geoJson.properties.stats.elevations.ascent | unitsString: 'elevation': units.elevation}}</div>
 
-              <div class="col-6 px-1">Descent</div>
-              <div class="col-6 px-1">{{geoJson.properties.stats.elevations.descent | unitsString: 'elevation': units.elevation}}</div>
+              <div class="col-5 px-1">Descent</div>
+              <div class="col-7 px-1">{{geoJson.properties.stats.elevations.descent | unitsString: 'elevation': units.elevation}}</div>
 
-              <div class="col-6 px-1">Max Elev</div>
-              <div class="col-6 px-1">{{geoJson.properties.stats.elevations.maxElev | unitsString: 'elevation': units.elevation}}</div>
+              <div class="col-5 px-1">Max Elev</div>
+              <div class="col-7 px-1">{{geoJson.properties.stats.elevations.maxElev | unitsString: 'elevation': units.elevation}}</div>
 
-              <div class="col-6 px-1">Min Elev</div>
-              <div class="col-6 px-1">{{geoJson.properties.stats.elevations.minElev | unitsString: 'elevation': units.elevation}}</div>
+              <div class="col-5 px-1">Min Elev</div>
+              <div class="col-7 px-1">{{geoJson.properties.stats.elevations.minElev | unitsString: 'elevation': units.elevation}}</div>
 
-              <div class="col-6 px-1">Lumpiness</div>
-              <div class="col-6 px-1">{{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}</div>
+              <div class="col-5 px-1">Lumpiness</div>
+              <div class="col-7 px-1">{{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}</div>
 
             </div>
 
@@ -200,14 +207,13 @@
         </div>
 
       </div>
-
-
-      <!-- BUTTONS -->
-      <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
-        <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
-        <button *ngIf="auth.isRegisteredUser()" (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm m-1" type="submit">Save</button>
-      </div>
-
+          <!-- BUTTONS -->
+          <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
+            <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
+            <button *ngIf="auth.isRegisteredUser()" (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm m-1" type="submit">Save</button>
+          </div>
     </div>
+
+
   </div>
 </div>
