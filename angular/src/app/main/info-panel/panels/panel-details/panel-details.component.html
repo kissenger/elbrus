@@ -1,25 +1,24 @@
-<div class="p-2 d-flex flex-column">
-
+<div class="d-flex flex-column">
 
   <!-- MINIMISED VIEW -->
 
   <div *ngIf="isMinimised">
 
     <!-- NO ROUTE SELECTED -->
-    <div *ngIf="!data.isPath()" class="my-2 text-center">
-      <div *ngIf="callingPage==='create'">
+    <div *ngIf="!data.isPath()&&callingPage==='create'" class="p-2 text-center border-top">
+      <!-- <div *ngIf="callingPage==='create'"> -->
         Click on the map to start creating.
-      </div>
-      <div *ngIf="callingPage==='list'">
-        Expand panel to select a route.
-      </div>
+      <!-- </div> -->
+      <!-- <div *ngIf="callingPage==='list'"> -->
+        <!-- Expand panel to select a route. -->
+      <!-- </div> -->
     </div>
 
     <!-- ROUTE SELECTED -->
 
-    <div *ngIf="data.isPath()" class="row no-gutters text-center">
+    <div *ngIf="data.isPath()" class="row no-gutters text-center p-2 border-top">
       <div class="col-6 m-0 text-left">
-        {{givenName | shortName: 15}}
+        {{givenName | shortName: 13}}
       </div>
       <div class="col-3 m-0 text-center">
         {{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}

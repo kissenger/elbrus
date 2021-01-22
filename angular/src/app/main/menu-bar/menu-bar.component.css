@@ -1,7 +1,7 @@
 
 
 /* menu bar formatting needed to located the containerin the right place */
-.menu-bar {
+.menu-container {
   top: 10px;
   left: 0px;
   font-size: small;
@@ -11,6 +11,37 @@
   box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
   cursor: default;
 }
+
+.collapse-btn {
+  pointer-events: auto;
+  background-color: var(--ts-grey-background);
+  cursor: pointer;
+  vertical-align: middle;
+  font-size: smaller;
+  color: rgb(110, 110, 110);
+}
+
+
+.hidden-view {
+  display: none;
+  pointer-events: none;
+  /* below is apparently better for 'screen readers' ...
+  position: absolute !important;
+  top: 50px !important;
+  left: -50px !important; */
+}
+
+/* .collapse-btn {
+  top: 10px;
+  left: 0px;
+  height: 30px;
+  width: 30px;
+  font-size: small;
+  background-color: white;
+  box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
+  cursor: default;
+} */
+
 
 /* @media only screen and (max-width: 900px) {
   .menu-bar {

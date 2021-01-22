@@ -39,7 +39,9 @@ div{
   background-color: var(--ts-grey-background);
   cursor: pointer;
   /* height: 15px; */
-  vertical-align: middle
+  vertical-align: middle;
+  font-size: smaller;
+  color: rgb(110, 110, 110);
 }
 
 .content-inner {

@@ -55,7 +55,6 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private router: Router,
     public auth: AuthService,
-    private alert: AlertService,
     private unitConvertPipe: UnitsConvertPipe,
     private unitLongNamePipe: UnitsLongNamePipe,
     private autoNamePipe: AutoNamePipe

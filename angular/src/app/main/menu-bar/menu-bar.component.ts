@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
 import { DataService } from 'src/app/shared/services/data.service';
+import * as globals from 'src/app/shared/globals';
 
 @Component({
   selector: 'app-menu-bar',
@@ -21,6 +22,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   public isData = false;
   public position: TsPosition;
   public homeLngLat: TsCoordinate;
+  public isMinimised = false;
 
   constructor(
     private data: DataService,
@@ -30,6 +32,11 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.homeLngLat = this.auth.getUser().homeLngLat;
+
+    // if on narrow screen, minimise panel
+    if (window.screen.width < globals.narrowScreenThreshold) {
+      this.isMinimised = true;
+    }
 
     // listen for when data is set to be able to enable the view buttons
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
@@ -50,6 +57,10 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
   onSnapSelect(type: TsSnapType) {
     this.map.snapType = type;
+  }
+
+  onMinimiseClick() {
+    this.isMinimised = !this.isMinimised;
   }
 
   ngOnDestroy() {

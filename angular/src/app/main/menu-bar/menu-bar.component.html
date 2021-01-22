@@ -1,143 +1,164 @@
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 
-<div class="btn-group-vertical menu-bar position-absolute pb-1 border">
-
-
-  <!-- VIEW -->
-
-  <div class="w-100 px-1 pt-0 pb-1">
-    <div class="w-100 p-1 border-bottom">
-      Views
-    </div>
-  </div>
-
-  <button
-    (click)="map.fitViewOne()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Fit active path</small>
-  </button>
-
-  <button
-    (click)="map.fitViewAll()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Fit all paths</small>
-  </button>
-
-  <button
-    (click)="map.goto(homeLngLat)"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Home Location</small>
-  </button>
-
-  <button
-    (click)="map.goto(position)"
-    [disabled]="!position"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Current location</small>
-  </button>
+<!-- <div class="collapse-btn border position-absolute text-center">
+    -
+</div> -->
 
 
-  <!-- MAP TYPE -->
+<div class="menu-container position-absolute border">
 
-  <div class="w-100 p-1">
-    <div class="w-100 p-1 border-bottom">
-      Map Type
-    </div>
-  </div>
-
-  <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
-    <label (click)="onMapTypeSelect('terrain')" class="active btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
-      <input type="radio" name="map-type" id="roads" autocomplete="off" checked> <small>Terrain</small>
-    </label>
-    <label (click)="onMapTypeSelect('satellite')" class="btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
-      <input type="radio" name="map-type" id="paths" autocomplete="off"> <Small>Satellite</Small>
-    </label>
+  <!-- <div class="collapse-btn w-100 text-center border"> -->
+    <div  (click)="onMinimiseClick()" class="collapse-btn text-center m-0 p-0">
+      <span [ngClass]="isMinimised ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" class="m-0 p-0"> Menu</span>
+    <!-- </div> -->
   </div>
 
 
+  <div [ngClass]="isMinimised ? 'hidden-view' : 'btn-group-vertical w-100 pb-1'" class="">
 
-  <!-- Actions -->
-
-  <div *ngIf="callingPage!=='list'" class="w-100 p-1">
-    <div class="w-100 p-1 border-bottom">
-      Actions
-    </div>
-  </div>
-
-  <button
-    *ngIf="callingPage!=='list'"
-    (click)="map.undo()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Undo</small>
-  </button>
-
-  <button
-    *ngIf="callingPage!=='list'"
-    (click)="map.clear()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Clear</small>
-  </button>
-
-  <button
-    *ngIf="callingPage!=='list'"
-    (click)="map.closePath();"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Close Route</small>
-  </button>
-
-  <button
-    *ngIf="callingPage!=='list'"
-    (click)="map.reversePath()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Reverse</small>
-  </button>
-
-  <button
-    *ngIf="callingPage!=='list'"
-    (click)="map.simplify()"
-    [disabled]="!isData"
-    type="button"
-    class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
-    <small>Simplify</small>
-  </button>
+    <!-- Collapse -->
 
 
 
-  <!-- Snap Options -->
 
-  <div *ngIf="callingPage!=='list'" class="w-100">
-    <div class="w-100 p-1">
+    <!-- VIEW -->
+
+    <div class="w-100 px-1 pt-0 pb-1 border-top">
       <div class="w-100 p-1 border-bottom">
-        Snap
+        Views
       </div>
     </div>
 
-    <!-- <div class="w-100  -->
+    <button
+      (click)="map.fitViewOne()"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Fit active path</small>
+    </button>
+
+    <button
+      (click)="map.fitViewAll()"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Fit all paths</small>
+    </button>
+
+    <button
+      (click)="map.goto(homeLngLat)"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Home Location</small>
+    </button>
+
+    <button
+      (click)="map.goto(position)"
+      [disabled]="!position"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Current location</small>
+    </button>
+
+
+    <!-- MAP TYPE -->
+
+    <div class="w-100 p-1">
+      <div class="w-100 p-1 border-bottom">
+        Map Type
+      </div>
+    </div>
 
     <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
-      <label (click)="onSnapSelect('driving')" class="btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
-        <input type="radio" name="snap-type" id="roads" autocomplete="off"> <small>Follow Roads</small>
+      <label (click)="onMapTypeSelect('terrain')" class="active btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="map-type" id="roads" autocomplete="off" checked> <small>Terrain</small>
       </label>
-      <label (click)="onSnapSelect('walking')" class="active btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
-        <input type="radio" name="snap-type" id="paths" autocomplete="off" checked> <Small>Follow Paths</Small>
-      </label>
-      <label (click)="onSnapSelect('none')" class="btn btn-light btn-sm text-left radio-btns p-0 pl-2 rounded-0">
-        <input type="radio" name="snap-type" id="none" autocomplete="off"> <Small> Don't Follow</Small>
+      <label (click)="onMapTypeSelect('satellite')" class="btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+        <input type="radio" name="map-type" id="paths" autocomplete="off"> <Small>Satellite</Small>
       </label>
     </div>
+
+
+
+    <!-- Actions -->
+
+    <div *ngIf="callingPage!=='list'" class="w-100 p-1">
+      <div class="w-100 p-1 border-bottom">
+        Actions
+      </div>
+    </div>
+
+    <button
+      *ngIf="callingPage!=='list'"
+      (click)="map.undo()"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Undo</small>
+    </button>
+
+    <button
+      *ngIf="callingPage!=='list'"
+      (click)="map.clear()"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Clear</small>
+    </button>
+
+    <button
+      *ngIf="callingPage!=='list'"
+      (click)="map.closePath();"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Close Route</small>
+    </button>
+
+    <button
+      *ngIf="callingPage!=='list'"
+      (click)="map.reversePath()"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Reverse</small>
+    </button>
+
+    <button
+      *ngIf="callingPage!=='list'"
+      (click)="map.simplify()"
+      [disabled]="!isData"
+      type="button"
+      class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
+      <small>Simplify</small>
+    </button>
+
+
+
+    <!-- Snap Options -->
+
+    <div *ngIf="callingPage!=='list'" class="w-100">
+      <div class="w-100 p-1">
+        <div class="w-100 p-1 border-bottom">
+          Snap
+        </div>
+      </div>
+
+      <!-- <div class="w-100  -->
+
+      <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
+        <label (click)="onSnapSelect('driving')" class="btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+          <input type="radio" name="snap-type" id="roads" autocomplete="off"> <small>Follow Roads</small>
+        </label>
+        <label (click)="onSnapSelect('walking')" class="active btn btn-light btn-sm btn-sm radio-btns text-left p-0 pl-2 rounded-0">
+          <input type="radio" name="snap-type" id="paths" autocomplete="off" checked> <Small>Follow Paths</Small>
+        </label>
+        <label (click)="onSnapSelect('none')" class="btn btn-light btn-sm text-left radio-btns p-0 pl-2 rounded-0">
+          <input type="radio" name="snap-type" id="none" autocomplete="off"> <Small> Don't Follow</Small>
+        </label>
+      </div>
+    </div>
+
   </div>
 
 </div>
