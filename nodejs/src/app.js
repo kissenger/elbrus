@@ -144,12 +144,19 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
     } else {
       routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
     }
-    const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
+
+    let isPublic;
+
     if (req.body.pathId !== '0000') {
-      // we are saving an edited path, delete the old one
-      await mongoModel('route').deleteOne( {_id: req.body.pathId} );
-    }
-    res.status(201).json( {pathId: document._id} )
+      // we are saving an edited path, need to know isPublic, and to delete it
+      const oldPath = await mongoModel('route').findOne( {_id: req.body.pathId});
+      isPublic = oldPath.isPublic;
+      mongoModel('route').deleteOne( {_id: req.body.pathId} );
+    } 
+
+    // now save the new path
+    const newPath = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true, !!isPublic) );
+    res.status(201).json( {pathId: newPath._id} )
 
   } catch (error) {
 

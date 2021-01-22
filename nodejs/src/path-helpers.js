@@ -9,12 +9,12 @@ const Route = require('./path-class').Route;
 /**
  * Returns an object from the Path Class that can be delivered to Mongo
  */
-function getMongoObject(path, userId, userName, isSaved) {
+function getMongoObject(path, userId, userName, isSaved, isPublic) {
   const mongoObject = path.pathData;
   mongoObject.userId = userId,
   mongoObject.info.createdBy = userName
   mongoObject.isSaved = isSaved,
-  mongoObject.isPublic = false
+  mongoObject.isPublic = isPublic
   return mongoObject;
 }
 
