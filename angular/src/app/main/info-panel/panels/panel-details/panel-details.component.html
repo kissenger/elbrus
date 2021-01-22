@@ -77,7 +77,7 @@
 
         <div class="h6 my-0 py-0">{{geoJson.properties.info.name}}</div>
 
-        <div *ngIf="geoJson.properties.info.description" class="">
+        <div *ngIf="!!geoJson.properties.info.description" class="">
           <i>{{geoJson.properties.info.description}}</i>
         </div>
 
@@ -98,7 +98,7 @@
               <textarea
                 class='form-control'
                 placeholder='Give your route a description'
-                [(ngModel)]="geoJson.properties.info.description"
+                [(ngModel)]="pathDescription"
                 name="description">
               </textarea>
           </div>
