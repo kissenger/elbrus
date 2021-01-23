@@ -1,5 +1,5 @@
 import { AuthService } from './../../../shared/services/auth.service';
-import { TsPosition, TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
+import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
 /**
  * Listens for request from panel-list component, makes the backend request and uses
  * map-service to make the desired changes to the plot
@@ -10,11 +10,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
-import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AlertService } from 'src/app/shared/services/alert.service';
-import { TsLineStyle, TsPlotPathOptions } from 'src/app/shared/interfaces';
 import { LocationService } from 'src/app/shared/services/location.service';
+import { TsMarkers } from 'src/app/shared/classes/ts-markers';
 
 @Component({
   selector: 'app-routes',
@@ -27,11 +25,12 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private pathIdListener: Subscription;
   private httpListener: Subscription;
   private chartPointListener: Subscription;
-  public tsMap;
+  private tsMap: mapboxgl.Map; // map context
+  private markers = new TsMarkers();
 
   constructor(
     private data: DataService,
-    public map: MapService,
+    public map: MapService,  // map service
     private http: HttpService,
     private alert: AlertService,
     private location: LocationService,
@@ -56,27 +55,23 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
         this.data.setPath(path);
         this.data.set({startPath: true}); // tells panel-list that we are showing a shared path
-        await this.map.newMap(null, null, path.bbox );
+        this.tsMap = await this.map.newMap(null, null, path.bbox );
         this.map.add(path, {}, {plotType: 'active'});
 
       } else {
         this.alert.showAsElement('Error: Path not found', 'Couldn\'t find requested path, or not authorised', true, false)
           .subscribe( () => {});
-        await this.map.newMap();
+          this.tsMap = await this.map.newMap();
       }
 
     } else {
-      // must set the path even if there isnt one because panel-list is waiting for it
-      // this.data.setPath(null);
-      await this.map.newMap();
+
+      this.tsMap = await this.map.newMap();
 
     }
 
-
     // get device location
     this.location.watch(this.map);
-    this.map.addHomeMarker();
-
 
     // listen for coordinate from chart and plot on map
     this.map.addPointsLayer('pointHighlighter', {
@@ -162,6 +157,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     if (this.pathIdListener) { this.pathIdListener.unsubscribe(); }
     if (this.httpListener) { this.httpListener.unsubscribe(); }
     if (this.chartPointListener) { this.chartPointListener.unsubscribe(); }
+
   }
 
 }

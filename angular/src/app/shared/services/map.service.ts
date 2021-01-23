@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
 import { ActivePathLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
+import { TsMarkers } from '../classes/ts-markers';
 
 @Injectable({
   providedIn: 'root'
@@ -26,8 +27,7 @@ export class MapService {
   public tsMap: mapboxgl.Map;
   public mapDefaultType: TsMapType = 'terrain';
   public pathLayers: ActivePathLayers;
-  private marker: mapboxgl.Marker;
-  private homeMarker: mapboxgl.Marker;
+  public markers: TsMarkers;
   private padding = {
     wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
     narrowScreen: {top: 10, left: 10, bottom: 10, right: 10}
@@ -42,14 +42,18 @@ export class MapService {
     Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.mapboxToken);
   }
 
+  get context() {
+    return this.tsMap;
+  }
 
   newMap(startPosition?: TsCoordinate, startZoom?: number, boundingBox?: TsBoundingBox) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
-    return new Promise<Array<TsCoordinate> | void>( (resolve, reject) => {
+    return new Promise<mapboxgl.Map>( (resolve, reject) => {
 
       let mapCentre: TsCoordinate;
       let mapZoom: number;
+      this.markers = new TsMarkers();
 
       if ( startPosition ) {
         // if location is provided, use that (zoom not needed as map will resize when path is added)
@@ -74,6 +78,8 @@ export class MapService {
 
       }
 
+
+
       if (!mapboxgl.supported()) {
 
         alert('Your browser does not support Mapbox GL');
@@ -93,12 +99,6 @@ export class MapService {
 
         this.pathLayers = new ActivePathLayers();
 
-        // console.log(this.auth.getUser().homeLngLat);
-
-
-        // htmlElement.style.backgroundPositionY = 'bottom 25px';
-
-
         this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
         this.tsMap.on('moveend', () => {
@@ -108,10 +108,15 @@ export class MapService {
         });
 
         this.tsMap.on('load', () => {
-          // console.log('map finished loading');
+
+          // add home marker
+          if (this.auth.isRegisteredUser()) {
+            this.markers.add('home', 'home', this.auth.getUser().homeLngLat, this.tsMap);
+          }
+
           this.data.set({mapView: this.getMapView()});
           this.data.mapBoundsEmitter.emit(this.getMapBounds());
-          resolve();
+          resolve(this.tsMap);
         });
       }
 
@@ -119,26 +124,6 @@ export class MapService {
 
   }
 
-
-  public addHomeMarker() {
-
-    const htmlElement = document.createElement('div');
-    htmlElement.className = 'marker';
-    htmlElement.style.backgroundImage = 'url(assets/images/home-marker.svg)';
-    htmlElement.style.backgroundSize = 'cover';
-    htmlElement.style.width = '40px';
-    htmlElement.style.height = '80px';
-
-    this.homeMarker = new mapboxgl.Marker(htmlElement)
-      .setLngLat(this.auth.getUser().homeLngLat)
-      .addTo(this.tsMap);
-
-  }
-
-  public repositionHomeMarker(newPosition: TsCoordinate) {
-    this.homeMarker.setLngLat(newPosition);
-
-  }
 
   // Sets the basemap style to either 'terrain' or 'satellite'
   // Mapbox helpfully removes all layers when the style is applied, so this function gets the current layers and sources first and
@@ -202,15 +187,6 @@ export class MapService {
 
 
 
-  public plotMarker(location: TsCoordinate) {
-    if (this.marker) {
-      this.marker.remove();
-    }
-    this.marker = new mapboxgl.Marker()
-      .setLngLat(location)
-      .addTo(this.tsMap);
-  }
-
   public getMapView() {
     // Used by other services to determine what is being shown so, for example, same view can be established after map change
     return {centre: this.tsMap.getCenter(), zoom: this.tsMap.getZoom()};
@@ -256,10 +232,32 @@ export class MapService {
 
       this.pathLayers.add(pathId, bbox);
       this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
-      this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
+      // this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
+      if (plotOptions.plotType !== 'overlay') {
+        this.addStartEndMarkers(pathId, path.firstPoint, path.lastPoint);
+      }
 
     });
 
+  }
+
+  addStartEndMarkers(pathId: string, startPoint: TsPosition, endPoint: TsPosition) {
+    this.markers.add(pathId + 'start', 'start', startPoint, this.tsMap);
+    this.markers.add(pathId + 'finish', 'finish', endPoint, this.tsMap);
+  }
+
+  clearStartEndMarkers(pathId: string) {
+    this.markers.delete(pathId + 'start');
+    this.markers.delete(pathId + 'finish');
+  }
+
+  updateStartEndMarkers(pathId: string, startPoint: TsPosition, endPoint: TsPosition) {
+    this.markers.move(pathId + 'start', startPoint);
+    this.markers.move(pathId + 'finish', endPoint);
+  }
+
+  updateHomeMarker(newPosition: TsPosition | TsCoordinate) {
+    this.markers.move('home', newPosition);
   }
 
 
@@ -303,25 +301,25 @@ export class MapService {
   }
 
 
-  public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
+  // public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
 
-    data = data ? data : this.geoJsonPipe.transform([], 'Point');
+  //   data = data ? data : this.geoJsonPipe.transform([], 'Point');
 
-    this.tsMap.addSource(layerId, {type: 'geojson', data } );
-    this.tsMap.addLayer({
-      id: layerId,
-      type: 'symbol',
-      source: layerId,
-      layout: {
-        'symbol-placement': 'point',
-        'text-anchor': 'bottom-left',
-        'text-font': ['Open Sans Regular'],
-        'text-field': '{title}',
-        'text-size': 18
-      }
-    });
+  //   this.tsMap.addSource(layerId, {type: 'geojson', data } );
+  //   this.tsMap.addLayer({
+  //     id: layerId,
+  //     type: 'symbol',
+  //     source: layerId,
+  //     layout: {
+  //       'symbol-placement': 'point',
+  //       'text-anchor': 'bottom-left',
+  //       'text-font': ['Open Sans Regular'],
+  //       'text-field': '{title}',
+  //       'text-size': 18
+  //     }
+  //   });
 
-  }
+  // }
 
   // public showPoint()
 
@@ -329,7 +327,7 @@ export class MapService {
   public remove(pathId: string) {
 
       this.removeLayer(pathId, 'line');
-      this.removeLayer(pathId, 'sym');
+      // this.removeLayer(pathId, 'sym');
       this.removeLayer(pathId, 'pts');
 
       this.pathLayers.remove( pathId );
@@ -353,7 +351,10 @@ export class MapService {
 
     // remove each active layer
     if ( this.pathLayers ) {
-      this.pathLayers.get.forEach( layer => { this.remove(layer.pathId); });
+      this.pathLayers.get.forEach( layer => {
+        this.remove(layer.pathId);
+        this.clearStartEndMarkers(layer.pathId);
+      });
     }
 
     this.pathLayers.clear();

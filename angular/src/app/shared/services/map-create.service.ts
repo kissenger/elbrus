@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MapService } from './map.service';
 import { HttpService } from './http.service';
 import { DataService } from './data.service';
-import { TsLineStyle, TsPosition, TsFeatureCollection, TsSnapType } from 'src/app/shared/interfaces';
+import { TsLineStyle, TsPosition, TsFeatureCollection, TsSnapType, TsCoordinate } from 'src/app/shared/interfaces';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared/classes/path-history';
@@ -10,6 +10,7 @@ import { AlertService } from './alert.service';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import * as mapboxgl from 'mapbox-gl';
+import { TsMarkers } from '../classes/ts-markers';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,8 @@ export class MapCreateService extends MapService {
   private points: TsFeatureCollection;
   private symbols: TsFeatureCollection;
 
+
+
   constructor(
     http: HttpService,
     data: DataService,
@@ -49,6 +52,7 @@ export class MapCreateService extends MapService {
 
     this.pathToEdit = this.data.getPath();
     this.history = this.pathToEdit ? new PathHistory( new Path( this.pathToEdit ) ) : new PathHistory();
+    this.markers = new TsMarkers();
 
     this.initialiseCreateMap(this.styleOptions);
     this.updateMap();
@@ -68,7 +72,7 @@ export class MapCreateService extends MapService {
     // save the current line, points and symbols because...
     this.line = this.history.geojsonClone;
     this.points = this.history.activePoints;
-    this.symbols = this.history.startEndPoints;
+    // this.symbols = this.history.startEndPoints;
 
     this.updateMapSource();
 
@@ -79,7 +83,24 @@ export class MapCreateService extends MapService {
   updateMapSource() {
     (this.tsMap.getSource('0000line') as mapboxgl.GeoJSONSource).setData(this.line);
     (this.tsMap.getSource('0000pts') as mapboxgl.GeoJSONSource).setData(this.points);
-    (this.tsMap.getSource('0000sym') as mapboxgl.GeoJSONSource).setData(this.symbols);
+
+    // manage markers :(
+    if (this.markers.exists('0000start')) {
+      if (this.history.lastPath?.firstPoint) {
+        this.markers.move('0000start', this.history.lastPath.firstPoint);
+      }
+    } else {
+      if (this.history.firstPoint) {
+        this.markers.add('0000start', 'start', this.history.firstPoint, this.tsMap);
+      }
+    }
+
+    if (this.markers.exists('0000finish')) {
+      this.markers.move('0000finish', this.history.lastPath.lastPoint );
+    } else if (this.history.lastPath?.lastPoint) {
+      this.markers.add('0000finish', 'finish', this.history.lastPath.lastPoint, this.tsMap);
+    }
+
   }
 
 
@@ -227,7 +248,7 @@ export class MapCreateService extends MapService {
           ]
       });
 
-    this.addSymbolLayer('0000sym');
+    // this.addSymbolLayer('0000sym');
 
     this.tsMap.on('click', this.onClickGetCoords);
     this.tsMap.on('mousedown', '0000pts', this.onMouseDown);

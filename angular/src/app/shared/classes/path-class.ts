@@ -120,11 +120,15 @@ export class Path {
   }
 
 
-  get startEndPoints() {
+  // get startEndPoints() {
 
-    return this.geoJsonPipe.transform(
-      [this.firstPoint, this.lastPoint], 'Point', [{title: 'start'}, {title: 'end'}]
-    );
-  }
+  //   return this.geoJsonPipe.transform(
+  //     [this.firstPoint, this.lastPoint], 'Point', [{title: 'start'}, {title: 'end'}]
+  //   );
+  // }
+
+  // get startEndPoints() {
+  //   return [this.firstPoint, this.lastPoint];
+  // }
 
 }

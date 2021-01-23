@@ -1,10 +1,11 @@
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../shared/services/auth.service';
-import { TsCoordinate, TsUser } from '../../shared/interfaces';
+import { TsCoordinate } from '../../shared/interfaces';
 import { Router } from '@angular/router';
 import { DataService } from '../../shared/services/data.service';
 import { Component, OnInit, OnDestroy} from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
+import { TsMarkers } from 'src/app/shared/classes/ts-markers';
 
 @Component({
   selector: 'app-map-select-location',
@@ -14,9 +15,9 @@ import { MapService } from 'src/app/shared/services/map.service';
 
 export class MapSelectLocationComponent implements OnInit, OnDestroy {
 
-  private user: TsUser;
   private newLocationListener: Subscription;
-  public location: TsCoordinate;
+  public home: TsCoordinate;
+  private markers = new TsMarkers();
 
   constructor(
     private map: MapService,
@@ -27,21 +28,20 @@ export class MapSelectLocationComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
 
-    this.user = this.auth.getUser();
-    this.location = this.user.homeLngLat;
-    await this.map.newMap(this.location);
-    this.map.addHomeMarker();
+    this.home = this.auth.getUser().homeLngLat;
+    await this.map.newMap(this.home);
+
+    this.newLocationListener = this.data.clickedCoordsEmitter.subscribe( (newHome: TsCoordinate) => {
+      this.home = newHome;
+      this.map.updateHomeMarker(newHome);
+    });
 
     this.map.getLocationOnClick();
-    this.newLocationListener = this.data.clickedCoordsEmitter.subscribe( (loc: TsCoordinate) => {
-      this.location = loc;
-      this.map.repositionHomeMarker(this.location);
-    });
 
   }
 
   onOK () {
-    this.data.set({newLocation: this.location});
+    this.data.set({newLocation: this.home});
     this.router.navigate(['profile']);
   }
 

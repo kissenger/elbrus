@@ -44,7 +44,6 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
     // initialise the map and launch create route
     await this.map.newMap();
-    this.map.addHomeMarker();
     this.map.createRoute();
     this.location.watch(this.map);
 
