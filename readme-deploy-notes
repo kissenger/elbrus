@@ -68,6 +68,8 @@ Deployment
 ----------
 git fetch --all
 git reset --hard origin/master
+cp env/environments angular/src
+cp env/.env nodejs
 sudo docker-compose down
 sudo docker system prune -a
 sudo docker-compose up --build --detach
@@ -76,6 +78,8 @@ sudo docker-compose up --build --detach
 *******
 STORAGE 
 *******
+
+If machine gets restarted for any reason, mounted drives will be lost and need remounting.
 
 Mounting a persistent disk to VM
 --------------------------------
