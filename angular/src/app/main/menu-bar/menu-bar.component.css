@@ -1,42 +1,77 @@
 
 
 /* menu bar formatting needed to located the containerin the right place */
-.menu-container {
-  top: 10px;
+.menu-container-outer {
+  top: 0px;
+  bottom: 0px;
   left: 0px;
-  font-size: small;
-  opacity: 1.0;
-  width: 100px;
-  background-color: white;
-  box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
-  cursor: default;
+  right: 0px;
+  /* border: 1px red dashed; */
+  /* pointer-events: none; */
 }
 
-.collapse-btn {
+.menu-container-inner {
+  width: 200px;
+  background-color: white;
+  /* border: 1px blue dotted; */
+  pointer-events: all;
+  border-radius: 5px;
+
+}
+
+.menu-item {
+  width: 100%;
+  color: black;
+  text-align: center;
+  pointer-events: all;
+}
+
+.menu-item-disabled {
+  color: grey;
+  pointer-events: none;
+}
+
+
+.icons-container {
+  top: 0px;
+  left: 0px;
+  height: 40px;
+  width: 40px;
+}
+
+
+img {
+  border: 1px solid var(--ts-brown);
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+
+}
+
+.hidden-view {
+  display: none;
+  pointer-events: none;
+}
+
+
+/* .collapse-btn {
   pointer-events: auto;
   background-color: var(--ts-grey-background);
   cursor: pointer;
   vertical-align: middle;
   font-size: smaller;
   color: rgb(110, 110, 110);
-}
+} */
 
 /* remove hover effect on small screens */
-@media only screen and (min-width: 900px) {
+/* @media only screen and (min-width: 900px) {
   .collapse-btn:hover {
     cursor: pointer;
     background: white;
   }
-}
+} */
 
-.hidden-view {
-  display: none;
-  pointer-events: none;
-  /* below is apparently better for 'screen readers' ...
-  position: absolute !important;
-  top: 50px !important;
-  left: -50px !important; */
-}
+
 
 /* .collapse-btn {
   top: 10px;

@@ -1,20 +1,53 @@
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css"> -->
 
-<!-- <div class="collapse-btn border position-absolute text-center">
-    -
-</div> -->
+<div class="icons-container position-absolute m-1">
+
+  <img src="assets/images/icon-menu-map.svg" (click)="onMapIconClick()" height="40" class="m-1 p-0">
+
+  <img src="assets/images/icon-menu-create.svg" height="40" class="m-1 p-0">
+</div>
+
+<div class="">
+
+</div>
 
 
-<div class="menu-container position-absolute border">
+<div [ngClass]="showMapMenu ? 'menu-container-outer position-absolute d-flex' : 'hidden-view'" (click)="onMapIconClick()">
 
-  <!-- <div class="collapse-btn w-100 text-center border"> -->
+  <div class="d-flex flex-wrap menu-container-inner mx-auto my-auto px-3 pt-3 pb-3 border">
+
+    <div class="w-100 text-center h5 mb-3">Map Options</div>
+
+    <div [ngClass]="!isData ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top" (click)="map.fitViewOne()">
+      Fit active path
+    </div>
+
+    <div [ngClass]="!isData ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top" (click)="map.fitViewAll()">
+      Fit all paths
+    </div>
+
+    <div class="menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
+      Go to home
+    </div>
+
+    <div [ngClass]="!position ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
+      Go to current position
+    </div>
+
+
+  </div>
+
+</div>
+
+<!-- <div class="menu-container position-absolute border">
+
     <div  (click)="onMinimiseClick()" class="collapse-btn text-center m-0 p-0">
       <span [ngClass]="isMinimised ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" class="m-0 p-0"> Menu</span>
-    <!-- </div> -->
+
   </div>
 
 
-  <div [ngClass]="isMinimised ? 'hidden-view' : 'btn-group-vertical w-100 pb-1'" class="">
+  <div [ngClass]="isMinimised ? 'hidden-view' : 'btn-group-vertical w-100 pb-1'" class=""> -->
 
     <!-- Collapse -->
 
@@ -23,7 +56,7 @@
 
     <!-- VIEW -->
 
-    <div class="w-100 px-1 pt-0 pb-1 border-top">
+    <!-- <div class="w-100 px-1 pt-0 pb-1 border-top">
       <div class="w-100 p-1 border-bottom">
         Views
       </div>
@@ -58,12 +91,12 @@
       type="button"
       class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
       <small>Current location</small>
-    </button>
+    </button> -->
 
 
     <!-- MAP TYPE -->
 
-    <div class="w-100 p-1">
+    <!-- <div class="w-100 p-1">
       <div class="w-100 p-1 border-bottom">
         Map Type
       </div>
@@ -77,11 +110,11 @@
         <input type="radio" name="map-type" id="paths" autocomplete="off"> <Small>Satellite</Small>
       </label>
     </div>
-
+ -->
 
 
     <!-- Actions -->
-
+<!--
     <div *ngIf="callingPage!=='list'" class="w-100 p-1">
       <div class="w-100 p-1 border-bottom">
         Actions
@@ -132,11 +165,11 @@
       class="btn btn-light btn-sm p-0 pl-2 text-left rounded-0">
       <small>Simplify</small>
     </button>
-
+ -->
 
 
     <!-- Snap Options -->
-
+<!--
     <div *ngIf="callingPage!=='list'" class="w-100">
       <div class="w-100 p-1">
         <div class="w-100 p-1 border-bottom">
@@ -144,7 +177,6 @@
         </div>
       </div>
 
-      <!-- <div class="w-100  -->
 
       <div class="btn-group-vertical btn-group-toggle w-100 pb-1" data-toggle="buttons">
         <label (click)="onSnapSelect('driving')" class="btn btn-light btn-sm radio-btns text-left p-0 pl-2 rounded-0">
@@ -159,6 +191,6 @@
       </div>
     </div>
 
-  </div>
+  </div> -->
 
-</div>
+<!-- </div> -->

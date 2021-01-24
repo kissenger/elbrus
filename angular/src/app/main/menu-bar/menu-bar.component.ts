@@ -23,6 +23,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   public position: TsPosition;
   public homeLngLat: TsCoordinate;
   public isMinimised = false;
+  public showMapMenu = false;
 
   constructor(
     private data: DataService,
@@ -49,6 +50,12 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     });
 
   }
+
+  onMapIconClick() {
+    this.showMapMenu = !this.showMapMenu;
+  }
+
+
 
   onMapTypeSelect(type: TsMapType) {
     this.map.setType(type);
