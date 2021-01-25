@@ -3,6 +3,14 @@
      see - https://stackoverflow.com/questions/33636796/chrome-safari-not-filling-100-height-of-flex-parent
 */
 
+/* VARIABLES */
+div{
+  --draggable-width: 275px;
+  --border-radius: 5px;
+  /* --bottom-margin: 30px; */
+}
+
+
 .map-div {
   /* border: 1px red solid; */
   position: absolute;
@@ -11,3 +19,66 @@
   left: 0px;
   right: 0px;
 }
+
+.small-screen-panel-container {
+  /* transition: height 0.5s; */
+  /* transition: transform 0.5s; */
+  position: absolute;
+  top: 0px;
+  width: var(--draggable-width);
+  left: calc((100vw - var(--draggable-width)) / 2);
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+
+  /* left: 20px;
+  right: 20px; */
+  /* border: 1px red solid; */
+}
+
+/* .small-screen-panel-container-opened {
+  transition: height 0.5s;
+  height: 80%;
+} */
+
+.inner-container {
+  transition: height 0.75s;
+  height: 0px;
+
+  background-color: white;
+  border-left: 1px var(--ts-green) solid;
+  border-right: 1px var(--ts-green) solid;
+  /* border-bottom: 1px var(--ts-green) solid; */
+
+}
+
+.inner-container-opened {
+  transition: height 0.75s;
+  /* transition: transform 0.5s; */
+  /* transform: translateY(400px); */
+  height: calc(100vh - 150px);
+  border-bottom: 1px var(--ts-green) solid;
+
+}
+
+
+.drag-selector-bar {
+  height: 30px;
+  width: 100%;
+  background-color: white;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom: 1px var(--ts-green) solid;
+  border-left: 1px var(--ts-green) solid;
+  border-right: 1px var(--ts-green) solid;
+}
+
+.drag-selector {
+  width: 50px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--ts-green);
+  /* border: 1px grey solid; */
+}
+
+

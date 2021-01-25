@@ -2,4 +2,19 @@
 <div class="map-div" id="map"></div>
 
 <app-menu-bar callingPage="list" [map]="map"></app-menu-bar>
-<app-info-panel callingPage="list"></app-info-panel>
+<!-- <app-info-panel callingPage="list"></app-info-panel> -->
+
+<!-- <div class="full-width-panel-container d-flex"> -->
+<div class="small-screen-panel-container">
+  <div [ngClass]="isDraggableOpen ? 'inner-container-opened' : ''" class="inner-container overflow-hidden">
+
+    <app-info-panel callingPage="list"></app-info-panel>
+
+  </div>
+
+  <div class="drag-selector-bar d-flex" (click)="onDraggableClick()">
+    <div class="drag-selector my-auto mx-auto">
+    </div>
+  </div>
+
+</div>

@@ -1,29 +1,22 @@
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 
-<div class="outer-container position-absolute">
+<!-- <div class="outer-container position-absolute"> -->
 
-  <div [ngClass]="isMinimised ? '' : 'h-100'" class="inner-container position-absolute border d-flex flex-column">
-
-
-    <!-- MINIMISE BUTTON -->
-    <div  (click)="onMinimiseClick()" class="collapse-btn text-center m-0 p-0">
-      <span [ngClass]="isMinimised ? 'fas fa-chevron-down' : 'fas fa-chevron-up'" class="m-0 p-0"> Console</span>
-    </div>
-
+<div class="h-100">
 
     <!-- MINIMISED VIEW -->
     <!-- TODO: Is there a better way to do this than to reuse the entire details panel? -->
-    <div [ngClass]="isMinimised ? '' : 'hidden-view'" class="bg-white">
+    <!-- <div [ngClass]="isMinimised ? '' : 'hidden-view'" class="bg-white">
       <app-panel-details callingPage="{{callingPage}}"></app-panel-details>
     </div>
-
+ -->
 
     <!-- MAXIMISED VIEW -->
     <!-- <div [ngClass]="isMinimised ? 'hidden-view' : ''" class="w-100 d-flex flex-column flex-grow-1"> -->
-    <div [ngClass]="isMinimised ? 'hidden-view' : 'd-flex flex-column flex-grow-1'" class="">
+    <!-- <div [ngClass]="isMinimised ? 'hidden-view' : 'd-flex flex-column flex-grow-1'" class=""> -->
 
-      <div class="border-fix position-absolute border-left border-right"></div>
+      <!-- <div class="border-fix border-left border-right"></div> -->
 
       <!-- TABS -->
       <!-- Define the tabs using ngfor to loop through the active array, as set by the .ts -->
@@ -39,15 +32,15 @@
       <!-- TAB CONTENT -->
       <!-- Inject panels depending on the type of page -->
       <div #div *ngFor="let tab of tabsArray" [ngClass]="getTabsClass(tab)" id={{tab.name}}
-        role="tabpanel" class="w-100 flex-grow-1 tab-panel bg-white position-relative">
+        role="tabpanel" class="h-100 w-100 flex-grow-1 tab-panel bg-white position-relative">
         <div class="position-absolute content-inner">
           <app-panels-injector  #injector tabName={{tab.name}} callingPage={{callingPage}}></app-panels-injector>
         </div>
       </div>
 
-    </div>
-
-
+    <!-- </div> -->
 
   </div>
-</div>
+
+  <!-- </div> -->
+<!-- </div> -->

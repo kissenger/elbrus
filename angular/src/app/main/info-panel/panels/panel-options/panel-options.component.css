@@ -10,3 +10,15 @@
   cursor: default
 }
 
+.ts-menu-item {
+  width: 100%;
+  color: black;
+  text-align: center;
+  pointer-events: all;
+}
+
+.ts-menu-item-disabled {
+  color: grey;
+  pointer-events: none;
+}
+

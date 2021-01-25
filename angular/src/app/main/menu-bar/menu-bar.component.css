@@ -15,7 +15,10 @@
   background-color: white;
   /* border: 1px blue dotted; */
   pointer-events: all;
-  border-radius: 5px;
+  border-radius: 10px;
+  border: 1px var(--ts-green) solid;
+
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
 
 }
 
@@ -33,7 +36,7 @@
 
 
 .icons-container {
-  top: 0px;
+  top: 20px;
   left: 0px;
   height: 40px;
   width: 40px;
@@ -41,7 +44,7 @@
 
 
 img {
-  border: 1px solid var(--ts-brown);
+  border: 1px solid var(--ts-green);
   border-radius: 5px;
   background-color: white;
   box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
@@ -90,7 +93,7 @@ img {
     opacity: 1.0;
   }
 } */
-
+/*
 .menu-bar:hover {
   opacity: 1.0;
 }
@@ -110,7 +113,6 @@ img {
 
 .radio-btns  {
   border-radius: none;
-  /* cursor: pointer; */
 }
 
 .radio-btns:hover  {
@@ -121,10 +123,9 @@ img {
 }
 
 
-/* Remove border effect from bootstrap btn */
 .btn-light:focus, .btn-light.focus {
   box-shadow: none;
 }
 
-
+ */
 

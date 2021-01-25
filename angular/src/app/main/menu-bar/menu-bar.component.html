@@ -13,10 +13,8 @@
 
 
 <div [ngClass]="showMapMenu ? 'menu-container-outer position-absolute d-flex' : 'hidden-view'" (click)="onMapIconClick()">
-
-  <div class="d-flex flex-wrap menu-container-inner mx-auto my-auto px-3 pt-3 pb-3 border">
-
-    <div class="w-100 text-center h5 mb-3">Map Options</div>
+  <div class="d-flex flex-wrap menu-container-inner mx-auto my-auto px-3 pt-2 pb-3">
+    <div class="w-100 text-center h6 mb-3">Map Options</div>
 
     <div [ngClass]="!isData ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top" (click)="map.fitViewOne()">
       Fit active path

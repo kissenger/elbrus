@@ -28,6 +28,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private tsMap: mapboxgl.Map; // map context
   private markers = new TsMarkers();
 
+  public isDraggableOpen = false;
+
   constructor(
     private data: DataService,
     public map: MapService,  // map service
@@ -110,21 +112,9 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
   }
 
-  // getPosition(): Promise<any> {
-
-  //   return new Promise((resolve, reject) => {
-
-  //     navigator.geolocation.getCurrentPosition(resp => {
-
-  //         resolve(<TsCoordinate>{lng: resp.coords.longitude, lat: resp.coords.latitude});
-  //       },
-  //       err => {
-  //         reject(err);
-  //       });
-  //   });
-
-  // }
-
+  onDraggableClick() {
+    this.isDraggableOpen = !this.isDraggableOpen;
+  }
 
 
   /** get a path id from the backend */

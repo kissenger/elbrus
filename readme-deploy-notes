@@ -93,3 +93,10 @@ Copying ASTGTM files from Google Cloud Storage to VM Storage
 -----------------------------------------------------------
 go to destination and type (from https://cloud.google.com/storage/docs/gsutil/commands/cp):
 sudo gsutil cp -r gs://trailscape-geotiffs .
+
+
+***********************************
+VIEW CONTENTS OF A DOCKER CONTAINER
+***********************************
+sudo docker ps -a (to get container id)
+sudo docker exec -it {docker container id} sh
