@@ -26,6 +26,8 @@ import { WelcomeComponent } from './secondary/welcome/welcome.component';
 import { LoginComponent } from './secondary/login/login.component';
 import { MapSelectLocationComponent } from './secondary/map-select-location/map-select-location.component';
 import { ProfileComponent } from './secondary/profile/profile.component';
+import { DisplayMobileComponent } from './main/display-mobile/display-mobile.component';
+import { DisplayDesktopComponent } from './main/display-desktop/display-desktop.component';
 
 // Services
 import { HttpService } from './shared/services/http.service';
@@ -38,6 +40,7 @@ import { TokenInterceptorService } from './shared/services/token-interceptor.ser
 import { LocationService } from './shared/services/location.service';
 import { AuthGuard } from './auth.guard';
 import { ErrorService } from './shared/services/error.service';
+import { ScreenSizeService } from './shared/services/screen-size.service';
 
 // Pipes
 import { UnitsStringPipe } from './shared/pipes/units-string.pipe';
@@ -77,7 +80,9 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     LoginComponent,
     WelcomeComponent,
     ProfileComponent,
-    MapSelectLocationComponent
+    MapSelectLocationComponent,
+    DisplayMobileComponent,
+    DisplayDesktopComponent
   ],
   imports: [
     BrowserModule,
@@ -95,6 +100,7 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     SpinnerService,
     AuthService,
     LocationService,
+    ScreenSizeService,
     AuthGuard,
     GeoJsonPipe,
     NamePipe,

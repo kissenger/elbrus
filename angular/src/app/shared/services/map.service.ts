@@ -177,7 +177,7 @@ export class MapService {
     bbox = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
 
     const options = {
-      padding: window.screen.width < globals.narrowScreenThreshold ? this.padding.narrowScreen : this.padding.wideScreen,
+      padding: this.padding.wideScreen,
       linear: true
     };
 

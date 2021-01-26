@@ -1,3 +1,4 @@
+import { ScreenSizeService } from './shared/services/screen-size.service';
 import { Component, Injector, OnInit } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { AlertBoxComponent } from 'src/app/shared/components/alert-box/alert-box.component';
@@ -12,7 +13,8 @@ export class AppComponent implements OnInit {
   title = 'cotopaxi';
 
   constructor(
-    injector: Injector
+    injector: Injector,
+    private screenSize: ScreenSizeService
   ) {
 
     //  // See angular custom elements example: https://angular.io/guide/elements

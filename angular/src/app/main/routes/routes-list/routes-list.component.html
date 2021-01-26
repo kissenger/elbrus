@@ -1,11 +1,17 @@
 
 <div class="map-div" id="map"></div>
 
-<app-menu-bar callingPage="list" [map]="map"></app-menu-bar>
+<app-display-mobile *ngIf="windowWidth < BREAKPOINT" callingPage="list"></app-display-mobile>
+<app-display-desktop *ngIf="windowWidth >= BREAKPOINT" callingPage="list"></app-display-desktop>
+
+
+<!-- <app-menu-bar callingPage="list" [map]="map"></app-menu-bar> -->
+
+
 <!-- <app-info-panel callingPage="list"></app-info-panel> -->
 
 <!-- <div class="full-width-panel-container d-flex"> -->
-<div class="small-screen-panel-container">
+<!-- <div class="small-screen-panel-container">
   <div [ngClass]="isDraggableOpen ? 'inner-container-opened' : ''" class="inner-container overflow-hidden">
 
     <app-info-panel callingPage="list"></app-info-panel>
@@ -17,4 +23,4 @@
     </div>
   </div>
 
-</div>
+</div> -->

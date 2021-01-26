@@ -32,10 +32,10 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
     this.tabsArray = this.infoPanel.getTabs(this.callingPage);
 
     // if on narrow screen, minimise panel
-    if (window.screen.width < globals.narrowScreenThreshold) {
-      this.isMinimised = true;
-      this.data.minimisePanelEmitter.emit(true);
-    }
+    // if (window.screen.width < globals.narrowScreenThreshold) {
+    //   this.isMinimised = true;
+    //   this.data.minimisePanelEmitter.emit(true);
+    // }
 
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
 

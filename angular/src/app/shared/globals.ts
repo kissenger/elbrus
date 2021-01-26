@@ -6,8 +6,15 @@ export const M_TO_FT = 3.28084;
 export const EXPORT_FILE_SIZE_LIMIT = 100000;
 export const LONG_PATH_THRESHOLD = 1000;
 
-// define the screen width below which we need to adapt
-export const narrowScreenThreshold = 500;
+// bootstrap responsive breakpoints
+// https://getbootstrap.com/docs/5.0/layout/breakpoints/
+export const BREAKPOINTS = {
+  SM: 576,
+  MD: 768,
+  LG: 992,
+  XL: 1200,
+  XXL: 1400
+};
 
 // lineStyles are defined here and on geoJSON - when specified locally they will override the geoJSON lineStyle
 // export const overlayLineStyle = {lineWidth: 2, lineColour: 'blue', lineOpacity: 0.3};

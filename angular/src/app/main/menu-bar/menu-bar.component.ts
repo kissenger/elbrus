@@ -35,9 +35,9 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     this.homeLngLat = this.auth.getUser().homeLngLat;
 
     // if on narrow screen, minimise panel
-    if (window.screen.width < globals.narrowScreenThreshold) {
-      this.isMinimised = true;
-    }
+    // if (window.screen.width < globals.narrowScreenThreshold) {
+    //   this.isMinimised = true;
+    // }
 
     // listen for when data is set to be able to enable the view buttons
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {

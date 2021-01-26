@@ -1,3 +1,4 @@
+import { ScreenSizeService } from './../../../shared/services/screen-size.service';
 import { AuthService } from './../../../shared/services/auth.service';
 import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
 /**
@@ -6,13 +7,14 @@ import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
  */
 
 import { HttpService } from './../../../shared/services/http.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import { LocationService } from 'src/app/shared/services/location.service';
 import { TsMarkers } from 'src/app/shared/classes/ts-markers';
+import * as globals from 'src/app/shared/globals';
 
 @Component({
   selector: 'app-routes',
@@ -25,10 +27,11 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private pathIdListener: Subscription;
   private httpListener: Subscription;
   private chartPointListener: Subscription;
-  private tsMap: mapboxgl.Map; // map context
-  private markers = new TsMarkers();
-
+  private tsMap: mapboxgl.Map;        // needed, dont delete
+  private markers = new TsMarkers();  // needed, dont delete
+  public windowWidth: number;
   public isDraggableOpen = false;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
     private data: DataService,
@@ -36,11 +39,18 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private alert: AlertService,
     private location: LocationService,
-    private auth: AuthService
-    ) { }
+    private auth: AuthService,
+    private screenSize: ScreenSizeService
+    ) {
+     }
 
 
   async ngOnInit() {
+
+    this.windowWidth = this.screenSize.width;
+    this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+      this.windowWidth = newWidth.width;
+    });
 
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.map.isMap()) { this.map.kill(); }
