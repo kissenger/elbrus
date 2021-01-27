@@ -1,4 +1,5 @@
 
 <div class="map-div" id="map"></div>
 
-<app-info-panel callingPage="review"></app-info-panel>
+<app-display-mobile *ngIf="windowWidth < BREAKPOINT" callingPage="list" [map]="map"></app-display-mobile>
+<app-display-desktop *ngIf="windowWidth >= BREAKPOINT" callingPage="list" [map]="map"></app-display-desktop>

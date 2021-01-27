@@ -19,15 +19,22 @@ export class ScreenSizeService {
   }
 
   public resize = new Observable((observer) => {
-    window.addEventListener('resize', (event) => {
+    window.addEventListener('resize', () => {
       observer.next({
         width: window.innerWidth,
         height: window.innerHeight
       });
     });
 
+    // bit wierd, but cant see a way to do it without repetition
     return {
       unsubscribe() {
+        window.removeEventListener('resize', () => {
+          observer.next({
+            width: window.innerWidth,
+            height: window.innerHeight
+          });
+        });
       }
     };
 

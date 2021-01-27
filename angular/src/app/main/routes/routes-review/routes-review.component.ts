@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
+import * as globals from 'src/app/shared/globals';
+import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
 
 @Component({
   selector: 'app-routes-review',
@@ -11,11 +13,20 @@ import { Router } from '@angular/router';
 })
 export class RoutesReviewComponent implements OnInit {
 
+  public windowWidth: number;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
+
   constructor(
-    private map: MapService,
+    public map: MapService,
     private data: DataService,
     private router: Router,
-  ) { }
+    private screenSize: ScreenSizeService
+  ) {
+    this.windowWidth = this.screenSize.width;
+    this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+      this.windowWidth = newWidth.width;
+    });
+  }
 
   ngOnInit() {
 

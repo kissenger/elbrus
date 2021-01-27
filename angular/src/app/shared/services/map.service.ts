@@ -101,10 +101,12 @@ export class MapService {
 
         this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
-        this.tsMap.on('moveend', () => {
-          // console.log('map finished moving');
-          this.data.set({mapView: this.getMapView()});
-          this.data.mapBoundsEmitter.emit(this.getMapBounds());
+        this.tsMap.on('moveend', (event) => {
+          // conditional ensures we dont update list if the screensize changes, thereby minimising calls to the backend
+          if (event.originalEvent.type === 'mouseup') {
+              this.data.set({mapView: this.getMapView()});
+              this.data.mapBoundsEmitter.emit(this.getMapBounds());
+            }
         });
 
         this.tsMap.on('load', () => {

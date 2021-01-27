@@ -1,5 +1,87 @@
-div {
-  position: absolute;
-  background:white;
-  top: 0px;
+
+/* this is needed for safari - h-100 will not work as parent is a flex element without explcit set height
+     see - https://stackoverflow.com/questions/33636796/chrome-safari-not-filling-100-height-of-flex-parent
+*/
+
+/* VARIABLES */
+div{
+  --menu-width: 275px;
+  --border-radius: 5px;
+  /* --bottom-margin: 30px; */
 }
+
+
+.outer-container {
+  /* transition: height 0.5s; */
+  /* transition: transform 0.5s; */
+  transition: background-color 0.75s;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  width: 100%;
+  cursor: auto;
+  pointer-events: none;
+  /* background-color: none; */
+}
+
+.outer-container-opened {
+  transition: background-color 0.75s;
+  cursor: default;
+  /* background-color: rgba(255,255,255,0.2); */
+  background-color: rgba(0,0,0,0.4);
+  pointer-events: all;
+}
+
+
+.inner-container {
+  transition: height 0.75s;
+  height: 0px;
+  width: var(--menu-width);
+  /* left: calc((100vw - var(--menu-width)) / 2); */
+
+  background-color: white;
+  border-left: 1px var(--ts-green) solid;
+  border-right: 1px var(--ts-green) solid;
+  /* border-bottom: 1px var(--ts-green) solid; */
+
+}
+
+.inner-container-opened {
+  transition: height 0.75s;
+  /* transition: transform 0.5s; */
+  /* transform: translateY(400px); */
+  height: calc(100vh - 150px);
+  border-bottom: 1px var(--ts-green) solid;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+
+
+}
+
+
+.toggle-bar {
+  height: 30px;
+  width: var(--menu-width);
+  background-color: white;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  border-bottom: 1px var(--ts-green) solid;
+  border-left: 1px var(--ts-green) solid;
+  border-right: 1px var(--ts-green) solid;
+  pointer-events: all;
+
+  cursor: pointer;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+
+}
+
+.toggle {
+  width: 50px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--ts-green);
+  /* border: 1px grey solid; */
+}
+
+

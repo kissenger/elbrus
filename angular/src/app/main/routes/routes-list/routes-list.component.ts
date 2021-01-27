@@ -6,8 +6,8 @@ import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
  * map-service to make the desired changes to the plot
  */
 
-import { HttpService } from './../../../shared/services/http.service';
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpService } from 'src/app/shared/services/http.service';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
@@ -30,7 +30,6 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private tsMap: mapboxgl.Map;        // needed, dont delete
   private markers = new TsMarkers();  // needed, dont delete
   public windowWidth: number;
-  public isDraggableOpen = false;
   public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
@@ -42,15 +41,13 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     private screenSize: ScreenSizeService
     ) {
+      this.windowWidth = this.screenSize.width;
+      this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+        this.windowWidth = newWidth.width;
+      });
      }
 
-
   async ngOnInit() {
-
-    this.windowWidth = this.screenSize.width;
-    this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
-      this.windowWidth = newWidth.width;
-    });
 
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.map.isMap()) { this.map.kill(); }
@@ -121,11 +118,6 @@ export class RoutesListComponent implements OnInit, OnDestroy {
         }
     });
   }
-
-  onDraggableClick() {
-    this.isDraggableOpen = !this.isDraggableOpen;
-  }
-
 
   /** get a path id from the backend */
   getPath(pathId: string) {

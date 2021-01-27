@@ -18,79 +18,67 @@
       -->
 
 
-
-
-
     <div class="w-100 text-center h6 mb-3 mt-3">New Routes</div>
 
-    <div [ngClass]="!auth.isRegisteredUser() ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top" (click)="onImportGpxClick()">
+    <div [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="onImportGpxClick()">
       Import .gpx file
     </div>
 
-    <div class="menu-item p-1 border-top border-bottom mb-3" (click)="onCreateClick()">
+    <div class="ts-menu-item p-1 border-top border-bottom mb-3" (click)="onCreateClick()">
       Create a new route
     </div>
 
 
+    <div *ngIf="!!pathId" class="border-bottom">
 
-    <div class="w-100 text-center h6 mb-3 mt-3 pt-3">Route Options</div>
+      <div class="w-100 text-center h6 mb-3 mt-3 pt-3">Route Options</div>
 
-    <div *ngIf="auth.isRegisteredUser() && (!isPathPublic || createdBy === auth.getUser().userName)"
-          class="menu-item p-1 border-top"
-          (click)="onChangePublicClick()">
-      Make route {{isPathPublic ? 'private' : 'public'}}
+      <div *ngIf="auth.isRegisteredUser() && (!isPathPublic || createdBy === auth.getUser().userName)"
+            class="ts-menu-item p-1 border-top"
+            (click)="onChangePublicClick()">
+        Make this route {{isPathPublic ? 'private' : 'public'}}
+      </div>
+
+      <div
+        [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        class="ts-menu-item p-1 border-top"
+        (click)="onCopyClick()">
+        Copy this route
+      </div>
+
+      <div
+        *ngIf="createdBy === auth.getUser().userName"
+        class="ts-menu-item p-1 border-top"
+        (click)="onDeleteClick()">
+        Delete this route
+      </div>
+
+      <div
+        *ngIf="isPathPublic"
+        [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        class="ts-menu-item p-1 border-top"
+        (click)="onShareClick()">
+        Get a shareable link
+      </div>
+
+
+
+      <div
+        [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        class="ts-menu-item p-1 border-top"
+        (click)="onExportGpxClick()">
+        Export to .gpx file
+      </div>
+
+
+      <!-- This is a hidden element activated by the 'Load from file' link above -->
+      <div class="file-selector">
+        <form id="file_form">
+          <input type="file" id="file-select-single" (change)="onFilePickedImport($event, false, 'route')" single>
+        </form>
+      </div>
+
     </div>
-
-    <div
-      [ngClass]="!auth.isRegisteredUser() ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top"
-      class="menu-item p-1 border-top"
-      (click)="onCopyClick()">
-      Copy this route
-    </div>
-
-    <div
-      *ngIf="createdBy === auth.getUser().userName"
-      class="menu-item p-1 border-top"
-      (click)="onDeleteClick()">
-      Copy this route
-    </div>
-
-
-    <div
-      *ngIf="createdBy === auth.getUser().userName"
-      class='text-like-link'
-      (click)="onDeleteClick()">
-      Delete route
-    </div>
-
-
-    <div
-      *ngIf="isPathPublic"
-      [ngClass]="!auth.isRegisteredUser() ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top"
-      class="menu-item p-1 border-top"
-      (click)="onShareClick()">
-      Get a shareable link
-    </div>
-
-
-
-    <div
-      [ngClass]="!auth.isRegisteredUser() ? 'menu-item-disabled' : ''" class="menu-item p-1 border-top"
-      class="menu-item p-1 border-top"
-      (click)="onExportGpxClick()">
-      Export to .gpx file
-    </div>
-
-
-
-
-    <!-- This is a hidden element activated by the 'Load from file' link above -->
-    <div class="file-selector">
-      <form id="file_form">
-        <input type="file" id="file-select-single" (change)="onFilePickedImport($event, false, 'route')" single>
-      </form>
-    </div>
-
 
   </div>
 

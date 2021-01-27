@@ -1,45 +1,26 @@
-
-
-/* menu bar formatting needed to located the containerin the right place */
-.menu-container-outer {
+.icons {
+  position: absolute;
   top: 0px;
-  bottom: 0px;
+
+}
+
+.menu-container {
+  transition: background-color 0.75s;
+  top: 0px;
   left: 0px;
   right: 0px;
-  /* border: 1px red dashed; */
-  /* pointer-events: none; */
-}
-
-.menu-container-inner {
-  width: 200px;
-  background-color: white;
-  /* border: 1px blue dotted; */
-  pointer-events: all;
-  border-radius: 10px;
-  border: 1px var(--ts-green) solid;
-
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-
-}
-
-.menu-item {
-  width: 100%;
-  color: black;
-  text-align: center;
-  pointer-events: all;
-}
-
-.menu-item-disabled {
-  color: grey;
+  bottom: 0px;
+  /* border: 1px red solid; */
   pointer-events: none;
+
 }
 
+.menu-container-open {
+  transition: background-color 0.75s;
+  cursor: default;
+  background-color: rgba(0,0,0,0.4);
+  pointer-events: all;
 
-.icons-container {
-  top: 20px;
-  left: 0px;
-  height: 40px;
-  width: 40px;
 }
 
 
@@ -48,6 +29,7 @@ img {
   border-radius: 5px;
   background-color: white;
   box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+  cursor: pointer;
 
 }
 
@@ -57,75 +39,34 @@ img {
 }
 
 
-/* .collapse-btn {
-  pointer-events: auto;
+.menu-container-inner {
+  width: 200px;
+  background-color: white;
+  /* border: 1px blue dotted; */
+  pointer-events: all;
+  border-radius: 5px;
+  border: 1px var(--ts-green) solid;
+
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+
+}
+
+.ts-menu-item {
+  width: 100%;
+  color: black;
+  text-align: center;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.ts-menu-item:hover {
   background-color: var(--ts-grey-background);
-  cursor: pointer;
-  vertical-align: middle;
-  font-size: smaller;
-  color: rgb(110, 110, 110);
-} */
+}
 
-/* remove hover effect on small screens */
-/* @media only screen and (min-width: 900px) {
-  .collapse-btn:hover {
-    cursor: pointer;
-    background: white;
-  }
-} */
-
-
-
-/* .collapse-btn {
-  top: 10px;
-  left: 0px;
-  height: 30px;
-  width: 30px;
-  font-size: small;
-  background-color: white;
-  box-shadow: 4px 0px 8px 0px rgba(0,0,0,0.2);
+.ts-menu-item-disabled {
+  color: grey;
+  pointer-events: none;
   cursor: default;
-} */
-
-
-/* @media only screen and (max-width: 900px) {
-  .menu-bar {
-    opacity: 1.0;
-  }
-} */
-/*
-.menu-bar:hover {
-  opacity: 1.0;
 }
 
-.btn-light {
-  background-color: white;
-  border: none;
-}
-
-.btn-light:hover:enabled {
-  background-color: rgb(218, 224, 229);
-}
-
-.clicky-btn:hover  {
-  opacity: 1.0;
-}
-
-.radio-btns  {
-  border-radius: none;
-}
-
-.radio-btns:hover  {
-  opacity: 1.0;
-  cursor: pointer;
-  background-color: rgb(218, 224, 229);
-
-}
-
-
-.btn-light:focus, .btn-light.focus {
-  box-shadow: none;
-}
-
- */
 

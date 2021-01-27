@@ -1,13 +1,5 @@
 .file-selector {
-    display: none;
-}
-
-.spacer {
-  height: 25px;
-}
-
-.text-muted {
-  cursor: default
+  display: none;
 }
 
 .ts-menu-item {
@@ -15,10 +7,16 @@
   color: black;
   text-align: center;
   pointer-events: all;
+  cursor: pointer;
+}
+
+.ts-menu-item:hover {
+  background-color: var(--ts-grey-background);
 }
 
 .ts-menu-item-disabled {
   color: grey;
   pointer-events: none;
+  cursor: default;
 }
 

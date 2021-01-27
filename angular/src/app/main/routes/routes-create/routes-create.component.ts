@@ -9,6 +9,8 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { TsPlotPathOptions, TsCallingPage, TsFeatureCollection, TsLineStyle, TsPosition, TsMapRequest } from 'src/app/shared/interfaces';
 import { ActivatedRoute } from '@angular/router';
 import { AlertService } from 'src/app/shared/services/alert.service';
+import * as globals from 'src/app/shared/globals';
+import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
 
 
 @Component({
@@ -24,6 +26,8 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   private chartPointListener: Subscription;
 
   public callingPage: TsCallingPage;
+  public windowWidth: number;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
     private data: DataService,
@@ -32,8 +36,14 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private alert: AlertService,
     private location: LocationService,
-    private auth: AuthService
-    ) { }
+    private auth: AuthService,
+    private screenSize: ScreenSizeService
+    ) {
+      this.windowWidth = this.screenSize.width;
+      this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+        this.windowWidth = newWidth.width;
+      });
+     }
 
   async ngOnInit() {
 
