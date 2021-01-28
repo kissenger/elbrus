@@ -10,11 +10,16 @@ export class DisplayDesktopComponent implements OnInit, OnDestroy {
 
   @Input() callingPage: TsCallingPageType;
   @Input() map: mapboxgl.Map;
+  public isMenuOpen = true;
 
   constructor(
    ) { }
 
   ngOnInit() {
+  }
+
+  onToggleClick() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 
   ngOnDestroy() {

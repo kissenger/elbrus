@@ -1,16 +1,17 @@
-<div>mobile</div>
-
 <app-menu-bar callingPage="list" [map]="map"></app-menu-bar>
 
+<div [ngClass]="isMenuOpen ? 'outer-container-open' : ''" class="outer-container">
 
-<!-- <app-info-panel callingPage="list"></app-info-panel> -->
-
-<!-- <div class="full-width-panel-container d-flex"> -->
-<div [ngClass]="isMenuOpen ? 'outer-container-opened' : ''" class="outer-container d-wrap-flex">
-  <div [ngClass]="isMenuOpen ? 'inner-container-opened' : ''" class="inner-container overflow-hidden mx-auto">
-
+  <div [ngClass]="isMenuOpen ? 'inner-container-open' : ''" class="inner-container overflow-hidden mx-auto">
     <app-info-panel callingPage="list"></app-info-panel>
+  </div>
 
+  <div
+    [ngClass]="!isMenuOpen&&data.isPath() ? 'small-details-open' : ''"
+    class="small-details overflow-hidden mx-auto"
+    (click)="onToggleClick()">
+
+    <app-panel-details-summary callingPage="list"> </app-panel-details-summary>
   </div>
 
   <div class="toggle-bar d-flex mx-auto" (click)="onToggleClick()">

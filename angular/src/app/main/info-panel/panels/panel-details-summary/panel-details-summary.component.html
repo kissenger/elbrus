@@ -1,0 +1,21 @@
+<div class="d-flex flex-column">
+
+  <!-- NO ROUTE SELECTED -->
+  <div *ngIf="!data.isPath()&&callingPage==='create'" class="p-1 text-center border-top">
+      Click on the map to start creating.
+  </div>
+
+  <!-- ROUTE SELECTED -->
+  <div *ngIf="data.isPath()" class="row no-gutters text-center p-1 border-top">
+    <div class="col-6 m-0 text-left">
+      {{geoJson.properties.info.name | shortName: 13}}
+    </div>
+    <div class="col-3 m-0 text-center">
+      {{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}
+    </div>
+    <div class="col-3 m-0 text-center">
+      {{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}
+    </div>
+  </div>
+
+</div>

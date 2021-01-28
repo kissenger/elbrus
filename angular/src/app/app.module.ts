@@ -15,7 +15,8 @@ import { FooterComponent } from './secondary/footer/footer.component';
 import { InfoPanelComponent } from './main/info-panel/info-panel.component';
 import { MenuBarComponent } from './main/menu-bar/menu-bar.component';
 import { PanelsInjectorComponent } from './main/info-panel/panels-injector/panels-injector.component';
-import { PanelDetailsComponent } from './main/info-panel/panels/panel-details/panel-details.component';
+import { PanelDetailsFullComponent } from './main/info-panel/panels/panel-details-full/panel-details-full.component';
+import { PanelDetailsSummaryComponent } from './main/info-panel/panels/panel-details-summary/panel-details-summary.component';
 import { PanelListComponent } from './main/info-panel/panels/panel-list/panel-list.component';
 import { PanelListItemComponent } from './main/info-panel/panels/panel-list/panel-list-item/panel-list-item.component';
 import { PanelOptionsComponent } from './main/info-panel/panels/panel-options/panel-options.component';
@@ -70,7 +71,8 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     ShortNamePipe,
     CoordsPipe,
     PanelsInjectorComponent,
-    PanelDetailsComponent,
+    PanelDetailsFullComponent,
+    PanelDetailsSummaryComponent,
     PanelListComponent,
     PanelListItemComponent,
     PanelOptionsComponent,
@@ -118,7 +120,6 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
   ],
   bootstrap: [AppComponent],
   entryComponents: [
-    PanelDetailsComponent,
     PanelListComponent,
     PanelOptionsComponent,
     AlertBoxComponent,

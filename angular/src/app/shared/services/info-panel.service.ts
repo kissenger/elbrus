@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PanelDetailsComponent } from 'src/app/main/info-panel/panels/panel-details/panel-details.component';
+import { PanelDetailsFullComponent } from 'src/app/main/info-panel/panels/panel-details-full/panel-details-full.component';
 import { PanelListComponent } from 'src/app/main/info-panel/panels/panel-list/panel-list.component';
 import { PanelOptionsComponent } from 'src/app/main/info-panel/panels/panel-options/panel-options.component';
 import { TsTabsArray } from 'src/app/shared/interfaces';
@@ -17,28 +17,28 @@ export class InfoPanelService {
   { create:
       [ { active: true,
           name: 'details',
-          component: PanelDetailsComponent },
+          component: PanelDetailsFullComponent },
         { active: false,
           name: 'overlay',
           component: PanelListComponent } ],
     edit:
       [ { active: true,
           name: 'details',
-          component: PanelDetailsComponent },
+          component: PanelDetailsFullComponent },
         { active: false,
           name: 'overlay',
           component: PanelListComponent } ],
     review:
       [ { active: true,
           name: 'details',
-          component: PanelDetailsComponent } ],
+          component: PanelDetailsFullComponent } ],
     list:
       [ { active: true,
           name: 'routes',
           component: PanelListComponent },
         { active: false,
           name: 'details',
-          component: PanelDetailsComponent,
+          component: PanelDetailsFullComponent,
           disabled: true },
         { active: false,
           name: 'overlay',

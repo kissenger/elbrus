@@ -1,0 +1,182 @@
+<div class="d-flex flex-column">
+
+
+  <!-- NO DATA -->
+  <div *ngIf="!data.isPath()" class="h-100 d-flex flex-column">
+
+    <div class="text-center flex-grow-1">
+
+      <div *ngIf="callingPage==='create'; else list">
+        <div class="text-center m-3">
+          Click on the map to begin.
+        </div>
+
+        <div class="small mt-auto text-center">
+          Data will show here when the route is at least two points long.
+        </div>
+      </div>
+
+      <ng-template #list>
+        <div class="text-center m-3">
+          No routes selected.
+        </div>
+
+        <div class="small mt-auto text-center">
+          Use the 'List' tab find and select routes.
+        </div>
+      </ng-template>
+
+    </div>
+
+    <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
+      <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
+    </div>
+
+  </div>
+
+  <!-- DATA -->
+  <div *ngIf="isData" class="absolute-container d-flex flex-column p-2">
+
+    <!-- NAME & DESCRIPTION only for list page -->
+    <div *ngIf="callingPage==='list'; else showForm" class="pb-2 border-bottom text-center">
+
+      <div class="h6 my-0 py-0">{{geoJson.properties.info.name}}</div>
+
+      <div *ngIf="!!geoJson.properties.info.description" class="">
+        <i>{{geoJson.properties.info.description}}</i>
+      </div>
+
+    </div>
+
+
+    <!-- FORM INPUTS only if create page -->
+    <ng-template #showForm>
+
+      <!-- Safari needs the form tags -->
+      <form>
+
+        <div class="input-group input-group-sm my-1">
+            <input class='form-control' type='text' [(ngModel)]="givenName" name="path_name">
+        </div>
+
+        <div class="input-group input-group-sm my-1">
+            <textarea
+              class='form-control'
+              placeholder='Give your route a description'
+              [(ngModel)]="pathDescription"
+              name="description">
+            </textarea>
+        </div>
+
+      </form>
+
+    </ng-template>
+
+    <div class="stats-pane flex-grow-1">
+
+      <!-- PATH DATA -->
+      <div class="px-2 pt-2 pb-0">
+
+        <div class="row no-gutters">
+
+          <div class="col-5 px-1">Distance</div>
+          <div class="col-7 px-1">{{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}</div>
+
+          <div class="col-5 px-1">Points</div>
+          <div class="col-7 px-1">{{geoJson.properties.stats.nPoints | number: '1.0-0'}}</div>
+
+          <div class="col-5 px-1">Category</div>
+          <div class="col-7 px-1">{{geoJson.properties.info.category}}</div>
+
+          <div class="col-5 px-1">Direction</div>
+          <div class="col-7 px-1">{{geoJson.properties.info.direction}}</div>
+
+          <div class="col-5 px-1">Public</div>
+          <div class="col-7 px-1">{{geoJson.properties.info.isPublic}}</div>
+
+          <div *ngIf="geoJson.properties.info.isPublic" class="col-6 px-1">Created by</div>
+          <div *ngIf="geoJson.properties.info.isPublic" class="col-6 px-1">{{geoJson.properties.info.createdBy}}</div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ELEVATIONS -->
+      <div *ngIf="isElevations" class="px-2 pt-0 pb-0">
+
+          <div class="row no-gutters">
+
+            <div class="col-5 px-1">Ascent</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.elevations.ascent | unitsString: 'elevation': units.elevation}}</div>
+
+            <div class="col-5 px-1">Descent</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.elevations.descent | unitsString: 'elevation': units.elevation}}</div>
+
+            <div class="col-5 px-1">Max Elev</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.elevations.maxElev | unitsString: 'elevation': units.elevation}}</div>
+
+            <div class="col-5 px-1">Min Elev</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.elevations.minElev | unitsString: 'elevation': units.elevation}}</div>
+
+            <div class="col-5 px-1">Lumpiness</div>
+            <div class="col-7 px-1">{{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}</div>
+
+          </div>
+
+      </div>
+
+
+      <!-- ELEVATIONS CHART -->
+      <div *ngIf="isElevations" class="">
+
+        <canvas class="py-3" height="300" baseChart
+            [datasets]="chartData"
+            [chartType]="'scatter'"
+            [labels]="chartLabels"
+            [options]="chartOptions"
+            [colors]="chartColors"
+            [legend]="chartLegend"
+            (chartHover)="onChartHover($event)"
+            (chartClick)="onChartClick($event)"
+            (mouseout)="onChartOut()">
+        </canvas>
+
+      </div>
+
+
+      <!-- HILLS TABLE -->
+      <div *ngIf="geoJson.properties.stats.hills.length > 0" class="pt-2 w-100 mx-auto text-center small">
+
+        <div class="row no-gutters border">
+
+          <div class="col-3 border-right">Starts at</div>
+          <div class="col-3 border-right">Hill Length</div>
+          <div class="col-2 border-right">Height Gain</div>
+          <div class="col-2 border-right">Grad Ave</div>
+          <div class="col-2">Grad Max</div>
+
+        </div>
+
+        <div class="row no-gutters border-left border-bottom" *ngFor="let row of geoJson.properties.stats.hills">
+
+          <div class="col-3 border-right"> {{this.geoJson.properties.params.cumDistance[row.startPoint] | unitsString: 'distance': units.distance}}</div>
+          <div class="col-3 border-right"> {{row.dDist | unitsString: 'distance': units.distance}}</div>
+          <div class="col-2 border-right"> {{row.dHeight | unitsString: 'elevation': units.elevation}}</div>
+          <div class="col-2 border-right"> {{row.aveGrad | number: '1.0-0'}}%</div>
+          <div class="col-2 border-right"> {{row.maxGrad | number: '1.0-0'}}%</div>
+
+        </div>
+
+      </div>
+
+    </div>
+        <!-- BUTTONS -->
+        <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
+          <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
+          <button *ngIf="auth.isRegisteredUser()" (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm m-1" type="submit">Save</button>
+        </div>
+  </div>
+
+
+</div>

@@ -1,4 +1,5 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { DataService } from 'src/app/shared/services/data.service';
+import { Component, Input, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
 
 @Component({
@@ -6,7 +7,7 @@ import { TsCallingPageType } from 'src/app/shared/interfaces';
   templateUrl: './display-mobile.component.html',
   styleUrls: ['./display-mobile.component.css']
 })
-export class DisplayMobileComponent implements OnInit, OnDestroy {
+export class DisplayMobileComponent implements OnInit {
 
   @Input() callingPage: TsCallingPageType;
   @Input() map: mapboxgl.Map;
@@ -14,6 +15,7 @@ export class DisplayMobileComponent implements OnInit, OnDestroy {
   public isMenuOpen = true;
 
   constructor(
+    public data: DataService
    ) { }
 
   ngOnInit() {
@@ -21,11 +23,8 @@ export class DisplayMobileComponent implements OnInit, OnDestroy {
 
   onToggleClick() {
     this.isMenuOpen = !this.isMenuOpen;
+    console.log(this.isMenuOpen)
   }
-
-  ngOnDestroy() {
-  }
-
 
 }
 

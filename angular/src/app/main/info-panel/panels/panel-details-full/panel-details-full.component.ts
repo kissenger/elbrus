@@ -1,4 +1,4 @@
-import { AutoNamePipe } from './../../../../shared/pipes/auto-name.pipe';
+import { AutoNamePipe } from '../../../../shared/pipes/auto-name.pipe';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -7,7 +7,6 @@ import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { TsUnits, TsFeature, TsFeatureCollection, TsPosition, TsCallingPageType } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
-import { AlertService } from 'src/app/shared/services/alert.service';
 import { Color, Label } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import 'chartjs-plugin-zoom';
@@ -15,11 +14,11 @@ import { UnitsConvertPipe } from 'src/app/shared/pipes/units-convert.pipe';
 import { UnitsLongNamePipe } from 'src/app/shared/pipes/units-longname.pipe';
 
 @Component({
-  selector: 'app-panel-details',
-  templateUrl: './panel-details.component.html',
-  styleUrls: ['./panel-details.component.css']
+  selector: 'app-panel-details-full',
+  templateUrl: './panel-details-full.component.html',
+  styleUrls: ['./panel-details-full.component.css']
 })
-export class PanelDetailsComponent implements OnInit, OnDestroy {
+export class PanelDetailsFullComponent implements OnInit, OnDestroy {
 
   // local variables
   // @Input() callingPage = 'list';
@@ -28,9 +27,6 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   // listeners
   private pathListener: Subscription;
   private minimisePanelListener: Subscription;
-
-  /* panel is minimised for thinner screens; also happens in info-panel component so changes need to be reflected there also */
-  public isMinimised = window.innerWidth < 900 ? true : false;
 
   // charting variables
   public chartData: ChartDataSets[] = [];
@@ -64,12 +60,6 @@ export class PanelDetailsComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
-
-    // subscribe to any changes in the minimised status of the panel
-    this.minimisePanelListener = this.data.minimisePanelEmitter.subscribe( (minimise: boolean) => {
-      this.isMinimised = minimise;
-    });
-
     this.data.unitsUpdateEmitter.subscribe( () => {
       this.units = this.auth.getUser().units;
     });

@@ -1,20 +1,13 @@
 
-/* this is needed for safari - h-100 will not work as parent is a flex element without explcit set height
-     see - https://stackoverflow.com/questions/33636796/chrome-safari-not-filling-100-height-of-flex-parent
-*/
 
-/* VARIABLES */
 div{
   --menu-width: 275px;
   --border-radius: 5px;
-  /* --bottom-margin: 30px; */
+  --transition-time: 0.85s;
 }
 
-
 .outer-container {
-  /* transition: height 0.5s; */
-  /* transition: transform 0.5s; */
-  transition: background-color 0.75s;
+  transition: background-color var(--transition-time);
   position: absolute;
   top: 0px;
   left: 0px;
@@ -23,42 +16,43 @@ div{
   width: 100%;
   cursor: auto;
   pointer-events: none;
-  /* background-color: none; */
 }
 
-.outer-container-opened {
-  transition: background-color 0.75s;
+.outer-container-open {
+  transition: background-color var(--transition-time);
   cursor: default;
-  /* background-color: rgba(255,255,255,0.2); */
   background-color: rgba(0,0,0,0.4);
-  pointer-events: all;
+  pointer-events: auto;
 }
-
 
 .inner-container {
-  transition: height 0.75s;
+  transition: height var(--transition-time);
   height: 0px;
   width: var(--menu-width);
-  /* left: calc((100vw - var(--menu-width)) / 2); */
-
   background-color: white;
   border-left: 1px var(--ts-green) solid;
   border-right: 1px var(--ts-green) solid;
-  /* border-bottom: 1px var(--ts-green) solid; */
-
 }
 
-.inner-container-opened {
-  transition: height 0.75s;
-  /* transition: transform 0.5s; */
-  /* transform: translateY(400px); */
+.inner-container-open {
+  transition: height var(--transition-time);
   height: calc(100vh - 150px);
-  border-bottom: 1px var(--ts-green) solid;
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-
 
 }
 
+.small-details {
+  width: var(--menu-width);
+  height: 0px;
+  background-color: white;
+  transition: height var(--transition-time);
+  border-left: 1px var(--ts-green) solid;
+  border-right: 1px var(--ts-green) solid;
+}
+
+.small-details-open {
+  height: 35px;
+  transition: height var(--transition-time);
+}
 
 .toggle-bar {
   height: 30px;
@@ -70,10 +64,8 @@ div{
   border-left: 1px var(--ts-green) solid;
   border-right: 1px var(--ts-green) solid;
   pointer-events: all;
-
   cursor: pointer;
   box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-
 }
 
 .toggle {
@@ -81,7 +73,6 @@ div{
   height: 4px;
   border-radius: 2px;
   background-color: var(--ts-green);
-  /* border: 1px grey solid; */
 }
 
 
