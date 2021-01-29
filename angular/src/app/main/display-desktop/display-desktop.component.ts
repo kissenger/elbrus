@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
+import { DataService } from 'src/app/shared/services/data.service';
 
 @Component({
   selector: 'app-display-desktop',
@@ -13,6 +14,7 @@ export class DisplayDesktopComponent implements OnInit, OnDestroy {
   public isMenuOpen = true;
 
   constructor(
+    public data: DataService
    ) { }
 
   ngOnInit() {
@@ -20,6 +22,7 @@ export class DisplayDesktopComponent implements OnInit, OnDestroy {
 
   onToggleClick() {
     this.isMenuOpen = !this.isMenuOpen;
+    console.log(this.isMenuOpen);
   }
 
   ngOnDestroy() {
