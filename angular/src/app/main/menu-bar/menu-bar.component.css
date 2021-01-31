@@ -1,8 +1,76 @@
-.icons {
-  position: absolute;
-  top: 0px;
 
+
+div{
+  --icon-height: 40px;
 }
+
+.icon-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  /* border: 1px red solid; */
+  width: calc(10px + var(--icon-height));
+}
+
+.icon-btn {
+  margin: 2px;
+  padding: 0px;
+  border: 2px solid var(--ts-green);
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+  cursor: pointer;
+  height: var(--icon-height);
+}
+
+/*
+.icon-radio {
+  margin: 2px;
+  padding: 0px;
+  border: 2px solid var(--ts-green);
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+  cursor: pointer;
+  height: var(--icon-height);
+} */
+
+
+.icon-radio-top {
+  margin: 2px 2px 0px 2px;
+  padding: 0px;
+  border: 2px solid var(--ts-green);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: white;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+  cursor: pointer;
+  height: var(--icon-height);
+}
+
+.icon-radio-bottom {
+  margin: -2px 2px 2px 2px;
+  padding: 0px;
+  border: 2px solid var(--ts-green);
+  /* border-top: none; */
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background-color: white;
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+  cursor: pointer;
+  height: var(--icon-height);
+}
+
+
+
+
+.icon-inactive {
+  opacity: 0.7;
+  cursor: default;
+  pointer-events: none;
+}
+
+
 
 .menu-container {
   transition: background-color 0.75s;
@@ -24,14 +92,7 @@
 }
 
 
-img {
-  border: 1px solid var(--ts-green);
-  border-radius: 5px;
-  background-color: white;
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-  cursor: pointer;
 
-}
 
 .hidden-view {
   display: none;

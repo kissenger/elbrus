@@ -1,11 +1,17 @@
-<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css"> -->
 
-<div class="icons">
-  <img src="assets/images/icon-menu-map.svg" (click)="onMapIconClick()" height="40" class="m-1 p-0">
-  <img src="assets/images/icon-menu-create.svg" height="40" class="m-1 p-0">
+
+<div class="icon-container d-flex flex-wrap">
+  <!-- <img src="assets/images/icon-menu-map.svg" (click)="onMapIconClick()" height="40" class="m-1 p-0"> -->
+  <img src="assets/images/icon-menu-fit-one.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon-btn" (click)="map.fitViewOne()">
+  <img src="assets/images/icon-menu-fit-all.svg"  [ngClass]="!isData ? 'icon-inactive' : ''"class="icon-btn" (click)="map.fitViewAll()">
+  <img src="assets/images/icon-menu-goto-home.svg" class="icon-btn" (click)="map.goto(homeLngLat)">
+  <img src="assets/images/icon-menu-goto-current.svg" [ngClass]="!position ? 'icon-inactive' : ''" class="icon-btn" (click)="map.goto(position)">
+
+  <img src="assets/images/icon-menu-view-terrain.svg" [ngClass]="map.getType==='terrain' ? 'icon-inactive' : ''" class="icon-radio-top" (click)="map.setType('terrain')">
+  <img src="assets/images/icon-menu-view-satellite.svg" [ngClass]="map.getType==='satellite' ? 'icon-inactive' : ''" class="icon-radio-bottom" (click)="map.setType('satellite')">
 </div>
 
-<div [ngClass]="showMapMenu ? 'menu-container-open' : ''" class="menu-container position-absolute d-flex" (click)="onMapIconClick()">
+<div [ngClass]="showMapMenu ? 'menu-container-open' : ''" class="menu-container position-absolute" (click)="onMapIconClick()">
 
   <div *ngIf="showMapMenu" class="menu-container-inner d-flex flex-wrap mx-auto my-auto px-3 pt-2 pb-3" >
 

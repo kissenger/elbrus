@@ -25,7 +25,8 @@ export class MapService {
   public isDev = !environment.production;
 
   public tsMap: mapboxgl.Map;
-  public mapDefaultType: TsMapType = 'terrain';
+  private mapDefaultType: TsMapType = 'terrain';
+  private _mapType: TsMapType = this.mapDefaultType;
   public pathLayers: ActivePathLayers;
   public markers: TsMarkers;
   private padding = {
@@ -148,7 +149,12 @@ export class MapService {
 
     // apply the new style
     this.tsMap.setStyle(this.mapboxStyles[type]);
+    this._mapType = type;
 
+  }
+
+  public get getType() {
+    return this._mapType;
   }
 
 
