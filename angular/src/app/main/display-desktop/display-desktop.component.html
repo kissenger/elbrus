@@ -1,4 +1,4 @@
-<app-menu-bar callingPage="list" [map]="map"></app-menu-bar>
+<app-menu-bar callingPage={{callingPage}} [map]="map"></app-menu-bar>
 
 <div class="outer-container">
 
@@ -13,7 +13,7 @@
 
     <div [ngClass]="isMenuOpen ? 'inner-container-open' : ''" class="inner-container overflow-hidden ml-auto p-0">
 
-      <app-info-panel callingPage="list"></app-info-panel>
+      <app-info-panel callingPage={{callingPage}}></app-info-panel>
 
     </div>
 
@@ -23,7 +23,7 @@
       class="small-details overflow-hidden  ml-auto"
       (click)="onToggleClick()">
 
-      <app-panel-details-summary callingPage="list"> </app-panel-details-summary>
+      <app-panel-details-summary callingPage={{callingPage}}> </app-panel-details-summary>
     </div>
 
   <!-- </div> -->

@@ -184,7 +184,7 @@
      id="layer1"
      transform="translate(-32.72148,-29.637969)">
     <path
-       style="fill:none;fill-opacity:1;stroke:#523209;stroke-width:1.56;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#523209;fill-opacity:1;stroke:#523209;stroke-width:1.56;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 46.104131,49.516362 6.210306,-10.646238 2.244061,3.809683 5.636244,-9.654678 9.550301,16.491234 z"
        id="path1634"
        sodipodi:nodetypes="cccccc" />
@@ -372,7 +372,7 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:20.3984px;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#523209;fill-opacity:1;stroke:none;stroke-width:0.546385;stroke-opacity:1">n</tspan></text>
     <g
        id="g1703"
-       transform="matrix(1.1064422,0,0,1.1064422,-3.572357,-7.2151971)">
+       transform="matrix(1.1160914,0,0,1.1160914,-3.7361798,-8.4148266)">
       <rect
          style="fill:#fffffe;fill-opacity:1;stroke:#ffffff;stroke-width:1.39589;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect1690"
@@ -432,5 +432,10 @@
            sodipodi:nodetypes="ccccccc" />
       </g>
     </g>
+    <path
+       style="fill:#333333;stroke:#ffffff;stroke-width:2.18338;stroke-linecap:round;stroke-linejoin:round"
+       d=""
+       id="path935"
+       transform="matrix(0.26458333,0,0,0.26458333,32.72148,29.637969)" />
   </g>
 </svg>

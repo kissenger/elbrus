@@ -12,7 +12,7 @@ div{
   top: 10px;
   right: 10px;
   pointer-events: none;
-  border: 2px var(--ts-green) solid;
+  border: 1px var(--ts-green) solid;
   border-radius: var(--border-radius);
   background-color: white;
 }

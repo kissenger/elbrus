@@ -2,74 +2,76 @@
 
 div{
   --icon-height: 40px;
+  --icon-border-width: 1px;
+  --icon-border-colour: var(--ts-green);
+  --icon-border-radius: 3px;
+  --icon-spacing: 1px;
 }
 
 .icon-container {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0px;
+  left: 0px;
+  width: 60px;
   /* border: 1px red solid; */
-  width: calc(10px + var(--icon-height));
 }
 
-.icon-btn {
-  margin: 2px;
-  padding: 0px;
-  border: 2px solid var(--ts-green);
+.icon-group {
+  /* position: relative; */
+  margin: 8px;
+  display: block;
+
+}
+
+.icon-background-btn {
+  margin: var(--icon-spacing);
+  background-color: white;
+  border-radius: var(--icon-border-radius);
+  border: var(--icon-border-width) solid var(--icon-border-colour);
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+  display: block;
+
+}
+
+.icon {
   border-radius: 5px;
-  background-color: white;
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
   cursor: pointer;
   height: var(--icon-height);
+
 }
-
-/*
-.icon-radio {
-  margin: 2px;
-  padding: 0px;
-  border: 2px solid var(--ts-green);
-  border-radius: 5px;
-  background-color: white;
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-  cursor: pointer;
-  height: var(--icon-height);
-} */
-
-
-.icon-radio-top {
-  margin: 2px 2px 0px 2px;
-  padding: 0px;
-  border: 2px solid var(--ts-green);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  background-color: white;
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-  cursor: pointer;
-  height: var(--icon-height);
-}
-
-.icon-radio-bottom {
-  margin: -2px 2px 2px 2px;
-  padding: 0px;
-  border: 2px solid var(--ts-green);
-  /* border-top: none; */
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  background-color: white;
-  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-  cursor: pointer;
-  height: var(--icon-height);
-}
-
-
 
 
 .icon-inactive {
-  opacity: 0.7;
+  opacity: 0.5;
   cursor: default;
   pointer-events: none;
 }
 
+
+.icon-radio-group {
+  background-color: white;
+  margin: var(--icon-spacing);
+  border-radius: var(--icon-border-radius);
+  border: var(--icon-border-width) solid var(--icon-border-colour);
+  box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
+}
+
+.icon-background-radio-top {
+  border-top-left-radius: var(--icon-border-radius);
+  border-top-right-radius: var(--icon-border-radius);
+  cursor: pointer;
+}
+
+.icon-background-radio-middle {
+  cursor: pointer;
+}
+
+
+.icon-background-radio-bottom {
+  border-bottom-left-radius: var(--icon-border-radius);
+  border-bottom-right-radius: var(--icon-border-radius);
+  cursor: pointer;
+}
 
 
 .menu-container {
@@ -78,7 +80,6 @@ div{
   left: 0px;
   right: 0px;
   bottom: 0px;
-  /* border: 1px red solid; */
   pointer-events: none;
 
 }
