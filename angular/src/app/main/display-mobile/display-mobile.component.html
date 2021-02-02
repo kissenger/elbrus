@@ -1,9 +1,12 @@
-<app-menu-bar callingPage="list" [map]="map"></app-menu-bar>
+
+<!-- <div class="menu-container"> -->
+  <app-menu-bar callingPage={{callingPage}} [map]="map"></app-menu-bar>
+<!-- </div> -->
 
 <div [ngClass]="isMenuOpen ? 'outer-container-open' : ''" class="outer-container">
 
   <div [ngClass]="isMenuOpen ? 'inner-container-open' : ''" class="inner-container overflow-hidden mx-auto">
-    <app-info-panel callingPage="list"></app-info-panel>
+    <app-info-panel callingPage={{callingPage}}></app-info-panel>
   </div>
 
   <div
@@ -11,7 +14,7 @@
     class="small-details overflow-hidden mx-auto"
     (click)="onToggleClick()">
 
-    <app-panel-details-summary callingPage="list"> </app-panel-details-summary>
+    <app-panel-details-summary callingPage={{callingPage}}> </app-panel-details-summary>
   </div>
 
   <div class="toggle-bar d-flex mx-auto" (click)="onToggleClick()">

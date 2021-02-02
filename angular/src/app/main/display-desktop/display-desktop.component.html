@@ -1,31 +1,23 @@
-<app-menu-bar callingPage={{callingPage}} [map]="map"></app-menu-bar>
+<!-- <div class="menu-container"> -->
+  <app-menu-bar callingPage={{callingPage}} [map]="map"></app-menu-bar>
+<!-- </div> -->
 
 <div class="outer-container">
 
-  <!-- <div class="border"> -->
-
-    <div class="toggle-bar d-flex ml-auto" (click)="onToggleClick()">
-      <!-- <div class="toggle my-auto mx-auto">
-      </div> -->
+  <div class="toggle-bar d-flex ml-auto" (click)="onToggleClick()">
     <img src="assets/images/icon-arrow.svg" height="10" [ngClass]="isMenuOpen ? 'arrow-icon-open' : ''" class="arrow-icon m-auto">
+  </div>
 
-    </div>
+  <div [ngClass]="isMenuOpen ? 'inner-container-open' : ''" class="inner-container overflow-hidden ml-auto p-0">
+    <app-info-panel callingPage={{callingPage}}></app-info-panel>
+  </div>
 
-    <div [ngClass]="isMenuOpen ? 'inner-container-open' : ''" class="inner-container overflow-hidden ml-auto p-0">
+  <div
+    [ngClass]="!isMenuOpen&&data.isPath() ? 'small-details-open' : ''"
+    class="small-details overflow-hidden  ml-auto"
+    (click)="onToggleClick()">
 
-      <app-info-panel callingPage={{callingPage}}></app-info-panel>
-
-    </div>
-
-
-    <div
-      [ngClass]="!isMenuOpen&&data.isPath() ? 'small-details-open' : ''"
-      class="small-details overflow-hidden  ml-auto"
-      (click)="onToggleClick()">
-
-      <app-panel-details-summary callingPage={{callingPage}}> </app-panel-details-summary>
-    </div>
-
-  <!-- </div> -->
+    <app-panel-details-summary callingPage={{callingPage}}> </app-panel-details-summary>
+  </div>
 
 </div>

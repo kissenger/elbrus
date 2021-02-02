@@ -23,7 +23,6 @@ export class DisplayMobileComponent implements OnInit {
 
   onToggleClick() {
     this.isMenuOpen = !this.isMenuOpen;
-    console.log(this.isMenuOpen)
   }
 
 }

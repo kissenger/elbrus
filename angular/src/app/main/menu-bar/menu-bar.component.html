@@ -1,8 +1,16 @@
+<div class="menu-container">
+
+  <div *ngIf="windowWidth<BREAKPOINT" class="icon-group">
+    <div class="icon-background-btn" (click)="onMapIconClick()">
+      <img src="assets/images/icon-menu-map.svg" [ngClass]="!isData&&!position ? 'icon-inactive' : ''" class="icon" title="View map options">
+    </div>
+  </div>
 
 
-<div class="icon-container d-flex flex-wrap">
 
-  <div class="icon-group">
+  <!-- VIEWS ICONS FOR DESKTOP ONLY -->
+
+  <div *ngIf="windowWidth>=BREAKPOINT" class="icon-group">
 
     <div class="icon-background-btn" (click)="map.fitViewOne()">
       <img src="assets/images/icon-menu-fit-one.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Fit only the active route">
@@ -32,53 +40,59 @@
 
   </div>
 
+  <!-- CREATE MENU FOR MOBILE AND DESKTOP -->
 
+  <div *ngIf="callingPage!=='list'" class="icon-group">
 
-  <div class="icon-group">
-
-    <div *ngIf="callingPage!=='list'" class="icon-background-btn" (click)="map.undo()">
+    <div class="icon-background-btn" (click)="map.undo()">
       <img src="assets/images/icon-menu-create-undo.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Undo last action">
     </div>
 
+    <div class="icon-background-btn" (click)="map.undo()">
+      <img src="assets/images/icon-menu-create-tools.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Undo last action">
+    </div>
+
     <div class="icon-radio-group">
-      <div class="icon-background-radio-top" (click)="map.setType('terrain')">
-        <img src="assets/images/icon-menu-create-snap-none.svg" [ngClass]="map.getType==='terrain' ? 'icon-inactive' : ''" class="icon" title="Show terrian view">
+      <div class="icon-background-radio-top" (click)="map.snapType='none'">
+        <img src="assets/images/icon-menu-create-snap-none.svg" [ngClass]="map.snapType==='none' ? 'icon-inactive' : ''" class="icon" title="No Snap">
       </div>
 
-      <div class="icon-background-radio-middle" (click)="map.setType('satellite')">
-        <img src="assets/images/icon-menu-create-snap-path.svg" [ngClass]="map.getType==='satellite' ? 'icon-inactive' : ''" class="icon" title="Show satellite view">
+      <div (click)="map.snapType='walking'">
+        <img src="assets/images/icon-menu-create-snap-path.svg" [ngClass]="map.snapType==='walking' ? 'icon-inactive' : ''" class="icon" title="Snap to paths">
       </div>
 
-      <div class="icon-background-radio-bottom" (click)="map.setType('satellite')">
-        <img src="assets/images/icon-menu-create-snap-road.svg" [ngClass]="map.getType==='satellite' ? 'icon-inactive' : ''" class="icon" title="Show satellite view">
+      <div class="icon-background-radio-bottom" (click)="map.snapType='driving'">
+        <img src="assets/images/icon-menu-create-snap-road.svg" [ngClass]="map.snapType==='driving' ? 'icon-inactive' : ''" class="icon" title="Snap to roads">
       </div>
     </div>
+
   </div>
 
 
-</div>
+  <!-- VIEWS MENU FOR MOBILE ONLY -->
 
-<div [ngClass]="showMapMenu ? 'menu-container-open' : ''" class="menu-container position-absolute" (click)="onMapIconClick()">
+  <div [ngClass]="showMapMenu ? 'menu-container-open' : ''" class="menu-container position-absolute" (click)="onMapIconClick()">
 
-  <div *ngIf="showMapMenu" class="menu-container-inner d-flex flex-wrap mx-auto my-auto px-3 pt-2 pb-3" >
+    <div *ngIf="showMapMenu" class="menu-container-inner d-flex flex-wrap mx-auto my-auto px-3 pt-2 pb-3" >
 
-    <div class="w-100 text-center h6 mb-3">Map Options</div>
+      <div class="w-100 text-center h6 mb-3">Map Options</div>
 
-    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewOne()">
-      Fit active path
+      <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewOne()">
+        Fit active path
+      </div>
+
+      <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewAll()">
+        Fit all paths
+      </div>
+
+      <div class="ts-menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
+        Go to home
+      </div>
+
+      <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
+        Go to current position
+      </div>
+
     </div>
-
-    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewAll()">
-      Fit all paths
-    </div>
-
-    <div class="ts-menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
-      Go to home
-    </div>
-
-    <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
-      Go to current position
-    </div>
-
   </div>
 </div>

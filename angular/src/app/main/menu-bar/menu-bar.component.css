@@ -8,7 +8,7 @@ div{
   --icon-spacing: 1px;
 }
 
-.icon-container {
+.menu-container {
   position: absolute;
   top: 0px;
   left: 0px;
@@ -34,10 +34,11 @@ div{
 }
 
 .icon {
-  border-radius: 5px;
   cursor: pointer;
-  height: var(--icon-height);
+}
 
+img {
+  height: var(--icon-height);
 }
 
 
@@ -59,18 +60,14 @@ div{
 .icon-background-radio-top {
   border-top-left-radius: var(--icon-border-radius);
   border-top-right-radius: var(--icon-border-radius);
-  cursor: pointer;
 }
 
-.icon-background-radio-middle {
-  cursor: pointer;
-}
-
+/* .icon-background-radio-middle {
+} */
 
 .icon-background-radio-bottom {
   border-bottom-left-radius: var(--icon-border-radius);
   border-bottom-right-radius: var(--icon-border-radius);
-  cursor: pointer;
 }
 
 
@@ -81,7 +78,6 @@ div{
   right: 0px;
   bottom: 0px;
   pointer-events: none;
-
 }
 
 .menu-container-open {
@@ -92,9 +88,6 @@ div{
 
 }
 
-
-
-
 .hidden-view {
   display: none;
   pointer-events: none;
@@ -104,13 +97,10 @@ div{
 .menu-container-inner {
   width: 200px;
   background-color: white;
-  /* border: 1px blue dotted; */
   pointer-events: all;
   border-radius: 5px;
   border: 1px var(--ts-green) solid;
-
   box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
-
 }
 
 .ts-menu-item {

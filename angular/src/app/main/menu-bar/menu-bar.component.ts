@@ -5,6 +5,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
 import { DataService } from 'src/app/shared/services/data.service';
 import * as globals from 'src/app/shared/globals';
+import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
 
 @Component({
   selector: 'app-menu-bar',
@@ -12,7 +13,6 @@ import * as globals from 'src/app/shared/globals';
   styleUrls: ['./menu-bar.component.css']
 })
 export class MenuBarComponent implements OnInit, OnDestroy {
-
 
   @Input() callingPage: TsCallingPageType;
   @Input() map;
@@ -24,20 +24,23 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   public homeLngLat: TsCoordinate;
   public isMinimised = false;
   public showMapMenu = false;
+  public windowWidth: number;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
     private data: DataService,
-    public auth: AuthService
-   ) { }
+    public auth: AuthService,
+    private screenSize: ScreenSizeService
+   ) {
+    this.windowWidth = this.screenSize.width;
+    this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+      this.windowWidth = newWidth.width;
+    });
+   }
 
   ngOnInit() {
 
     this.homeLngLat = this.auth.getUser().homeLngLat;
-
-    // if on narrow screen, minimise panel
-    // if (window.screen.width < globals.narrowScreenThreshold) {
-    //   this.isMinimised = true;
-    // }
 
     // listen for when data is set to be able to enable the view buttons
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {

@@ -24,7 +24,7 @@ import { TsMarkers } from '../classes/ts-markers';
 export class MapCreateService extends MapService {
 
   private history: PathHistory;
-  private snapType: TsSnapType = 'walking';
+  private _snapType: TsSnapType = 'walking';
   private styleOptions: TsLineStyle = {};
   private selectedPointId: number;
   private selectedLineIds: Array<{featureIndex: number, coordIndex: number}>;
@@ -32,8 +32,6 @@ export class MapCreateService extends MapService {
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
   private symbols: TsFeatureCollection;
-
-
 
   constructor(
     http: HttpService,
@@ -46,7 +44,13 @@ export class MapCreateService extends MapService {
     super(http, data, auth, geoJsonPipe);
   }
 
+  public get snapType() {
+    return this._snapType;
+  }
 
+  public set snapType(newType: TsSnapType) {
+    this._snapType = newType;
+  }
 
   public createRoute() {
 
@@ -121,20 +125,20 @@ export class MapCreateService extends MapService {
 
    /**
    * gets the coordinates for a given start and end point
-   * handling the snapType in here is useful as it abstracts it from the calling functions
+   * handling the _snapType in here is useful as it abstracts it from the calling functions
    */
   private getNextPathCoords(start: TsPosition, end: TsPosition) {
 
     return new Promise<Array<TsPosition>>( (resolve, reject) => {
 
       // if we dont need to get directions, just return the supplied coords as an array
-      if (this.snapType === 'none') {
+      if (this._snapType === 'none') {
         resolve([start, end]);
 
       // otherwise, get coords from directions service
       } else {
 
-        this.http.mapboxDirectionsQuery(this.snapType, start, end).subscribe( (result) => {
+        this.http.mapboxDirectionsQuery(this._snapType, start, end).subscribe( (result) => {
 
           if (result.code === 'Ok') {
 
@@ -414,7 +418,7 @@ export class MapCreateService extends MapService {
 
         try {
 
-          if (this.snapType === 'none') {
+          if (this._snapType === 'none') {
             backendResult = await this.getPathFromBackend(coords);
 
           } else {
