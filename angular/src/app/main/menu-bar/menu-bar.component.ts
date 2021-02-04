@@ -24,6 +24,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   public homeLngLat: TsCoordinate;
   public isMinimised = false;
   public showMapMenu = false;
+  public showToolsMenu = false;
   public windowWidth: number;
   public BREAKPOINT = globals.BREAKPOINTS.MD;
 
@@ -58,7 +59,9 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     this.showMapMenu = !this.showMapMenu;
   }
 
-
+  onToolsIconClick() {
+    this.showToolsMenu = !this.showToolsMenu;
+  }
 
   onMapTypeSelect(type: TsMapType) {
     this.map.setType(type);

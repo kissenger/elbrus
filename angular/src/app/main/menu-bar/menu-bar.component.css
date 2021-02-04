@@ -8,11 +8,19 @@ div{
   --icon-spacing: 1px;
 }
 
-.menu-container {
+.outer-container-mobile {
+  position: absolute;
+  top: 50px;
+  width: 60px;
+  right: 0px;
+  /* border: 1px red solid; */
+}
+
+.outer-container-desktop {
   position: absolute;
   top: 0px;
-  left: 0px;
   width: 60px;
+  left: 0px;
   /* border: 1px red solid; */
 }
 
@@ -72,12 +80,14 @@ img {
 
 
 .menu-container {
+  position: absolute;
   transition: background-color 0.75s;
   top: 0px;
   left: 0px;
   right: 0px;
   bottom: 0px;
   pointer-events: none;
+  /* border: 1px blue solid; */
 }
 
 .menu-container-open {
@@ -85,7 +95,6 @@ img {
   cursor: default;
   background-color: rgba(0,0,0,0.4);
   pointer-events: all;
-
 }
 
 .hidden-view {

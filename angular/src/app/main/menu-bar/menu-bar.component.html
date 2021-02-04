@@ -1,4 +1,6 @@
-<div class="menu-container">
+
+
+<div [ngClass]="windowWidth<BREAKPOINT ? 'outer-container-mobile' : 'outer-container-desktop'">
 
   <div *ngIf="windowWidth<BREAKPOINT" class="icon-group">
     <div class="icon-background-btn" (click)="onMapIconClick()">
@@ -48,8 +50,8 @@
       <img src="assets/images/icon-menu-create-undo.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Undo last action">
     </div>
 
-    <div class="icon-background-btn" (click)="map.undo()">
-      <img src="assets/images/icon-menu-create-tools.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Undo last action">
+    <div class="icon-background-btn" (click)="onToolsIconClick()">
+      <img src="assets/images/icon-menu-create-tools.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Show route tools menu">
     </div>
 
     <div class="icon-radio-group">
@@ -68,31 +70,65 @@
 
   </div>
 
-
-  <!-- VIEWS MENU FOR MOBILE ONLY -->
-
-  <div [ngClass]="showMapMenu ? 'menu-container-open' : ''" class="menu-container position-absolute" (click)="onMapIconClick()">
-
-    <div *ngIf="showMapMenu" class="menu-container-inner d-flex flex-wrap mx-auto my-auto px-3 pt-2 pb-3" >
-
-      <div class="w-100 text-center h6 mb-3">Map Options</div>
-
-      <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewOne()">
-        Fit active path
-      </div>
-
-      <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewAll()">
-        Fit all paths
-      </div>
-
-      <div class="ts-menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
-        Go to home
-      </div>
-
-      <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
-        Go to current position
-      </div>
-
-    </div>
-  </div>
 </div>
+
+
+
+<!-- VIEWS MENU FOR MOBILE ONLY -->
+
+<div [ngClass]="showMapMenu ? 'menu-container-open' : ''" class="menu-container d-flex" (click)="onMapIconClick()">
+
+  <div *ngIf="showMapMenu" class="menu-container-inner d-flex flex-wrap mx-auto my-auto px-3 pt-2 pb-3" >
+
+    <div class="w-100 text-center h6 mb-3">Map Options</div>
+
+    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewOne()">
+      Fit active path
+    </div>
+
+    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.fitViewAll()">
+      Fit all paths
+    </div>
+
+    <div class="ts-menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
+      Go to home
+    </div>
+
+    <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
+      Go to current position
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- CREATE TOOLS -->
+
+<div [ngClass]="showToolsMenu ? 'menu-container-open' : ''" class="menu-container d-flex" (click)="onToolsIconClick()">
+
+  <div *ngIf="showToolsMenu" class="menu-container-inner d-flex flex-wrap mx-auto my-auto px-3 pt-2 pb-3" >
+
+    <div class="w-100 text-center h6 mb-3">Routing Tools</div>
+
+    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.clear()">
+      Clear all
+    </div>
+
+    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.closePath()">
+      Close route
+    </div>
+
+    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.reversePath()">
+      Reverse route
+    </div>
+
+    <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.simplify()">
+      Simplify route
+    </div>
+
+  </div>
+
+</div>
+
