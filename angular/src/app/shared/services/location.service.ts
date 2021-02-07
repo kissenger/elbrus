@@ -12,7 +12,7 @@ export class LocationService {
   private mapInstance;
   private navHandler: any;
   private watchOptions: {
-    enableHighAccuracy: false,
+    enableHighAccuracy: true,
     timeout: 5000,
     maximumAge: 5000
   };

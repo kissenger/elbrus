@@ -10,56 +10,64 @@
       <div class="h6 text-left border-bottom m-0 p-2">Info</div>
     <!-- </div> -->
 
-    <div class="row">
-      <div class="col-2 p-2 m-0"></div>
-      <div class="col-4 p-2 m-0 text-left font-weight-bold">Username</div>
-      <div class="col-6 p-2 m-0 text-left"> {{user.userName}} </div>
+    <div class="row no-gutters align-items-center">
+      <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Username</div>
+      <div class="col-6 text-left"> {{user.userName}} </div>
     </div>
 
-    <div class="row align-items-center">
-      <div class="col-2 p-2 m-0"></div>
-      <div class="col-4 p-2 m-0 text-left font-weight-bold">Home Location</div>
-      <div class="col-4 p-2 m-0 text-left"> {{user.homeLngLat | coords}}</div>
-      <div class="col-2 p-2 m-0 text-center">
+    <div class="row no-gutters align-items-center">
+      <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Home Location</div>
+      <div class="col-4 text-left"> {{user.homeLngLat | coords}}</div>
+      <div class="col-2 text-center">
         <span class="text-like-link" (click)="onChangeLocation()">change</span>
       </div>
     </div>
 
-    <div class="row">
-      <div class="col-2 p-2 m-0"></div>
-      <div class="col-4 p-2 m-0 text-left font-weight-bold">email</div>
-      <div class="col-6 p-2 m-0 text-left"> {{user.email}} </div>
+    <div class="row no-gutters align-items-center">
+      <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">email</div>
+      <div class="col-6 text-left"> {{user.email}} </div>
     </div>
 
     <!-- PREFERENCES BLOCK -->
     <!-- <div class="row"> -->
-      <div class="h6 text-left border-bottom m-0 mt-5 p-3">Preferences</div>
+      <div class="h6 text-left border-bottom m-0 mt-5 p-2">Preferences</div>
     <!-- </div> -->
 
-    <div class="row justify-content-center">
-      <div class="col-2 p-2 m-0"></div>
-      <div class="col-4 p-2 m-0 text-left font-weight-bold">Distance</div>
-      <div class="col-4 p-2 m-0 text-left"> {{ user.units.distance | unitsLongName }}</div>
-      <div class="col-2 p-2 m-0 text-center">
+    <div class="row no-gutters align-items-center">
+      <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Distance</div>
+      <div class="col-4 text-left"> {{ user.units.distance | unitsLongName }}</div>
+      <div class="col-2 text-center">
         <span class="text-like-link" (click)="onChangeDistanceUnits()">change</span>
       </div>
     </div>
 
-    <div class="row justify-content-center">
-      <div class="col-2 p-2 m-0"></div>
-      <div class="col-4 p-2 m-0 text-left font-weight-bold">Elevation</div>
-      <div class="col-4 p-2 m-0 text-left"> {{ user.units.elevation | unitsLongName }}</div>
-      <div class="col-2 p-2 m-0 text-center">
+    <div class="row no-gutters align-items-center">
+      <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Elevation</div>
+      <div class="col-4 text-left"> {{ user.units.elevation | unitsLongName }}</div>
+      <div class="col-2 text-center">
         <span class="text-like-link" (click)="onChangeElevationUnits()">change</span>
       </div>
     </div>
 
     <!-- BUTTONS -->
 
-    <div class="row flex-grow-1 justify-content-center p-3 mt-5 align-items-center">
+    <!-- <div class="row flex-grow-1 justify-content-center p-3 mt-5 align-items-center">
       <div class="col-4 ">
+        <button class="btn btn-sm btn-primary btn-block" type="submit" (click)="onLogout()">Logout</button>
         <button class="btn btn-sm btn-primary btn-block" type="submit" (click)="onClose()">Close</button>
       </div>
+    </div> -->
+
+    <div class="d-flex w-100 mt-5 justify-content-center">
+
+      <div class="col-6 col-md-3 m-0 p-1">
+        <button class="btn w-100 btn-outline-secondary" type="button" (click)="onLogoutClick()">Logout</button>
+      </div>
+
+      <div class="col-6 col-md-3 m-0 p-1">
+        <button class="btn w-100 btn-primary" type="button" (click)="onClose()">Close</button>
+      </div>
+
     </div>
 
   </div>

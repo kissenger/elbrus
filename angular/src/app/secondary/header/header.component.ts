@@ -13,7 +13,7 @@ import { Location } from '@angular/common';
 
 export class HeaderComponent implements OnInit, OnDestroy {
 
-  public showMenu: boolean;
+  public showProfileIcon: boolean;
   public isWelcomePageSubs: Subscription;
 
   constructor(
@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // this detects a route change so we know what page we are on and dynamically set header menu
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.showMenu = event.urlAfterRedirects !== '/welcome' && event.urlAfterRedirects !== '/login';
+        this.showProfileIcon = event.urlAfterRedirects !== '/welcome' && event.urlAfterRedirects !== '/login';
       }
     });
 

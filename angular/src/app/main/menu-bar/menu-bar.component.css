@@ -10,7 +10,7 @@ div{
 
 .outer-container-mobile {
   position: absolute;
-  top: 50px;
+  bottom: 50px;
   width: 60px;
   right: 0px;
   /* border: 1px red solid; */

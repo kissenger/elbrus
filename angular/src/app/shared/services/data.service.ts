@@ -17,8 +17,8 @@ export class DataService {
   public pathCommandEmitter = new EventEmitter();         // from panel-list to routes-list
   public chartPointEmitter = new EventEmitter();          // from panel-details to routes-list - listen for mouse on chart event
   public pathIdEmitter = new EventEmitter();              // from data to panel-details, panel-list
-  public minimisePanelEmitter = new EventEmitter();       // from info-panel to panel-details
   public mapBoundsEmitter = new EventEmitter();           // from map to ...
+  public forceMenuCloseEmitter = new EventEmitter();      // from options on create route click to display-mobile
 
   private dataStore: Object = {};
   // private _path: {geoJson: TsFeatureCollection, isSet: boolean} = {geoJson: null, isSet: false};

@@ -1,4 +1,4 @@
-<div class="d-flex flex-column">
+<!-- <div class="d-flex flex-column"> -->
 
 
   <!-- NO DATA -->
@@ -34,6 +34,8 @@
 
   </div>
 
+
+
   <!-- DATA -->
   <div *ngIf="isData" class="absolute-container d-flex flex-column p-2">
 
@@ -60,12 +62,12 @@
         </div>
 
         <div class="input-group input-group-sm my-1">
-            <textarea
-              class='form-control'
-              placeholder='Give your route a description'
-              [(ngModel)]="pathDescription"
-              name="description">
-            </textarea>
+          <textarea
+            class='form-control'
+            placeholder='Give your route a description'
+            [(ngModel)]="pathDescription"
+            name="description">
+          </textarea>
         </div>
 
       </form>
@@ -171,12 +173,12 @@
       </div>
 
     </div>
-        <!-- BUTTONS -->
-        <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
-          <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
-          <button *ngIf="auth.isRegisteredUser()" (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm m-1" type="submit">Save</button>
-        </div>
+      <!-- BUTTONS -->
+      <div *ngIf="callingPage !== 'list'" class="text-center mt-2" >
+        <button (click)="onCancel()" type="button" class="btn btn-outline-secondary btn-sm m-1" type="cancel">Cancel</button>
+        <button *ngIf="auth.isRegisteredUser()" (click)="onSave()" [disabled]="!data.isPath()" type="button" class="btn btn-primary btn-sm m-1" type="submit">Save</button>
+      </div>
   </div>
 
 
-</div>
+<!-- </div> -->

@@ -4,6 +4,15 @@
 /* div { border: 1px red solid;  } */
 /* li  { border: 1px blue solid; } */
 /* nav { border: 1px orange solid; } */
+div{
+  --icon-height: 10px;
+}
+
+.icon {
+  cursor: pointer;
+  height: 35px;
+}
+
 
 
 .header-container {

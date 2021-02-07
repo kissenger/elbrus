@@ -10,7 +10,7 @@
   </div>
 
   <div
-    [ngClass]="!isMenuOpen&&data.isPath() ? 'small-details-open' : ''"
+    [ngClass]="!isMenuOpen&&(data.isPath()||callingPage==='create') ? 'small-details-open' : ''"
     class="small-details overflow-hidden mx-auto"
     (click)="onToggleClick()">
 

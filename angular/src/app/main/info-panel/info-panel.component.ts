@@ -30,13 +30,6 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.tabsArray = this.infoPanel.getTabs(this.callingPage);
-
-    // if on narrow screen, minimise panel
-    // if (window.screen.width < globals.narrowScreenThreshold) {
-    //   this.isMinimised = true;
-    //   this.data.minimisePanelEmitter.emit(true);
-    // }
-
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
 
       // enable disabled tabs when we have data
@@ -48,11 +41,6 @@ export class InfoPanelComponent implements OnInit, OnDestroy {
 
     });
 
-  }
-
-  onMinimiseClick() {
-    this.isMinimised = !this.isMinimised;
-    this.data.minimisePanelEmitter.emit(this.isMinimised);
   }
 
   getTabsClass(tab: TsTab) {

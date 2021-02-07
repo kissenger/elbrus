@@ -22,7 +22,6 @@ export class DisplayDesktopComponent implements OnInit, OnDestroy {
 
   onToggleClick() {
     this.isMenuOpen = !this.isMenuOpen;
-    console.log(this.isMenuOpen);
   }
 
   ngOnDestroy() {

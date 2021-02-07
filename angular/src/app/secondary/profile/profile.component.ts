@@ -102,6 +102,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   }
 
+  onLogoutClick() {
+    this.auth.logout();
+    this.router.navigate(['/welcome']);
+  }
+
   onClose() {
     const redirect = this.data.get('redirect');
     if (redirect) {

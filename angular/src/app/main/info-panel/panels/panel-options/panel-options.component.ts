@@ -59,6 +59,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onCreateClick() {
+    // this.data.forceMenuCloseEmitter.emit(null);
     this.data.setPath(null);
     this.router.navigate(['/routes/create']);
   }

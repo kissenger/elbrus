@@ -4,7 +4,7 @@
 
   <div *ngIf="windowWidth<BREAKPOINT" class="icon-group">
     <div class="icon-background-btn" (click)="onMapIconClick()">
-      <img src="assets/images/icon-menu-map.svg" [ngClass]="!isData&&!position ? 'icon-inactive' : ''" class="icon" title="View map options">
+      <img src="assets/images/icon-menu-map.svg" class="icon" title="View map options">
     </div>
   </div>
 
@@ -46,12 +46,12 @@
 
   <div *ngIf="callingPage!=='list'" class="icon-group">
 
-    <div class="icon-background-btn" (click)="map.undo()">
-      <img src="assets/images/icon-menu-create-undo.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Undo last action">
+    <div class="icon-background-btn">
+      <img src="assets/images/icon-menu-create-undo.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Undo last action" (click)="map.undo()">
     </div>
 
-    <div class="icon-background-btn" (click)="onToolsIconClick()">
-      <img src="assets/images/icon-menu-create-tools.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Show route tools menu">
+    <div class="icon-background-btn">
+      <img src="assets/images/icon-menu-create-tools.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Show route tools menu" (click)="onToolsIconClick()">
     </div>
 
     <div class="icon-radio-group">

@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Component, Input, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
@@ -19,6 +20,9 @@ export class DisplayMobileComponent implements OnInit {
    ) { }
 
   ngOnInit() {
+    if (this.callingPage === 'create') {
+      this.isMenuOpen = false;
+    }
   }
 
   onToggleClick() {

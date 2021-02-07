@@ -11,11 +11,10 @@ import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { TsUnits, TsBoundingBox, TsCoordinate, TsListItem, TsMapRequest } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
-import { AlertService } from 'src/app/shared/services/alert.service';
 import { ListItems } from 'src/app/shared/classes/list-items';
 
 const LIST_ITEM_HEIGHT = 37;
-const LIST_HEIGHT_CORRECTION = 300;  // higher number results in fewer routes loaded
+const LIST_HEIGHT_CORRECTION = 350;  // higher number results in fewer routes loaded
 
 @Component({
   selector: 'app-panel-list',

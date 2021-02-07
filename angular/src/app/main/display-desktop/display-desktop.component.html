@@ -12,11 +12,7 @@
     <app-info-panel callingPage={{callingPage}}></app-info-panel>
   </div>
 
-  <div
-    [ngClass]="!isMenuOpen&&data.isPath() ? 'small-details-open' : ''"
-    class="small-details overflow-hidden  ml-auto"
-    (click)="onToggleClick()">
-
+  <div [ngClass]="!isMenuOpen&&data.isPath() ? 'small-details-open' : ''" class="small-details overflow-hidden ml-auto" (click)="onToggleClick()">
     <app-panel-details-summary callingPage={{callingPage}}> </app-panel-details-summary>
   </div>
 
