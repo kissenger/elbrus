@@ -55,7 +55,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   private startPathId: string;
 
   // keep track of user and preferences
-  public isRegisteredUser = this.auth.isRegisteredUser();
+  public isRegisteredUser = this.auth.isRegistered;
   public units: TsUnits;
   public home: TsCoordinate;
 
@@ -69,9 +69,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.limit = Math.max(1, Math.floor(((window.innerHeight - LIST_HEIGHT_CORRECTION) / LIST_ITEM_HEIGHT)));
-    this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
+    this.units = this.isRegisteredUser ? this.auth.user.units : globals.defaultUnits;
     this.newUnitsListener = this.data.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
+      this.units = this.isRegisteredUser ? this.auth.user.units : globals.defaultUnits;
     });
 
     // Map view has changed, need to update list

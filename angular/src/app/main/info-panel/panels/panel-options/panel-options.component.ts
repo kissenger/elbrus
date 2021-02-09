@@ -53,7 +53,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   /** virtually clicks the hidden form element to launch the select file dialogue */
   onImportGpxClick() {
-    if (!this.auth.isRegisteredUser()) { return; }
+    if (!this.auth.isRegistered) { return; }
     document.getElementById('file-select-single').click();
   }
 
@@ -75,7 +75,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onCopyClick() {
-    if (!this.auth.isRegisteredUser()) { return; }
+    if (!this.auth.isRegistered) { return; }
     this.httpListener = this.http.copyPath(this.pathType, this.pathId).subscribe( (result) => {
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router.onSameUrlNavigation = 'reload';
@@ -85,7 +85,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onDeleteClick() {
-    if (!this.auth.isRegisteredUser()) { return; }
+    if (!this.auth.isRegistered) { return; }
     this.alert.showAsElement('Are you sure?', 'Cannot undo delete!', true, true).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
         this.http.deletePath(this.pathId).subscribe( () => {
@@ -98,13 +98,13 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
 
   onEditClick() {
-    if (!this.auth.isRegisteredUser()) { return; }
+    if (!this.auth.isRegistered) { return; }
     this.router.navigate(['/routes/edit']);
   }
 
 
   onShareClick() {
-    if (!this.auth.isRegisteredUser()) { return; }
+    if (!this.auth.isRegistered) { return; }
     const link = `${environment.PROTOCOL}://${environment.FRONTEND_URL}/routes/list/${this.pathId}`;
     navigator.clipboard.writeText(link)
       .then( () => {

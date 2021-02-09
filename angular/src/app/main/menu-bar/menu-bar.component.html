@@ -23,7 +23,7 @@
     </div>
 
     <div class="icon-background-btn" (click)="map.goto(homeLngLat)">
-      <img src="assets/images/icon-menu-goto-home.svg" class="icon" title="Goto home">
+      <img src="assets/images/icon-menu-goto-home.svg" [ngClass]="auth.isGuest ? 'icon-inactive' : ''"class="icon" class="icon" title="Goto home">
     </div>
 
     <div class="icon-background-btn" (click)="map.goto(position)">

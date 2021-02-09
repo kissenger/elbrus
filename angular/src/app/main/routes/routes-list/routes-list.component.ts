@@ -60,7 +60,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       const path = await this.getPath(idFromStore);
 
       // allow if createdBy this user, or if public
-      if (path.properties.info.isPublic || this.auth.getUser().userName === path.properties.info.createdBy) {
+      if (path.properties.info.isPublic || this.auth.user.userName === path.properties.info.createdBy) {
 
         this.data.setPath(path);
         this.data.set({startPath: true}); // tells panel-list that we are showing a shared path

@@ -121,6 +121,7 @@ authRoute.post('/api/login', async (req, res) => {
     } else {
 
       user = await Users.findOne( {userName: userName}, {} );
+
       if (!user) {
         throw new AuthenticationError('User name not found.');
       };
@@ -135,7 +136,9 @@ authRoute.post('/api/login', async (req, res) => {
     }
 
     const token = jsonwebtoken.sign( subject, KEY );
+   // console.log({token, ...JSON.parse(JSON.stringify(user))});
     res.status(200).send({token, user});
+    // res.status(200).send({token, ...JSON.parse(JSON.stringify(user))});
 
   } catch (error) {
 

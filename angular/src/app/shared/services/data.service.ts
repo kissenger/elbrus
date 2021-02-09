@@ -51,6 +51,7 @@ export class DataService {
 
 
 
+
   // saves a key/value pair to the data store
   public set(data: {
     mapView?: any,
@@ -73,6 +74,9 @@ export class DataService {
       return this.dataStore[keyName];
   }
 
+  public clearAll() {
+    this.dataStore = {};
+  }
 
   // delete key/value pair from the store
   public clearKey(keyName: string) {

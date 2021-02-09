@@ -62,14 +62,13 @@ export class MapService {
         mapZoom = startZoom ? startZoom : globals.defaultMapView.zoom;
 
       } else if ( this.data.get('mapView') ) {
-
         // otherwise look for stored mapview
         mapCentre = this.data.get('mapView').centre;
         mapZoom = this.data.get('mapView').zoom;
 
-      } else if ( this.auth.isRegisteredUser() ) {
+      } else if ( this.auth.isRegistered ) {
         // if that doesnt work, try to find the default location of the logged-in user
-        mapCentre = this.auth.getUser().homeLngLat;
+        mapCentre = this.auth.user.homeLngLat;
         mapZoom = globals.defaultMapView.zoom;
 
       } else {
@@ -113,8 +112,8 @@ export class MapService {
         this.tsMap.on('load', () => {
 
           // add home marker
-          if (this.auth.isRegisteredUser()) {
-            this.markers.add('home', 'home', this.auth.getUser().homeLngLat, this.tsMap);
+          if (this.auth.isRegistered) {
+            this.markers.add('home', 'home', this.auth.user.homeLngLat, this.tsMap);
           }
 
           this.data.set({mapView: this.getMapView()});

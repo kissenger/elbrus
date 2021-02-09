@@ -57,7 +57,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     this.map.createRoute();
     this.location.watch(this.map);
 
-    if ( this.auth.isGuestUser() ) {
+    if ( this.auth.isGuest ) {
       this.alert.showAsElement(`Warning: Route will not be saved`,
       'Routes created as using guest account cannot be saved.  If you wish to save your route, please log in.'
       , true, false).subscribe( () => {});

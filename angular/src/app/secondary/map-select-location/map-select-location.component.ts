@@ -28,7 +28,7 @@ export class MapSelectLocationComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
 
-    this.home = this.auth.getUser().homeLngLat;
+    this.home = this.auth.user.homeLngLat;
     await this.map.newMap(this.home);
 
     this.newLocationListener = this.data.clickedCoordsEmitter.subscribe( (newHome: TsCoordinate) => {

@@ -1,3 +1,4 @@
+import { DataService } from './data.service';
 import { Injectable } from '@angular/core';
 import { TsUser } from 'src/app/shared/interfaces';
 import { HttpService } from './http.service';
@@ -6,58 +7,67 @@ import { HttpService } from './http.service';
 
 export class AuthService {
 
+  private MAX_AGE = 60 * 60 * 24 * 365 * 10;  // 31 days
+  private COOKIE_NAME_USER = '__tsusr';
+  private COOKIE_NAME_TOKEN = '__tstkn';
+
   constructor(
-    private http: HttpService
-  ) {
+    private http: HttpService,
+    private data: DataService
+  ) {}
 
+
+  public get isLoggedIn() {
+    return !!this.token;
   }
 
-  isToken() {
-    // if there is a token then we are logged in as user or guest
-    return !!sessionStorage.getItem('tsToken');
+  public get isGuest() {
+    return !!(this.user.userName === 'guest');
   }
 
-  isGuestUser() {
+  public get isRegistered() {
+    return this.isLoggedIn && !this.isGuest;
+  }
+
+
+  public set user(user: TsUser) {
+    document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; max-age=${this.MAX_AGE}; Path=\\`;
+  }
+
+  public set token(token: string) {
+    document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; max-age=${this.MAX_AGE}; Path=\\`;
+  }
+
+  public get user() {
     try {
-      return JSON.parse(sessionStorage.getItem('user')).userName === 'guest';
+      return JSON.parse(this.fetchCookie(this.COOKIE_NAME_USER));
     } catch {
-      return false;
+      return null;
     }
   }
 
-  isRegisteredUser() {
-    return this.isToken() && !this.isGuestUser();
+  public get token() {
+    try {
+      return JSON.parse(this.fetchCookie(this.COOKIE_NAME_TOKEN));
+    } catch {
+      return null;
+    }
   }
 
-  getToken() {
-    return sessionStorage.getItem('tsToken');
+  private fetchCookie(cookieName: string) {
+    return document.cookie?.split('; ').find(row => row.startsWith(cookieName))?.split('=')[1];
   }
 
-  setToken(token: string) {
-    sessionStorage.setItem('tsToken', token);
-  }
-
-  setUser(user: TsUser) {
-    sessionStorage.setItem('user', JSON.stringify(user));
-  }
-
-  getUser() {
-    return JSON.parse(sessionStorage.getItem('user'));
-  }
-
-  deleteToken() {
-    sessionStorage.removeItem('tsToken');
-    sessionStorage.removeItem('user');
+  private deleteCookie(cookieName: string) {
+    document.cookie = `${cookieName}=; max-age=0`;
   }
 
   logout() {
-    // actually just re-login as guest - unless sthat fails, in which case delete the token
-    // try {
-    //   this.login( 'guest', null );
-    // } catch {
-      this.deleteToken();
-    // }
+    this.deleteCookie(this.COOKIE_NAME_USER);
+    this.deleteCookie(this.COOKIE_NAME_TOKEN);
+    this.data.clearAll();
   }
+
 
   login( userName: string, password: string ) {
 
@@ -65,13 +75,12 @@ export class AuthService {
 
       this.http.login( {userName, password} ).subscribe( (result) => {
 
-        this.setToken(result.token);
-        this.setUser(result.user);
+        this.user = result.user;
+        this.token = result.token;
         res();
 
       }, (error) => {
 
-        // throw new Error(error);
         rej(error);
 
       });
@@ -80,15 +89,14 @@ export class AuthService {
   }
 
 
-  register(user) {
+  register(user: TsUser) {
 
     return new Promise<void>( (res, rej) => {
 
-
       this.http.register(user).subscribe( (result) => {
 
-        this.setToken(result.token);
-        this.setUser(result.user);
+        this.user = result.user;
+        this.token = result.token;
         res();
 
       }, (error) => {

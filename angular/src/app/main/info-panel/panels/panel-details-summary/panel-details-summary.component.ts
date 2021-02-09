@@ -17,7 +17,7 @@ export class PanelDetailsSummaryComponent implements OnInit, OnDestroy {
   @Input() callingPage: TsCallingPageType;
 
   // listeners
-  // private pathListener: Subscription;
+  private unitsListener: Subscription;
 
   // geoJson variables
   public geoJson: TsFeatureCollection;
@@ -34,9 +34,9 @@ export class PanelDetailsSummaryComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
-    this.data.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.auth.getUser().units;
+    this.units = this.auth.isRegistered ? this.auth.user.units : globals.defaultUnits;
+    this.unitsListener = this.data.unitsUpdateEmitter.subscribe( () => {
+      this.units = this.auth.user.units;
     });
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
@@ -66,6 +66,7 @@ export class PanelDetailsSummaryComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
+    if (this.unitsListener) { this.unitsListener.unsubscribe(); }
   }
 
 }

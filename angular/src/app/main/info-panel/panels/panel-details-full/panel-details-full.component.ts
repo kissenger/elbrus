@@ -26,7 +26,8 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
 
   // listeners
   private pathListener: Subscription;
-  private minimisePanelListener: Subscription;
+  private unitsListener: Subscription;
+
 
   // charting variables
   public chartData: ChartDataSets[] = [];
@@ -59,9 +60,9 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.units = this.auth.isRegisteredUser() ? this.auth.getUser().units : globals.defaultUnits;
-    this.data.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.auth.getUser().units;
+    this.units = this.auth.isRegistered ? this.auth.user.units : globals.defaultUnits;
+    this.unitsListener = this.data.unitsUpdateEmitter.subscribe( () => {
+      this.units = this.auth.user.units;
     });
 
     // both created and imported paths data are sent from map-service when the geoJSON is plotted: listen for the broadcast
@@ -278,7 +279,7 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.pathListener) { this.pathListener.unsubscribe(); }
-    if (this.minimisePanelListener) { this.minimisePanelListener.unsubscribe(); }
+    if (this.unitsListener) { this.unitsListener.unsubscribe(); }
   }
 
 }

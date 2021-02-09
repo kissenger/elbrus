@@ -37,7 +37,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
    */
   async ngOnInit() {
 
-    this.user = this.auth.getUser();
+    this.user = this.auth.user;
     const newLocation = this.data.get('newLocation');
     this.data.clearKey('newLocation');  // TODO: needed?
     const oldLocation = this.user.homeLngLat; // needed in case new location cannot be saved, revert back to old
@@ -88,7 +88,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       this.httpSubscription = this.http.updateUserData(this.user).subscribe( (res) => {
         this.spinner.removeElement();
-        this.auth.setUser(this.user);
+        // this.auth.setUser(this.user);
         resolve(true);
       },
 

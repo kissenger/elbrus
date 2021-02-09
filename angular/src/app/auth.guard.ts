@@ -1,6 +1,6 @@
 import { DataService } from './shared/services/data.service';
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { AuthService } from './shared/services/auth.service';
 
 /**
@@ -15,7 +15,6 @@ export class AuthGuard implements CanActivate {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private activatedRoute: ActivatedRoute,
     private data: DataService
   ) {}
 
@@ -23,7 +22,7 @@ export class AuthGuard implements CanActivate {
 
     const url: string = state.url;
 
-    if ( this.auth.isToken() ) {
+    if ( this.auth.isLoggedIn ) {
 
       // If the last query parameter in the url is a mongo object id, store it and redirect to routes/list
       const lastQueryParam = url.split('/').slice(-1)[0];

@@ -41,7 +41,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.homeLngLat = this.auth.getUser().homeLngLat;
+    this.homeLngLat = this.auth.user.homeLngLat;
 
     // listen for when data is set to be able to enable the view buttons
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {

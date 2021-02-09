@@ -9,19 +9,8 @@
 
   <!-- <div *ngIf="windowWidth<BREAKPOINT" class="icon-group"> -->
     <div *ngIf='showProfileIcon' class="icon-background-btn my-auto px-2" >
-      <img *ngIf="auth.isRegisteredUser()" src="assets/images/icon-header-profile.svg" class="icon" title="View Profile" (click)="onProfileClick()">
-      <img *ngIf="auth.isGuestUser()" src="assets/images/icon-header-profile.svg" class="icon" title="Register/Login" (click)="onLogoutClick()">
+      <img *ngIf="auth.isRegistered" src="assets/images/icon-header-profile.svg" class="icon" title="View Profile" (click)="onProfileClick()">
+      <img *ngIf="auth.isGuest" src="assets/images/icon-header-profile.svg" class="icon" title="Register/Login" (click)="onLogoutClick()">
     </div>
-  <!-- </div> -->
-<!--
-  <div *ngIf='showMenu' class="dropdown mx-1 my-auto h-100 pull-right">
-    <div class="dropbtn dropdown-toggle m-0 px-2 py-1">Menu</div>
-    <div class="dropdown-content dropdown-menu-right">
-      <li *ngIf="auth.isRegisteredUser()" (click)="onProfileClick()" class="p-2">View Profile</li>
-      <li *ngIf="auth.isRegisteredUser()" (click)="onLogoutClick()" class="p-2">Logout</li>
-      <li *ngIf="auth.isGuestUser()" (click)="onLoginClick()" class="p-2">Login/Register</li>
-      <li *ngIf="auth.isGuestUser()" (click)="onLogoutClick()" class="p-2">Welcome page</li>
-    </div>
-  </div> -->
 
 </div>

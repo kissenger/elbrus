@@ -61,7 +61,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       await this.auth.login(userName, password);
       const redirect = this.data.get('redirect');
-      this.data.clearKey('reDirect');
+      // this.data.clearKey('reDirect');
+      this.data.clearAll(); // new login so clear all stored data
       if ( redirect ) {
         this.router.navigate([redirect]);
       } else {
@@ -105,6 +106,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       try {
         await this.auth.register(user);
+        this.data.clearAll(); // new login so clear all stored data
         this.router.navigate(['routes/list']);
 
       } catch (error) {

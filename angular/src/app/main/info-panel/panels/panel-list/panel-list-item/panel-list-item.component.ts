@@ -16,7 +16,7 @@ export class PanelListItemComponent implements OnInit, OnDestroy {
 
   @Input() item: TsListItem;
   public units: TsUnits;
-  public isRegisteredUser = this.auth.isRegisteredUser();
+  public isRegisteredUser = this.auth.isRegistered;
   private dataSubscription: Subscription;
 
   constructor(
@@ -26,11 +26,11 @@ export class PanelListItemComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
+    this.units = this.isRegisteredUser ? this.auth.user.units : globals.defaultUnits;
 
     // in case units are changed while viewing the list
     this.dataSubscription = this.data.unitsUpdateEmitter.subscribe( () => {
-      this.units = this.isRegisteredUser ? this.auth.getUser().units : globals.defaultUnits;
+      this.units = this.isRegisteredUser ? this.auth.user.units : globals.defaultUnits;
     });
   }
 

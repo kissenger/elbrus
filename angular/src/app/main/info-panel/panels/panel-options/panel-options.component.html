@@ -20,7 +20,7 @@
 
     <div class="w-100 text-center h6 mb-3 mt-3">New Routes</div>
 
-    <div [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="onImportGpxClick()">
+    <div [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="onImportGpxClick()">
       Import .gpx file
     </div>
 
@@ -33,21 +33,21 @@
 
       <div class="w-100 text-center h6 mb-3 mt-3 pt-3">Route Options</div>
 
-      <div *ngIf="auth.isRegisteredUser() && (!isPathPublic || createdBy === auth.getUser().userName)"
+      <div *ngIf="auth.isRegistered && (!isPathPublic || createdBy === auth.user.userName)"
             class="ts-menu-item p-1 border-top"
             (click)="onChangePublicClick()">
         Make this route {{isPathPublic ? 'private' : 'public'}}
       </div>
 
       <div
-        [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
         class="ts-menu-item p-1 border-top"
         (click)="onCopyClick()">
         Copy this route
       </div>
 
       <div
-        *ngIf="createdBy === auth.getUser().userName"
+        *ngIf="createdBy === auth.user.userName"
         class="ts-menu-item p-1 border-top"
         (click)="onDeleteClick()">
         Delete this route
@@ -55,7 +55,7 @@
 
       <div
         *ngIf="isPathPublic"
-        [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
         class="ts-menu-item p-1 border-top"
         (click)="onShareClick()">
         Get a shareable link
@@ -64,7 +64,7 @@
 
 
       <div
-        [ngClass]="!auth.isRegisteredUser() ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
         class="ts-menu-item p-1 border-top"
         (click)="onExportGpxClick()">
         Export to .gpx file
