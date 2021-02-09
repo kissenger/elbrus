@@ -113,13 +113,10 @@ function getListData(docs) {
   return docs.map( d => ({
     name: d.info.name,
     stats: d.stats,
-    // category: d.info.category,
-    // direction: d.info.direction,
-    // pathType: d.info.pathType,
-    // startTime: d.startTime,
-    // creationDate: d.creationDate,
-    // isElevations: d.info.isElevations,
-    // isLong: d.info.isLong,
+    info: {
+      ...d.info,
+      isPublic: d.isPublic
+    },
     pathId: d._id
     })
   );

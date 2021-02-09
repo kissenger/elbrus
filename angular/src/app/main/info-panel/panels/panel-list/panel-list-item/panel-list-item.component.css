@@ -3,6 +3,9 @@ div {
   border: 1px blue solid;
 } */
 
+img {
+  height: 15px;
+}
 .list-item {
   cursor: pointer;
 }

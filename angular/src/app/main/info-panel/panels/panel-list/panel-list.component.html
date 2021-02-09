@@ -49,7 +49,7 @@
 
         <div (click)="listAction(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
           <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
-            <app-panel-list-item  [item]="item" class="m-0 p-0 "></app-panel-list-item>
+            <app-panel-list-item  [item]="item" [isPublicDropDown]="isPublicDropDown" class="m-0 p-0 "></app-panel-list-item>
           </div>
         </div>
 

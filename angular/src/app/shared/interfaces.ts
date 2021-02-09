@@ -44,18 +44,12 @@ export interface TsMapView {
 export interface TsListItem {
   name: string;
   stats: TsPathStats;
-  category: string;
-  direction: string;
-  pathType: string;
-  startTime: string;
-  creationDate: string;
+  info: TsInfo;
   pathId: string;
-  count: number;
-  isElevations: boolean;
-  isLong: boolean;
   isActive?: boolean;
   colour?: string;
 }
+
 
 export type TsListArray = TsListItem[];
 

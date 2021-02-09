@@ -2,9 +2,20 @@
 
     <div id="{{item.pathId}}" class="list-item px-1 py-0 m-0 w-100">
 
-        <div class="row m-0 p-0">
-          <div class="col m-0 p-0 name">
+        <div class="row m-0 p-0 border">
+          <div class="col m-0 p-0 name border">
             {{item.name | shortName: 24}}
+          </div>
+          <!-- {{item.info.isPublic}}
+          {{!isPublicDropDown}} -->
+          <div *ngIf="!isPublicDropDown">
+            <img *ngIf="item.info.isPublic" src="assets/images/icon-list-public.svg" class="icon mt-1" title="Public route">
+            <img *ngIf="item.info.createdBy===auth.user.userName" src="assets/images/icon-list-owner.svg" class="icon mt-1" title="Created by me">
+
+          </div>
+
+          <div *ngIf="isPublicDropDown">
+            <img *ngIf="item.info.createdBy===auth.user.userName" src="assets/images/icon-list-owner.svg" class="icon mt-1" title="Created by me">
           </div>
         </div>
 
@@ -15,10 +26,11 @@
             {{item.stats.distance | unitsString: 'distance': units.distance}}
           </div>
 
-          <div *ngIf="!!item.stats.elevations" class="col-4 m-0 p-0 text-left">
+          <div *ngIf="!!item.stats.elevations" class="col-4 m-0 p-0 text-center">
             {{item.stats.elevations.ascent | unitsString: 'elevation': units.elevation}}
           </div>
-          <div *ngIf="!!item.stats.elevations" class="col-4 m-0 p-0 text-left">
+
+          <div *ngIf="!!item.stats.elevations" class="col-4 m-0 p-0 text-right">
             {{item.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}
           </div>
 

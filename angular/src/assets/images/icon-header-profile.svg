@@ -18,11 +18,11 @@
      id="defs9035">
     <clipPath
        clipPathUnits="userSpaceOnUse"
-       id="clipPath2176">
+       id="clipPath2121">
       <circle
          style="fill:none;stroke:#000000;stroke-width:0.0901417;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         id="circle2178"
-         cx="47.716496"
+         id="circle2123"
+         cx="48.205353"
          cy="49.39946"
          r="12.482759" />
     </clipPath>
@@ -34,11 +34,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.7035448"
-     inkscape:cx="102.50143"
-     inkscape:cy="73.385707"
+     inkscape:zoom="7.1339001"
+     inkscape:cx="48.505735"
+     inkscape:cy="52.626449"
      inkscape:document-units="mm"
-     inkscape:current-layer="g2145"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:pagecheckerboard="false"
@@ -48,10 +48,10 @@
      fit-margin-bottom="0"
      lock-margins="false"
      inkscape:snap-global="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="837"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata9038">
@@ -61,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -72,35 +72,36 @@
      transform="translate(-32.134897,-36.628033)">
     <g
        id="g2145"
-       transform="matrix(0.80077051,0,0,0.80077051,8.7834721,9.071693)"
-       clip-path="url(#clipPath2176)">
+       transform="matrix(0.80077051,0,0,0.80077051,8.7834723,9.071693)"
+       clip-path="none">
       <path
          id="rect8901-2"
          style="fill:#ffffff;stroke:none;stroke-width:0.0292103;stroke-linecap:round;stroke-opacity:0.6"
-         d="m 41.465457,48.855738 c -3.043886,0 -5.494238,2.450869 -5.494238,5.494756 v 5.403803 h 23.490555 v -5.403803 c 0,-3.043887 -2.450352,-5.494756 -5.494238,-5.494756 z" />
+         d="m 41.954313,48.855738 c -3.043886,0 -5.494238,2.450869 -5.494238,5.494756 v 5.403803 H 59.95063 v -5.403803 c 0,-3.043887 -2.450352,-5.494756 -5.494238,-5.494756 z" />
       <path
          id="rect8901"
          style="fill:#523209;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-opacity:0.6"
-         d="m 42.111929,49.961614 c -2.757111,0 -4.976957,2.219847 -4.976957,4.976956 l 3.747311,9.748195 17.53046,-4.882859 V 54.93857 c 0,-2.757109 -2.219847,-4.976956 -4.976958,-4.976956 z"
-         sodipodi:nodetypes="ssccsss" />
+         d="m 42.543425,49.961614 c -2.757111,0 -4.976957,2.219847 -4.976957,4.976956 l 0.01942,9.281982 21.184135,0.05445 0.07421,-4.471092 v -4.86534 c 0,-2.757109 -2.219847,-4.976956 -4.976958,-4.976956 z"
+         sodipodi:nodetypes="sscccsss"
+         clip-path="url(#clipPath2121)" />
       <circle
          style="fill:#ffffff;stroke:none;stroke-width:0.0326784;stroke-linecap:round;stroke-opacity:0.6"
          id="path8897-5"
-         cx="47.773914"
+         cx="48.205353"
          cy="44.227852"
          r="7.0470495" />
       <circle
          style="fill:#523209;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-opacity:0.6"
          id="path8897"
-         cx="47.773914"
+         cx="48.205349"
          cy="44.227852"
          r="5.7057104" />
     </g>
     <circle
        style="fill:none;stroke:#523209;stroke-width:0.967224;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path2147-0"
-       cx="46.993435"
-       cy="49.110359"
+       cx="47.384895"
+       cy="48.938068"
        r="11.066983" />
   </g>
 </svg>

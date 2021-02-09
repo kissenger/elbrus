@@ -15,17 +15,17 @@ import { DataService } from 'src/app/shared/services/data.service';
 export class PanelListItemComponent implements OnInit, OnDestroy {
 
   @Input() item: TsListItem;
+  @Input() isPublicDropDown: boolean;
   public units: TsUnits;
   public isRegisteredUser = this.auth.isRegistered;
   private dataSubscription: Subscription;
 
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     private data: DataService,
     ) { }
 
   ngOnInit() {
-
     this.units = this.isRegisteredUser ? this.auth.user.units : globals.defaultUnits;
 
     // in case units are changed while viewing the list
