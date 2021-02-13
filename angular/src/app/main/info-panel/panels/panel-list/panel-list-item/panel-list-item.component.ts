@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { Component, OnInit, OnDestroy, Input} from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges} from '@angular/core';
 import * as globals from 'src/app/shared/globals';
 import { TsListItem, TsUnits } from 'src/app/shared/interfaces';
 import { AuthService } from 'src/app/shared/services/auth.service';
@@ -15,7 +15,7 @@ import { DataService } from 'src/app/shared/services/data.service';
 export class PanelListItemComponent implements OnInit, OnDestroy {
 
   @Input() item: TsListItem;
-  @Input() isPublicDropDown: boolean;
+  @Input() listType: 'public' | 'private';
   public units: TsUnits;
   public isRegisteredUser = this.auth.isRegistered;
   private dataSubscription: Subscription;

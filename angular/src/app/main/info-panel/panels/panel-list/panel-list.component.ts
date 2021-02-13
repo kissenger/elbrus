@@ -4,7 +4,7 @@
  * Emits the desired changes to the displayed map (listener is routes-list component)
  */
 
-import { Component, OnInit, OnDestroy, Input, PACKAGE_ROOT_URL } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import * as globals from 'src/app/shared/globals';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -50,7 +50,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
-  public isPublicDropDown = null;   // state of the dropdown box
+  public listType: 'public' | 'private' = null;
   private boundingBox: TsBoundingBox = null;    // current view
   private startPathId: string;
 
@@ -82,10 +82,13 @@ export class PanelListComponent implements OnInit, OnDestroy {
         // check for start path, if yes then we need list to tell us which path is displayed
         this.data.clearKey('startPath');
         this.startPathId = this.data.getPath().properties.pathId;
-        this.isPublicDropDown = this.data.getPath().properties.info.isPublic;
+        this.listType = this.data.getPath().properties.info.isPublic ? 'public' : 'private';
       } else {
         // if there is no startPath, need some logic to set the dropdown  (if already set, dont change it)
-        this.isPublicDropDown = !this.isPublicDropDown && this.isRegisteredUser ? false : true;
+        if (!this.listType) {
+          this.listType = this.isRegisteredUser ? 'public' : 'private';
+        }
+
       }
 
       this.boundingBox = bounds;
@@ -117,7 +120,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // } else {
 
       this.isLoading = true;
-      this.listListener = this.http.getPathsList('route', this.isPublicDropDown, this.offset, this.limit, this.boundingBox)
+      this.listListener = this.http.getPathsList('route', this.listType === 'public', this.offset, this.limit, this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
           this.listItems.merge(result.list);

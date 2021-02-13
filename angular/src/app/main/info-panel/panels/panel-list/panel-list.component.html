@@ -6,10 +6,10 @@
   <form>
 
     <!-- <div class="form-group m-0 p-0"> -->
-      <select [(ngModel)]="isPublicDropDown" name="gordon"
+      <select [(ngModel)]="listType" name="gordon"
         (ngModelChange)="onSelectMenuChange()" class="custom-select custom-select-sm my-1">
-        <option *ngIf="isRegisteredUser" [value]=false>My routes</option>
-        <option [value]=true>Public routes</option>
+        <option *ngIf="isRegisteredUser" value="private">My routes</option>
+        <option value="public">Public routes</option>
       </select>
     <!-- </div> -->
 
@@ -18,7 +18,7 @@
   <!-- EMPTY ROUTE LIST -->
   <div *ngIf="tabName === 'overlay' && nAvailableRoutes === 0" class="w-100 text-center flex-grow-1">
 
-{{tabName}}
+<!-- {{tabName}} -->
   </div>
 
   <div *ngIf="tabName === 'routes' && nAvailableRoutes === 0" class="w-100 text-center flex-grow-1">
@@ -27,11 +27,11 @@
       No routes found.
     </div>
 
-    <div *ngIf="!isPublicDropDown" class="small mt-3 text-center mt-auto">
+    <div *ngIf="listType==='private'" class="small mt-3 text-center mt-auto">
       Use the 'Options' tab to load or create a route, or use the dropdown above to view shared routes.
     </div>
 
-    <div *ngIf="isPublicDropDown" class="small mt-3 text-center mt-auto">
+    <div *ngIf="listType==='public'" class="small mt-3 text-center mt-auto">
       Only routes in the current map view are listed.  Try moving the map to find routes.
     </div>
 
@@ -49,7 +49,7 @@
 
         <div (click)="listAction(item.pathId)" [ngStyle]="getCssStyle(item.pathId, i)">
           <div class="highlight" [ngStyle]="getCssStyle(item.pathId, i, 'highlight')">
-            <app-panel-list-item  [item]="item" [isPublicDropDown]="isPublicDropDown" class="m-0 p-0 "></app-panel-list-item>
+            <app-panel-list-item  [item]="item" [listType]="listType" class="m-0 p-0"></app-panel-list-item>
           </div>
         </div>
 
