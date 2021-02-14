@@ -40,7 +40,15 @@
       </div>
 
       <div
-        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        *ngIf="createdBy === auth.user.userName"
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''"
+        class="ts-menu-item p-1 border-top"
+        (click)="onEditClick()">
+        Edit this route
+      </div>
+
+      <div
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''"
         class="ts-menu-item p-1 border-top"
         (click)="onCopyClick()">
         Copy this route
@@ -55,16 +63,14 @@
 
       <div
         *ngIf="isPathPublic"
-        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''"
         class="ts-menu-item p-1 border-top"
         (click)="onShareClick()">
         Get a shareable link
       </div>
 
-
-
       <div
-        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top"
+        [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''"
         class="ts-menu-item p-1 border-top"
         (click)="onExportGpxClick()">
         Export to .gpx file
