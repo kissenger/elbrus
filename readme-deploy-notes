@@ -75,9 +75,9 @@ sudo docker system prune -a
 sudo docker-compose up --build --detach
 
 
-*******
-STORAGE 
-*******
+***********
+VM STORAGE 
+***********
 
 If machine gets restarted for any reason, mounted drives will be lost and need remounting.
 
@@ -89,15 +89,14 @@ follow instructions here: https://cloud.google.com/compute/docs/disks/add-persis
 to list available disks: sudo lsblk
 to mount the disk: sudo mount -o discard,defaults /dev/sdb ./data
 
-Copying ASTGTM files from Google Cloud Storage to VM Storage
------------------------------------------------------------
-go to destination and type (from https://cloud.google.com/storage/docs/gsutil/commands/cp):
-sudo gsutil cp -r gs://trailscape-geotiffs .
 
 
 ************************************
-Downloading ASTGTM_v003 data
+Elevation Data ASTGTM_v003 data
 ************************************
+
+Downloading source data
+-----------------------
 download data from: https://search.earthdata.nasa.gov/search
 login: ki..
 passwrd: E..1
@@ -107,7 +106,12 @@ Use command: "C:\Program Files\7-Zip\7z.exe" e *.zip -oc:\unzip
 ... to unzip all into a directory, losing the directory structure
 Delete all *_num.tif files
 Upload to cloud storage bucket (just upload files or folder): https://console.cloud.google.com/storage/browser?project=trailscape&prefix=
-See above for transferring to VM storage
+
+Copying ASTGTM files from Google Cloud Storage to VM Storage
+-----------------------------------------------------------
+go to destination and type (from https://cloud.google.com/storage/docs/gsutil/commands/cp):
+sudo gsutil cp -r gs://trailscape-geotiffs-europe/_ASTGTM .
+
 
 ***********************************
 VIEW CONTENTS OF A DOCKER CONTAINER
