@@ -268,7 +268,12 @@ export class MapCreateService extends MapService {
     this.tsMap.on('contextmenu', '0000pts', this.onRightClick);
     this.tsMap.on('mouseenter', '0000pts', this.onMouseEnter);
     this.tsMap.on('mouseleave', '0000pts', this.onMouseLeave);
-
+    this.tsMap.on('mousedown', () => {
+      this.tsMap.getCanvas().style.cursor = 'grabbing';
+    });
+    this.tsMap.on('mouseup', () => {
+      this.tsMap.getCanvas().style.cursor = 'crosshair';
+    });
   }
 
 
