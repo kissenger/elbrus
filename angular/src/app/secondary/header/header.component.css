@@ -13,7 +13,9 @@ div{
   height: 35px;
 }
 
-
+.icon-holder {
+  color: var(--ts-brown);
+}
 
 .header-container {
   border-bottom: 1px var(--ts-green) solid;

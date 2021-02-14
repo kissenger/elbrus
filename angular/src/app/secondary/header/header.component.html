@@ -7,10 +7,11 @@
     </a>
   </div>
 
-  <!-- <div *ngIf="windowWidth<BREAKPOINT" class="icon-group"> -->
-    <div *ngIf='showProfileIcon' class="icon-background-btn my-auto px-2" >
-      <img *ngIf="auth.isRegistered" src="assets/images/icon-header-profile.svg" class="icon" title="View Profile" (click)="onProfileClick()">
-      <img *ngIf="auth.isGuest" src="assets/images/icon-header-profile.svg" class="icon" title="Register/Login" (click)="onLogoutClick()">
-    </div>
+
+  <div *ngIf='showProfileIcon' class="icon-holder my-auto px-2" >
+    {{auth.user.userName}}
+    <img *ngIf="auth.isRegistered" src="assets/images/icon-header-profile.svg" class="icon" title="View Profile" (click)="onProfileClick()">
+    <img *ngIf="auth.isGuest" src="assets/images/icon-header-profile.svg" class="icon" title="Register/Login" (click)="onLogoutClick()">
+  </div>
 
 </div>

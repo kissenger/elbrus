@@ -34,8 +34,16 @@ export class AuthService {
     document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; max-age=${this.MAX_AGE}; Path=\\`;
   }
 
-  public set token(token: string) {
+  public set guest(user: TsUser) {
+    document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; Path=\\`;
+  }
+
+  public set userToken(token: string) {
     document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; max-age=${this.MAX_AGE}; Path=\\`;
+  }
+
+  public set guestToken(token: string) {
+    document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; Path=\\`;
   }
 
   public get user() {
@@ -75,8 +83,13 @@ export class AuthService {
 
       this.http.login( {userName, password} ).subscribe( (result) => {
 
-        this.user = result.user;
-        this.token = result.token;
+        if (result.user.userName === 'guest') {
+          this.guest = result.user;
+          this.guestToken = result.token;
+        } else {
+          this.user = result.user;
+          this.userToken = result.token;
+        }
         res();
 
       }, (error) => {
@@ -96,7 +109,7 @@ export class AuthService {
       this.http.register(user).subscribe( (result) => {
 
         this.user = result.user;
-        this.token = result.token;
+        this.userToken = result.token;
         res();
 
       }, (error) => {

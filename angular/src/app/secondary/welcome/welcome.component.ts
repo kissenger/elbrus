@@ -19,6 +19,9 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    if (this.auth.isRegistered) {
+      this.router.navigate(['routes/list']);
+    }
   }
 
   async onGuestClick() {
