@@ -29,8 +29,8 @@ export const defaultUnits: TsUnits = {
 };
 
 export const defaultMapView: TsMapView = {
-    centre: {lat: 51.47685, lng: -0.00000},
-    zoom: 12
+    centre: {lat: 54.5, lng: -3.4360},
+    zoom: 4.8
 };
 
 
