@@ -37,7 +37,7 @@
 
 
   <!-- DATA -->
-  <div *ngIf="isData" class="absolute-container d-flex flex-column p-2">
+  <div *ngIf="data.isPath()" class="absolute-container d-flex flex-column p-2">
 
     <!-- NAME & DESCRIPTION only for list page -->
     <div *ngIf="callingPage==='list'; else showForm" class="pb-2 border-bottom text-center">

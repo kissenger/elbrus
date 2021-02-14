@@ -31,7 +31,6 @@ export class MapCreateService extends MapService {
   private pathToEdit: TsFeatureCollection;
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
-  private symbols: TsFeatureCollection;
 
   constructor(
     http: HttpService,
@@ -73,10 +72,9 @@ export class MapCreateService extends MapService {
       if (this.isDev) { console.log(geoJson); }
     });
 
-    // save the current line, points and symbols because...
+    // save the current line, points because...
     this.line = this.history.geojsonClone;
     this.points = this.history.activePoints;
-    // this.symbols = this.history.startEndPoints;
 
     this.updateMapSource();
 
@@ -90,8 +88,13 @@ export class MapCreateService extends MapService {
 
     // manage markers :(
     if (this.markers.exists('0000start')) {
-      if (this.history.lastPath?.firstPoint) {
-        this.markers.move('0000start', this.history.lastPath.firstPoint);
+      if (!this.history.firstPoint) {
+        this.markers.delete('0000start');
+      } else {
+        if (this.history.lastPath) {
+          this.markers.move('0000start', this.history.lastPath.firstPoint );
+        }
+
       }
     } else {
       if (this.history.firstPoint) {
@@ -100,7 +103,11 @@ export class MapCreateService extends MapService {
     }
 
     if (this.markers.exists('0000finish')) {
-      this.markers.move('0000finish', this.history.lastPath.lastPoint );
+      if (this.history.lastPath) {
+        this.markers.move('0000finish', this.history.lastPath.lastPoint );
+      } else {
+        this.markers.delete('0000finish');
+      }
     } else if (this.history.lastPath?.lastPoint) {
       this.markers.add('0000finish', 'finish', this.history.lastPath.lastPoint, this.tsMap);
     }
@@ -179,6 +186,7 @@ export class MapCreateService extends MapService {
       if (alertBoxResponse) {
         this.history.clear();
         this.updateMap();
+        this.data.clearPath();
       }
 
     });
@@ -311,15 +319,12 @@ export class MapCreateService extends MapService {
   private onMove = (e: mapboxgl.MapLayerMouseEvent) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
+    console.log(this.points.features);
     this.points.features[this.selectedPointId].geometry.coordinates = coords;
 
     if (this.selectedLineIds) {
       // if there is a line plotted to move (ie not just the first point)
       this.selectedLineIds.forEach( ids => this.line.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
-    }
-
-    if (this.selectedPointId === 0 || this.selectedPointId === this.points.features.length - 1) {
-      this.symbols.features[this.selectedPointId === 0 ? 0 : 1].geometry.coordinates = coords;
     }
 
     this.updateMapSource();

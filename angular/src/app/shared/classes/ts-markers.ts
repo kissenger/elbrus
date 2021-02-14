@@ -19,6 +19,8 @@ export class TsMarkers {
     htmlElement.style.width = '40px';
     htmlElement.style.height = '80px';
     htmlElement.style.backgroundSize = 'cover';
+    htmlElement.style.pointerEvents = 'none';
+
 
 
     this.markers.push({

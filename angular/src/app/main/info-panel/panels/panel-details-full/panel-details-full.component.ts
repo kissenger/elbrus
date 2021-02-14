@@ -45,7 +45,7 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
   public units: TsUnits;
   public pathType: string;
   public pathDirection: string;
-  public isData = false;
+  // public isData = false;
 
   constructor(
     public data: DataService,
@@ -72,7 +72,6 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
       if ( this.data.isPath() ) {
 
         this.geoJson = this.data.getPath();
-        this.isData = true;
 
         if (this.geoJson?.properties?.info?.name) {
           this.givenName = this.geoJson.properties.info.name;
