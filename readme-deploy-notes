@@ -95,6 +95,20 @@ go to destination and type (from https://cloud.google.com/storage/docs/gsutil/co
 sudo gsutil cp -r gs://trailscape-geotiffs .
 
 
+************************************
+Downloading ASTGTM_v003 data
+************************************
+download data from: https://search.earthdata.nasa.gov/search
+login: ki..
+passwrd: E..1
+Use chrome extension "simple mass downloader" to download zips to directory
+(copy list of urls from download page and use "paste from urls" option in extension)
+Use command: "C:\Program Files\7-Zip\7z.exe" e *.zip -oc:\unzip
+... to unzip all into a directory, losing the directory structure
+Delete all *_num.tif files
+Upload to cloud storage bucket (just upload files or folder): https://console.cloud.google.com/storage/browser?project=trailscape&prefix=
+See above for transferring to VM storage
+
 ***********************************
 VIEW CONTENTS OF A DOCKER CONTAINER
 ***********************************
