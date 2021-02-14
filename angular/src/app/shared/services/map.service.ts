@@ -103,10 +103,11 @@ export class MapService {
 
         this.tsMap.on('moveend', (event) => {
           // conditional ensures we dont update list if the screensize changes, thereby minimising calls to the backend
-          if (event.originalEvent?.type === 'mouseup') {
-              this.data.set({mapView: this.getMapView()});
-              this.data.mapBoundsEmitter.emit(this.getMapBounds());
-            }
+          if (event.originalEvent?.type === 'resize') {
+          } else {
+            this.data.set({mapView: this.getMapView()});
+            this.data.mapBoundsEmitter.emit(this.getMapBounds());
+          }
         });
 
         this.tsMap.on('load', () => {
