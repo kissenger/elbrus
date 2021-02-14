@@ -86,7 +86,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
       } else {
         // if there is no startPath, need some logic to set the dropdown  (if already set, dont change it)
         if (!this.listType) {
-          this.listType = this.isRegisteredUser ? 'public' : 'private';
+          this.listType = this.isRegisteredUser ? 'private' : 'public';
         }
 
       }

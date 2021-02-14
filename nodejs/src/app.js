@@ -244,9 +244,9 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, as
 
 
     if ( req.role === 'guest' && req.params.isPublic === 'false' ) {
-      // console.log('Unauthorised request from guest')
-      // res.status(401).send('Unauthorised request from guest');
+      res.status(401).send('Unauthorised request from guest');
       throw new Error('Unauthorised request from guest');
+
     }
 
     const pathType = req.params.pathType;
