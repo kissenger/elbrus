@@ -31,19 +31,19 @@ export class AuthService {
 
 
   public set user(user: TsUser) {
-    document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; max-age=${this.MAX_AGE}; Path=\\`;
+    document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; max-age=${this.MAX_AGE}; path=\\`;
   }
 
   public set guest(user: TsUser) {
-    document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; Path=\\`;
+    document.cookie = `${this.COOKIE_NAME_USER}=${JSON.stringify(user)}; path=\\`;
   }
 
   public set userToken(token: string) {
-    document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; max-age=${this.MAX_AGE}; Path=\\`;
+    document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; max-age=${this.MAX_AGE}; path=\\`;
   }
 
   public set guestToken(token: string) {
-    document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; Path=\\`;
+    document.cookie = `${this.COOKIE_NAME_TOKEN}=${JSON.stringify(token)}; path=\\`;
   }
 
   public get user() {
@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   private deleteCookie(cookieName: string) {
-    document.cookie = `${cookieName}=; max-age=0`;
+    document.cookie = `${cookieName}=; path=\\`;
   }
 
   logout() {

@@ -69,7 +69,7 @@ export class MapService {
       } else if ( this.auth.isRegistered ) {
         // if that doesnt work, try to find the default location of the logged-in user
         mapCentre = this.auth.user.homeLngLat;
-        mapZoom = globals.defaultMapView.zoom;
+        mapZoom = 12;
 
       } else {
         // otherwise fall back to default values

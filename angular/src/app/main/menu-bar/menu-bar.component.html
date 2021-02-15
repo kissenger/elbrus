@@ -90,7 +90,7 @@
       Fit all paths
     </div>
 
-    <div class="ts-menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
+    <div  [ngClass]="auth.isGuest ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.goto(homeLngLat)">
       Go to home
     </div>
 
