@@ -1,5 +1,5 @@
 import { AuthService } from './../../../shared/services/auth.service';
-import { LocationService } from 'src/app/shared/services/location.service';
+import { PositionService } from 'src/app/shared/services/position.service';
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MapCreateService } from 'src/app/shared/services/map-create.service';
@@ -35,7 +35,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     private http: HttpService,
     private activatedRoute: ActivatedRoute,
     private alert: AlertService,
-    private location: LocationService,
+    private location: PositionService,
     private auth: AuthService,
     private screenSize: ScreenSizeService
     ) {
@@ -55,7 +55,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     // initialise the map and launch create route
     await this.map.newMap();
     this.map.createRoute();
-    this.location.watch(this.map);
+    this.location.watch();
 
     if ( this.auth.isGuest ) {
       this.alert.showAsElement(`Warning: Route will not be saved`,

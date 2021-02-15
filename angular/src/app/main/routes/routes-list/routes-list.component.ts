@@ -1,3 +1,4 @@
+import { TsPosition } from './../../../shared/interfaces';
 import { ScreenSizeService } from './../../../shared/services/screen-size.service';
 import { AuthService } from './../../../shared/services/auth.service';
 import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
@@ -12,7 +13,7 @@ import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { AlertService } from 'src/app/shared/services/alert.service';
-import { LocationService } from 'src/app/shared/services/location.service';
+import { PositionService } from 'src/app/shared/services/position.service';
 import { TsMarkers } from 'src/app/shared/classes/ts-markers';
 import * as globals from 'src/app/shared/globals';
 
@@ -27,17 +28,19 @@ export class RoutesListComponent implements OnInit, OnDestroy {
   private pathIdListener: Subscription;
   private httpListener: Subscription;
   private chartPointListener: Subscription;
+  private positionListener: Subscription;
   private tsMap: mapboxgl.Map;        // needed, dont delete
   private markers = new TsMarkers();  // needed, dont delete
   public windowWidth: number;
   public BREAKPOINT = globals.BREAKPOINTS.MD;
+  private startPosition: TsPosition = null;
 
   constructor(
     private data: DataService,
     public map: MapService,  // map service
     private http: HttpService,
     private alert: AlertService,
-    private location: LocationService,
+    private position: PositionService,
     private auth: AuthService,
     private screenSize: ScreenSizeService
     ) {
@@ -51,6 +54,12 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     // if we come into list component from eg delete route, the map exists and is causing trouble, so delete it and start afresh
     if (this.map.isMap()) { this.map.kill(); }
+
+    // get current position if user is guest, so we can initiate the map with it
+    if (this.auth.isGuest) {
+      this.startPosition = await this.position.current;
+    }
+
 
     // look for a stored pathId - if present we need to display it.  PathId is set in stored by AuthGuard
     const idFromStore = this.data.get('pathId');
@@ -70,17 +79,24 @@ export class RoutesListComponent implements OnInit, OnDestroy {
       } else {
         this.alert.showAsElement('Error: Path not found', 'Couldn\'t find requested path, or not authorised', true, false)
           .subscribe( () => {});
-          this.tsMap = await this.map.newMap();
+          this.tsMap = await this.map.newMap(this.startPosition, 12);
       }
 
     } else {
 
-      this.tsMap = await this.map.newMap();
+      this.tsMap = await this.map.newMap(this.startPosition, 12);
 
     }
 
-    // get device location
-    this.location.watch(this.map);
+
+    // initiate position watch
+    this.position.watch();
+    this.positionListener = this.data.positionEmitter.subscribe( () => {
+      this.map.updatePosition(this.data.get('devicePosition'), this.data.get('deviceAccuracy'));
+    });
+
+
+
 
     // listen for coordinate from chart and plot on map
     this.map.addPointsLayer('pointHighlighter', {
@@ -149,6 +165,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     if (this.pathIdListener) { this.pathIdListener.unsubscribe(); }
     if (this.httpListener) { this.httpListener.unsubscribe(); }
     if (this.chartPointListener) { this.chartPointListener.unsubscribe(); }
+    if (this.positionListener) { this.positionListener.unsubscribe(); }
+    this.position.unwatch();
 
   }
 

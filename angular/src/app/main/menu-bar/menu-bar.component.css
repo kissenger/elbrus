@@ -43,6 +43,7 @@ div{
 
 .icon {
   cursor: pointer;
+  display: block;
 }
 
 img {
@@ -127,7 +128,7 @@ img {
 .ts-menu-item-disabled {
   color: grey;
   pointer-events: none;
-  cursor: default;
+  cursor: progress;
 }
 
 

@@ -29,7 +29,7 @@ export class MenuBarComponent implements OnInit, OnDestroy {
   public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
-    private data: DataService,
+    public data: DataService,
     public auth: AuthService,
     private screenSize: ScreenSizeService
    ) {
@@ -47,10 +47,9 @@ export class MenuBarComponent implements OnInit, OnDestroy {
     this.newPathListener = this.data.pathIdEmitter.subscribe( () => {
       this.isData = this.data.getPath();
     });
-
     // listen for availability of location
-    this.locationListener = this.data.locationEmitter.subscribe( (pos) => {
-      this.position = pos;
+    this.locationListener = this.data.positionEmitter.subscribe( () => {
+      this.position = this.data.get('devicePosition');
     });
 
   }

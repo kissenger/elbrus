@@ -1,4 +1,4 @@
-import { TsCoordinate } from './../interfaces';
+import { TsDataStoreKeyValuePairs } from './../interfaces';
 import { TsFeatureCollection } from 'src/app/shared/interfaces';
 import { EventEmitter, Injectable } from '@angular/core';
 
@@ -9,7 +9,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 export class DataService {
 
   public clickedCoordsEmitter = new EventEmitter();
-  public locationEmitter = new EventEmitter();            // from location service to menu-bar
+  public positionEmitter = new EventEmitter();            // from location service to menu-bar
   public unitsUpdateEmitter = new EventEmitter();
   public pathStatsEmitter = new EventEmitter();           // from map-create to panel-create-detail
   public activeTabEmitter = new EventEmitter();           // from map service to info panel
@@ -33,14 +33,22 @@ export class DataService {
 
   // returns true if saved path is linestring, false or not set
   public isPath() {
-    return this.get('_path')?.features[0].geometry.type === 'LineString';
+    try {
+      return this.get('_path')?.features[0].geometry.type === 'LineString';
+    } catch {
+      return false;
+    }
   }
 
 
   // a wrapper for getting paths, for consistency with setPath
   // returns the geojson path if it was set, null if is was set but is empty, and false if it was not set
   public getPath() {
-    return this.get('_path');
+    try {
+      return this.get('_path');
+    } catch {
+      return null;
+    }
   }
 
 
@@ -53,15 +61,7 @@ export class DataService {
 
 
   // saves a key/value pair to the data store
-  public set(data: {
-    mapView?: any,
-    redirect?: string,
-    isPosition?: boolean,
-    _path?: TsFeatureCollection,
-    startPath?: boolean,
-    newLocation?: TsCoordinate,
-    pathId?: string                   // used by authguard to set the pathId when shared route
-  }) {
+  public set(data: TsDataStoreKeyValuePairs) {
     Object.keys(data).forEach( key => {
       this.dataStore[key] = data[key];
     });
@@ -69,8 +69,7 @@ export class DataService {
 
 
   // returns the value for a provided key
-  public get(keyName: string) {
-    // if (keyName in this.dataStore) {
+  public get(keyName: keyof TsDataStoreKeyValuePairs) {
       return this.dataStore[keyName];
   }
 
@@ -79,7 +78,7 @@ export class DataService {
   }
 
   // delete key/value pair from the store
-  public clearKey(keyName: string) {
+  public clearKey(keyName: keyof TsDataStoreKeyValuePairs) {
     if (keyName in this.dataStore) {
       delete this.dataStore[keyName];
     }

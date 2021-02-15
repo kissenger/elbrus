@@ -12,20 +12,20 @@
 
     <div class="row no-gutters align-items-center">
       <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Username</div>
-      <div class="col-6 text-left"> {{user.userName}} </div>
+      <div class="col-6 text-left"> {{auth.user.userName}} </div>
     </div>
 
     <div class="row no-gutters align-items-center">
       <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Home Location</div>
-      <div class="col-4 text-left"> {{user.homeLngLat | coords}}</div>
+      <div class="col-4 text-left"> {{auth.user.homeLngLat | coords}}</div>
       <div class="col-2 text-center">
-        <span class="text-like-link" (click)="onChangeLocation()">change</span>
+        <span class="text-like-link" (click)="onChangeLocationClick()">change</span>
       </div>
     </div>
 
     <div class="row no-gutters align-items-center">
       <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">email</div>
-      <div class="col-6 text-left"> {{user.email}} </div>
+      <div class="col-6 text-left"> {{auth.user.email}} </div>
     </div>
 
     <!-- PREFERENCES BLOCK -->
@@ -35,7 +35,7 @@
 
     <div class="row no-gutters align-items-center">
       <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Distance</div>
-      <div class="col-4 text-left"> {{ user.units.distance | unitsLongName }}</div>
+      <div class="col-4 text-left"> {{ auth.user.units.distance | unitsLongName }}</div>
       <div class="col-2 text-center">
         <span class="text-like-link" (click)="onChangeDistanceUnits()">change</span>
       </div>
@@ -43,7 +43,7 @@
 
     <div class="row no-gutters align-items-center">
       <div class="col-4 offset-lg-2 offset-1 py-2 text-left font-weight-bold">Elevation</div>
-      <div class="col-4 text-left"> {{ user.units.elevation | unitsLongName }}</div>
+      <div class="col-4 text-left"> {{ auth.user.units.elevation | unitsLongName }}</div>
       <div class="col-2 text-center">
         <span class="text-like-link" (click)="onChangeElevationUnits()">change</span>
       </div>

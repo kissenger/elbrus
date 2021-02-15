@@ -38,7 +38,7 @@ import { AlertService } from './shared/services/alert.service';
 import { SpinnerService } from './shared/services/spinner.service';
 import { AuthService } from './shared/services/auth.service';
 import { TokenInterceptorService } from './shared/services/token-interceptor.service';
-import { LocationService } from './shared/services/location.service';
+import { PositionService } from './shared/services/position.service';
 import { AuthGuard } from './auth.guard';
 import { ErrorService } from './shared/services/error.service';
 import { ScreenSizeService } from './shared/services/screen-size.service';
@@ -101,7 +101,7 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     AlertService,
     SpinnerService,
     AuthService,
-    LocationService,
+    PositionService,
     ScreenSizeService,
     AuthGuard,
     GeoJsonPipe,

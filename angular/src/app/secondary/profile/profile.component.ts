@@ -3,11 +3,9 @@ import { AuthService } from '../../shared/services/auth.service';
 import { TsUser } from '../../shared/interfaces';
 import { HttpService } from '../../shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { AlertService } from '../../shared/services/alert.service';
 import { DataService } from '../../shared/services/data.service';
 import { SpinnerService } from '../../shared/services/spinner.service';
 import { Router } from '@angular/router';
-import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -16,18 +14,15 @@ import {Location} from '@angular/common';
 })
 export class ProfileComponent implements OnInit, OnDestroy {
 
-  public user: TsUser;
   public isChanged = false;
   private httpSubscription: Subscription;
 
   constructor(
     private auth: AuthService,
     private http: HttpService,
-    private alert: AlertService,
     private data: DataService,
     private spinner: SpinnerService,
-    private router: Router,
-    private location: Location
+    private router: Router
   ) { }
 
   /**
@@ -37,65 +32,49 @@ export class ProfileComponent implements OnInit, OnDestroy {
    */
   async ngOnInit() {
 
-    this.user = this.auth.user;
-    const newLocation = this.data.get('newLocation');
-    this.data.clearKey('newLocation');  // TODO: needed?
-    const oldLocation = this.user.homeLngLat; // needed in case new location cannot be saved, revert back to old
+    const newLocation = this.data.get('newHomeLocation');
+    this.data.clearKey('newHomeLocation');
 
     if ( !!newLocation ) {
-      this.user.homeLngLat = newLocation;
-      if (!await this.updateUser()) {
-        this.user.homeLngLat = oldLocation;
-      }
+      const user = this.auth.user;
+      user.homeLngLat = newLocation;
+      await this.updateUser(user);
     }
 
   }
 
-  onChangeLocation() {
+  onChangeLocationClick() {
     this.router.navigate(['profile/select-home']);
   }
 
   async onChangeDistanceUnits() {
-    this.toggleDistanceUnits();
-    // if unsuccessful, re-toggle units
-    if (!await this.updateUser()) {
-      this.toggleDistanceUnits();
-    }
+    const user = this.auth.user;
+    user.units.distance = user.units.distance === 'mi' ? 'km' : 'mi';
+    await this.updateUser(user);
   }
 
   async onChangeElevationUnits() {
-    this.toggleElevationUnits();
-    // only update screen if operation was successful, otherwise reset units to original
-    if (!await this.updateUser()) {
-      this.toggleElevationUnits();
-    }
-  }
-
-  toggleDistanceUnits() {
-    this.user.units.distance = this.user.units.distance === 'mi' ? 'km' : 'mi';
-  }
-
-  toggleElevationUnits() {
-    this.user.units.elevation = this.user.units.elevation === 'ft' ? 'm' : 'ft';
+    const user = this.auth.user;
+    user.units.elevation = user.units.elevation === 'ft' ? 'm' : 'ft';
+    await this.updateUser(user);
   }
 
 
-  updateUser() {
+  updateUser(user: TsUser) {
 
     return new Promise<boolean>( (resolve, reject) => {
 
       this.spinner.showAsElement();
 
-      this.httpSubscription = this.http.updateUserData(this.user).subscribe( (res) => {
+      this.httpSubscription = this.http.updateUserData(user).subscribe( () => {
         this.spinner.removeElement();
-        // this.auth.setUser(this.user);
+        this.auth.user = user;
         resolve(true);
       },
 
       (error) => {
         this.spinner.removeElement();
-        // console.log(error);
-        // this.alert.showAsElement(`${error.name}: ${error.name} `, error.message, true, false).subscribe( () => {});
+        console.log(error);
         resolve(false);
       });
     });

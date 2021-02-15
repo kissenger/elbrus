@@ -47,12 +47,12 @@ export class MapService {
     return this.tsMap;
   }
 
-  newMap(startPosition?: TsCoordinate, startZoom?: number, boundingBox?: TsBoundingBox) {
+  newMap(startPosition?: TsCoordinate | TsPosition, startZoom?: number, boundingBox?: TsBoundingBox) {
 
     // setting the center and zoom here prevents flying animation - zoom gets over-ridden when the map bounds are set below
     return new Promise<mapboxgl.Map>( (resolve, reject) => {
 
-      let mapCentre: TsCoordinate;
+      let mapCentre: TsCoordinate | TsPosition;
       let mapZoom: number;
       this.markers = new TsMarkers();
 
@@ -156,7 +156,6 @@ export class MapService {
   public get getType() {
     return this._mapType;
   }
-
 
 
 
@@ -309,27 +308,53 @@ export class MapService {
   }
 
 
-  // public addSymbolLayer(layerId: string, data?: TsFeatureCollection, ) {
 
-  //   data = data ? data : this.geoJsonPipe.transform([], 'Point');
+  public updatePosition(position: TsPosition, accuracy: number) {
 
-  //   this.tsMap.addSource(layerId, {type: 'geojson', data } );
-  //   this.tsMap.addLayer({
-  //     id: layerId,
-  //     type: 'symbol',
-  //     source: layerId,
-  //     layout: {
-  //       'symbol-placement': 'point',
-  //       'text-anchor': 'bottom-left',
-  //       'text-font': ['Open Sans Regular'],
-  //       'text-field': '{title}',
-  //       'text-size': 18
-  //     }
-  //   });
+    if (this.isDev) { console.log({position: position, accuracy: accuracy}); }
 
-  // }
+    if (!this.tsMap.getLayer('position')) {
+      this.addPositionLayer();
+      this.addAccuracyLayer();
+    }
 
-  // public showPoint()
+    const coords = position ? [position] : null;
+    const props = position ? [{accuracy: accuracy, latitude: position[1]}] : null;
+    this.setLayerData('position', 'Point', coords);
+    this.setLayerData('accuracy', 'Point', coords, props);
+  }
+
+
+
+  addPositionLayer() {
+    this.addPointsLayer('position', {
+      'circle-radius': 4,
+      'circle-opacity': 1,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#523209',
+      'circle-color': '#83964B',
+    });
+  }
+
+
+
+  addAccuracyLayer() {
+    // 0.019 is from https://docs.mapbox.com/help/glossary/zoom-level/#zoom-levels-and-geographical-distance
+    this.addPointsLayer('accuracy', {
+      'circle-radius': [
+        'interpolate', ['exponential', 2], ['zoom'],
+            0, 0,
+            22, ['/', ['get', 'accuracy'], ['*', 0.019, ['cos', ['/', ['*', ['get', 'latitude'], ['pi']], 180]]]]
+      ],
+      'circle-opacity': 0.1,
+      'circle-stroke-width': 1,
+      'circle-stroke-color': '#523209',
+      'circle-stroke-opacity': 0.5,
+      'circle-color': '#83964B',
+    });
+  }
+
+
 
 
   public remove(pathId: string) {

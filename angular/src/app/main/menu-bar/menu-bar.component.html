@@ -14,29 +14,29 @@
 
   <div *ngIf="windowWidth>=BREAKPOINT" class="icon-group">
 
-    <div class="icon-background-btn" (click)="map.fitViewOne()">
-      <img src="assets/images/icon-menu-fit-one.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Fit only the active route">
+    <div class="icon-background-btn">
+      <img src="assets/images/icon-menu-fit-one.svg" [ngClass]="!isData ? 'icon-inactive' : ''" class="icon" title="Fit only the active route" (click)="map.fitViewOne()">
     </div>
 
-    <div class="icon-background-btn" (click)="map.fitViewAll()">
-      <img src="assets/images/icon-menu-fit-all.svg"  [ngClass]="!isData ? 'icon-inactive' : ''"class="icon"  title="Fit all displayed routes">
+    <div class="icon-background-btn">
+      <img src="assets/images/icon-menu-fit-all.svg"  [ngClass]="!isData ? 'icon-inactive' : ''"class="icon"  title="Fit all displayed routes" (click)="map.fitViewAll()">
     </div>
 
-    <div class="icon-background-btn" (click)="map.goto(homeLngLat)">
-      <img src="assets/images/icon-menu-goto-home.svg" [ngClass]="auth.isGuest ? 'icon-inactive' : ''"class="icon" class="icon" title="Goto home">
+    <div class="icon-background-btn">
+      <img src="assets/images/icon-menu-goto-home.svg" [ngClass]="auth.isGuest ? 'icon-inactive' : ''"class="icon" class="icon" title="Goto home" (click)="map.goto(homeLngLat)">
     </div>
 
-    <div class="icon-background-btn" (click)="map.goto(position)">
-      <img src="assets/images/icon-menu-goto-current.svg" [ngClass]="!position ? 'icon-inactive' : ''" class="icon" title="Goto current position">
+    <div class="icon-background-btn">
+      <img src="assets/images/icon-menu-goto-current.svg" [ngClass]="!position ? 'icon-inactive' : ''" class="icon" title="Goto current position" (click)="map.goto(position)">
     </div>
 
     <div class="icon-radio-group">
-      <div class="icon-background-radio-top" (click)="map.setType('terrain')">
-        <img src="assets/images/icon-menu-view-terrain.svg" [ngClass]="map.getType==='terrain' ? 'icon-inactive' : ''" class="icon" title="Show terrian view">
+      <div class="icon-background-radio-top">
+        <img src="assets/images/icon-menu-view-terrain.svg" [ngClass]="map.getType==='terrain' ? 'icon-inactive' : ''" class="icon" title="Show terrian view" (click)="map.setType('terrain')">
       </div>
 
-      <div class="icon-background-radio-bottom" (click)="map.setType('satellite')">
-        <img src="assets/images/icon-menu-view-satellite.svg" [ngClass]="map.getType==='satellite' ? 'icon-inactive' : ''" class="icon" title="Show satellite view">
+      <div class="icon-background-radio-bottom">
+        <img src="assets/images/icon-menu-view-satellite.svg" [ngClass]="map.getType==='satellite' ? 'icon-inactive' : ''" class="icon" title="Show satellite view" (click)="map.setType('satellite')">
       </div>
     </div>
 
@@ -94,7 +94,7 @@
       Go to home
     </div>
 
-    <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
+    <div [ngClass]="!position? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.goto(position)">
       Go to current position
     </div>
 

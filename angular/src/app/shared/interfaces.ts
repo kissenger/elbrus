@@ -1,4 +1,19 @@
 
+
+export interface TsDataStoreKeyValuePairs {
+  mapView?: any;
+  redirect?: string;
+  isPosition?: boolean;
+  devicePosition?: TsPosition;
+  deviceAccuracy?: number;
+  newHomeLocation?: TsCoordinate;
+  _path?: TsFeatureCollection;
+  startPath?: boolean;
+  pathId?: string;
+}
+
+
+
 // Define unit type for definition of user units
 export interface TsUnits {
     distance: 'mi' | 'km';
