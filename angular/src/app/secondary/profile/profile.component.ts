@@ -14,11 +14,10 @@ import { Router } from '@angular/router';
 })
 export class ProfileComponent implements OnInit, OnDestroy {
 
-  public isChanged = false;
   private httpSubscription: Subscription;
 
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     private http: HttpService,
     private data: DataService,
     private spinner: SpinnerService,
@@ -99,7 +98,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.data.unitsUpdateEmitter.emit();
     if (this.httpSubscription) { this.httpSubscription.unsubscribe(); }
-
   }
 
 }

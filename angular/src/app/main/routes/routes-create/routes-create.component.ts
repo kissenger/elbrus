@@ -6,8 +6,7 @@ import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { HttpService } from 'src/app/shared/services/http.service';
-import { TsPlotPathOptions, TsCallingPage, TsFeatureCollection, TsLineStyle, TsPosition, TsMapRequest } from 'src/app/shared/interfaces';
-import { ActivatedRoute } from '@angular/router';
+import { TsPlotPathOptions, TsFeatureCollection, TsLineStyle, TsMapRequest } from 'src/app/shared/interfaces';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import * as globals from 'src/app/shared/globals';
 import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
@@ -21,11 +20,9 @@ import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
 export class RoutesCreateComponent implements OnInit, OnDestroy {
 
   private pathIdListener: Subscription;
-  private callingPageListener: Subscription;
   private httpListener: Subscription;
   private chartPointListener: Subscription;
 
-  public callingPage: TsCallingPage;
   public windowWidth: number;
   public BREAKPOINT = globals.BREAKPOINTS.MD;
 
@@ -33,7 +30,6 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     private data: DataService,
     public map: MapCreateService,
     private http: HttpService,
-    private activatedRoute: ActivatedRoute,
     private alert: AlertService,
     private location: PositionService,
     private auth: AuthService,
@@ -47,12 +43,8 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
 
-    this.callingPageListener = this.activatedRoute.data.subscribe( data => {
-      this.callingPage = data.callingPage;
-    });
-
-
     // initialise the map and launch create route
+    if (this.map.isMap()) { this.map.kill(); }
     await this.map.newMap();
     this.map.createRoute();
     this.location.watch();
@@ -114,15 +106,14 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   }
 
 
-  addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
-    this.map.add(pathAsGeojson, style, options );
-
-  }
+  // addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
+  //   this.map.add(pathAsGeojson, style, options );
+  // }
 
 
   ngOnDestroy() {
     if ( this.pathIdListener ) { this.pathIdListener.unsubscribe(); }
-    if ( this.callingPageListener ) { this.callingPageListener.unsubscribe(); }
+    // if ( this.callingPageListener ) { this.callingPageListener.unsubscribe(); }
     if ( this.httpListener ) { this.httpListener.unsubscribe(); }
     if ( this.chartPointListener ) { this.chartPointListener.unsubscribe(); }
   }

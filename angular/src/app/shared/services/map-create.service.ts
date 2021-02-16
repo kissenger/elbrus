@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MapService } from './map.service';
 import { HttpService } from './http.service';
 import { DataService } from './data.service';
-import { TsLineStyle, TsPosition, TsFeatureCollection, TsSnapType, TsCoordinate } from 'src/app/shared/interfaces';
+import { TsLineStyle, TsPosition, TsFeatureCollection, TsSnapType } from 'src/app/shared/interfaces';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { PathHistory } from 'src/app/shared/classes/path-history';
