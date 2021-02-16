@@ -147,8 +147,8 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.7935447"
-     inkscape:cx="139.92406"
+     inkscape:zoom="2.6104123"
+     inkscape:cx="105.64467"
      inkscape:cy="101.3615"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -174,7 +174,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -435,14 +435,14 @@
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:20.3984px;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#523209;fill-opacity:1;stroke:none;stroke-width:0.546385;stroke-opacity:1">n</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15.8942px;line-height:1.25;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#523209;fill-opacity:1;stroke-width:0.18626"
-       x="41.517612"
-       y="54.661625"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.1321px;line-height:1.25;font-family:Verdana;-inkscape-font-specification:'Verdana, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#523209;fill-opacity:1;stroke-width:0.142173"
+       x="39.477879"
+       y="54.090649"
        id="text2811"><tspan
          sodipodi:role="line"
          id="tspan2815"
-         x="41.517612"
-         y="54.661625"
-         style="stroke-width:0.18626">ALL</tspan></text>
+         x="39.477879"
+         y="54.090649"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.1321px;font-family:Verdana;-inkscape-font-specification:'Verdana, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.142173">ALL</tspan></text>
   </g>
 </svg>

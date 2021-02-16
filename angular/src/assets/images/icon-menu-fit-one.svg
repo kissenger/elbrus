@@ -122,7 +122,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.7004265"
-     inkscape:cx="78.12672"
+     inkscape:cx="61.27753"
      inkscape:cy="100.64769"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -147,7 +147,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -384,14 +384,14 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:11.088px;line-height:1.25;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#523209;fill-opacity:1;stroke-width:0.129938"
-       x="36.583111"
-       y="53.128448"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.61571px;line-height:1.25;font-family:Verdana;-inkscape-font-specification:'Verdana, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;fill:#523209;fill-opacity:1;stroke-width:0.088213"
+       x="36.379402"
+       y="52.217182"
        id="text2811"><tspan
          sodipodi:role="line"
          id="tspan2837"
-         x="36.583111"
-         y="53.128448"
-         style="stroke-width:0.129938">ACTIVE</tspan></text>
+         x="36.379402"
+         y="52.217182"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.61571px;font-family:Verdana;-inkscape-font-specification:'Verdana, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.088213">ACTIVE</tspan></text>
   </g>
 </svg>
