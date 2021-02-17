@@ -13,7 +13,7 @@
    version="1.1"
    id="svg9041"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="icon-list-owner.svg">
+   sodipodi:docname="icon-login-person.svg">
   <defs
      id="defs9035">
     <clipPath
@@ -44,11 +44,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.5213512"
-     inkscape:cx="69.745407"
-     inkscape:cy="47.842388"
+     inkscape:zoom="5.0485253"
+     inkscape:cx="80.177125"
+     inkscape:cy="44.424349"
      inkscape:document-units="mm"
-     inkscape:current-layer="g130"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:pagecheckerboard="false"
@@ -71,7 +71,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -81,19 +81,46 @@
      id="layer1"
      transform="translate(-32.134897,-36.628033)">
     <g
-       id="g130"
-       transform="translate(0,-0.52407247)">
+       id="g2145"
+       transform="matrix(0.80077051,0,0,0.80077051,8.7834721,9.071693)"
+       clip-path="url(#clipPath2176)">
       <path
-         id="rect8901-7"
-         style="fill:#83964b;fill-opacity:1;stroke:none;stroke-width:0.0241239;stroke-linecap:round;stroke-opacity:0.6"
-         d="m 40.374694,48.991688 c -2.334452,0 -4.213696,1.749174 -4.213696,3.921724 v 5.734017 c 0,2.172547 0.02768,2.268595 2.362129,2.268595 h 17.798914 c 2.334448,0 2.286681,-0.0609 2.286681,-2.233455 v -5.769157 c 0,-2.17255 -1.879244,-3.921724 -4.213696,-3.921724 h -2.68614 a 7.4336999,6.9181498 0 0 1 -4.323768,1.29036 7.4336999,6.9181498 0 0 1 -4.323767,-1.29036 z" />
-      <ellipse
-         style="fill:#83964b;fill-opacity:1;stroke:none;stroke-width:0.0269248;stroke-linecap:round;stroke-opacity:0.6"
-         id="path8897-2"
-         cx="47.384895"
-         cy="43.149605"
-         rx="6.0187659"
-         ry="5.6013455" />
+         id="rect8901-2"
+         style="fill:#ffffff;stroke:none;stroke-width:0.0292103;stroke-linecap:round;stroke-opacity:0.6"
+         d="m 41.465457,48.855738 c -3.043886,0 -5.494238,2.450869 -5.494238,5.494756 v 5.403803 h 23.490555 v -5.403803 c 0,-3.043887 -2.450352,-5.494756 -5.494238,-5.494756 z" />
+      <circle
+         style="fill:#ffffff;stroke:none;stroke-width:0.0326784;stroke-linecap:round;stroke-opacity:0.6"
+         id="path8897-5"
+         cx="47.773914"
+         cy="44.227852"
+         r="7.0470495" />
+    </g>
+    <g
+       id="g2145-1"
+       transform="matrix(1.0383966,0,0,1.0383966,-2.6713771,-3.0547829)"
+       clip-path="none">
+      <path
+         id="rect8901-2-4"
+         style="fill:#ffffff;stroke:none;stroke-width:0.0292103;stroke-linecap:round;stroke-opacity:0.6"
+         d="m 41.954313,48.855738 c -3.043886,0 -5.494238,2.450869 -5.494238,5.494756 v 5.403803 H 59.95063 v -5.403803 c 0,-3.043887 -2.450352,-5.494756 -5.494238,-5.494756 z" />
+      <path
+         id="rect8901"
+         style="fill:#523209;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-opacity:0.6"
+         d="m 42.543425,49.961614 c -2.757111,0 -4.976957,2.219847 -4.976957,4.976956 l 0.01942,9.281982 21.184135,0.05445 0.07421,-4.471092 v -4.86534 c 0,-2.757109 -2.219847,-4.976956 -4.976958,-4.976956 z"
+         sodipodi:nodetypes="sscccsss"
+         clip-path="url(#clipPath2121)" />
+      <circle
+         style="fill:#ffffff;stroke:none;stroke-width:0.0326784;stroke-linecap:round;stroke-opacity:0.6"
+         id="path8897-5-5"
+         cx="48.205353"
+         cy="44.227852"
+         r="7.0470495" />
+      <circle
+         style="fill:#523209;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-opacity:0.6"
+         id="path8897"
+         cx="48.205349"
+         cy="44.227852"
+         r="5.7057104" />
     </g>
     <circle
        style="fill:none;stroke:#523209;stroke-width:0.967224;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
