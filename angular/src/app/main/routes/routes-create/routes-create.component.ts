@@ -22,6 +22,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   private pathIdListener: Subscription;
   private httpListener: Subscription;
   private chartPointListener: Subscription;
+  private positionListener: Subscription;
 
   public windowWidth: number;
   public BREAKPOINT = globals.BREAKPOINTS.MD;
@@ -31,7 +32,7 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     public map: MapCreateService,
     private http: HttpService,
     private alert: AlertService,
-    private location: PositionService,
+    private position: PositionService,
     private auth: AuthService,
     private screenSize: ScreenSizeService
     ) {
@@ -47,7 +48,11 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
     if (this.map.isMap()) { this.map.kill(); }
     await this.map.newMap();
     this.map.createRoute();
-    this.location.watch();
+    // initiate position watch
+    this.position.watch();
+    this.positionListener = this.data.positionEmitter.subscribe( () => {
+      this.map.updatePosition(this.data.get('devicePosition'), this.data.get('deviceAccuracy'));
+    });
 
     if ( this.auth.isGuest ) {
       this.alert.showAsElement(`Warning: Route will not be saved`,
@@ -106,16 +111,11 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   }
 
 
-  // addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
-  //   this.map.add(pathAsGeojson, style, options );
-  // }
-
-
   ngOnDestroy() {
     if ( this.pathIdListener ) { this.pathIdListener.unsubscribe(); }
-    // if ( this.callingPageListener ) { this.callingPageListener.unsubscribe(); }
     if ( this.httpListener ) { this.httpListener.unsubscribe(); }
     if ( this.chartPointListener ) { this.chartPointListener.unsubscribe(); }
+    if ( this.positionListener ) { this.positionListener.unsubscribe(); }
   }
 
 
