@@ -7,6 +7,8 @@ import { AlertService } from 'src/app/shared/services/alert.service';
 import { SpinnerService } from 'src/app/shared/services/spinner.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { environment } from 'src/environments/environment';
+import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
+import * as globals from 'src/app/shared/globals';
 
 @Component({
   selector: 'app-panel-options',
@@ -21,7 +23,8 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
   public createdBy: string;
   public pathId: string;
   private pathType: string;
-  private nPoints: number;
+  public windowWidth: number;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
     private router: Router,
@@ -29,8 +32,14 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
     private data: DataService,
     private alert: AlertService,
     private spinner: SpinnerService,
-    public auth: AuthService
-  ) {}
+    public auth: AuthService,
+    private screenSize: ScreenSizeService
+   ) {
+    this.windowWidth = this.screenSize.width;
+    this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+      this.windowWidth = newWidth.width;
+    });
+   }
 
   ngOnInit() {
 
@@ -43,7 +52,6 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
         this.createdBy = geoJson.properties.info.createdBy;
         this.pathId = geoJson.properties.pathId;
         this.pathType = geoJson.properties.info.pathType;
-        this.nPoints = geoJson.properties.stats.nPoints;
       }
 
     });

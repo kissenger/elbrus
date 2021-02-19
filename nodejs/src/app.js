@@ -151,7 +151,8 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
       // we are saving an edited path, need to know isPublic, and to delete it
       const oldPath = await mongoModel('route').findOne( {_id: req.body.pathId});
       isPublic = oldPath.isPublic;
-      mongoModel('route').deleteOne( {_id: req.body.pathId} );
+      console.log(oldPath)
+      await mongoModel('route').deleteOne( {_id: req.body.pathId} );
     } 
 
     // now save the new path
@@ -246,8 +247,7 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, as
     if ( req.role === 'guest' && req.params.isPublic === 'false' ) {
       res.status(401).send('Unauthorised request from guest');
       throw new Error('Unauthorised request from guest');
-
-    }
+  }
 
     const pathType = req.params.pathType;
     const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };

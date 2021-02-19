@@ -96,6 +96,12 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     });
 
 
+    if ( this.auth.isGuest ) {
+      this.alert.showAsElement(`Welcome Guest!`,
+      'Just to let you know, as a guest you\'ll only have a limited set of features.  Register an to access all features that trailscape.cc has to offer.'
+      , true, false).subscribe( () => {});
+    }
+
 
 
     // listen for coordinate from chart and plot on map

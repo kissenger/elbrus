@@ -40,7 +40,7 @@
       </div>
 
       <div
-        *ngIf="createdBy === auth.user.userName"
+        *ngIf="createdBy === auth.user.userName && windowWidth > BREAKPOINT"
         [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''"
         class="ts-menu-item p-1 border-top"
         (click)="onEditClick()">
