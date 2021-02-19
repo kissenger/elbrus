@@ -108,20 +108,22 @@ function checkBoxBounds(bbox) {
   * Returns an object expected by the front end when a list query is made
   * Called by get-paths-list()
   */
-function getListData(docs) {
+// function getListData(docs) {
 
-  return docs.map( d => ({
-    name: d.info.name,
-    stats: d.stats,
-    info: {
-      ...d.info,
-      isPublic: d.isPublic
-    },
-    pathId: d._id
-    })
-  );
+//   // return docs.map( d => ({
+//   //   // name: d.info.name,
+//   //   stats: d.stats,
+//   //   info: {
+//   //     ...d.info,
+//   //     isPublic: d.isPublic
+//   //   },
+//   //   pathId: d._id
+//   //   })
+//   // );
 
-}
+//   return docs;
+
+// }
 
 
 

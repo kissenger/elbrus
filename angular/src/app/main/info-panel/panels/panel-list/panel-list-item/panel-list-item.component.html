@@ -4,7 +4,7 @@
 
         <div class="row m-0 p-0">
           <div class="col m-0 p-0 name">
-            {{item.name | shortName: 24}}
+            {{item.info.name | shortName: 24}}
           </div>
 
           <div *ngIf="listType==='private'">

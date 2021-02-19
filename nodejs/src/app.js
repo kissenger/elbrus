@@ -241,54 +241,79 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
  *****************************************************************/
 
 
-app.get('/api/get-list/:pathType/:isPublic/:offset/:limit', auth.verifyToken, async (req, res) => {
+app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort', auth.verifyToken, async (req, res) => {
 
 
-    if ( req.role === 'guest' && req.params.isPublic === 'false' ) {
-      res.status(401).send('Unauthorised request from guest');
-      throw new Error('Unauthorised request from guest');
+  if ( req.role === 'guest' && req.params.isPublic === 'false' ) {
+    res.status(401).send('Unauthorised request from guest');
+    throw new Error('Unauthorised request from guest');
+  }
+  console.log(req.params.sort)
+
+  const pathType = req.params.pathType;
+  const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
+  const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
+  const geoQuery = { geometry: { $geoIntersects: { $geometry: box} } };
+  console.log(req.params.sort)
+
+  if ( req.params.isPublic === 'true') {
+    geoQuery.isPublic = true;
+  } else {
+    geoQuery.userId = req.userId;
+  }
+  console.log(req.params.sort)
+
+  // sort type
+  let queryParameter;
+  if (req.params.sort === 'proximity') {
+    queryParameter = {
+      $geoNear: {
+        near: point,
+        spherical: false,
+        distanceField: 'distance',
+        query: geoQuery 
+      }
+    }
+  } else if (req.params.sort === 'alphabetical') {
+    queryParameter = 
+      { $match: geoQuery },
+      { $sort: {stats: {distance: -1} } }
   }
 
-    const pathType = req.params.pathType;
-    const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
-    const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
-    const query = { geometry: { $geoIntersects: { $geometry: box} } };
-
-    if ( req.params.isPublic === 'true') {
-      query.isPublic = true;
-    } else {
-      query.userId = req.userId;
-    }
-
-    const docs = await mongoModel(pathType).aggregate([
-      {
-        $geoNear: {
-          near: point,
-          spherical: false,
-          distanceField: 'distance',
-          query: query 
-        }
-      },
-      {
-        $facet: {
-          count: [{ $count: "count" }],
-          list: [
-            {$skip: req.params.limit * req.params.offset }, 
-            {$limit: req.params.limit * 1}
-          ]
-        }
+  const docs = await mongoModel(pathType).aggregate([
+    {$match: geoQuery},
+    { $project: {
+      "lowerCaseName": {$toLower: "$info.name"},
+      name: "$info.name",
+      info: 1,
+      stats: 1,
+      pathId: "$_id",
+      isPublic: 1
+    },
+  },
+    { $sort: { "lowerCaseName": -1} }, 
+    {
+      $facet: {
+        count: [{ $count: "count" }],
+        list: [
+          {$skip: req.params.limit * req.params.offset}, 
+          {$limit: req.params.limit * 1}
+        ]
       }
-    ]);
-    
-    let count; 
-    try {
-      count = docs[0].count[0].count;
-    } catch {
-      count = 0;
-    }   
+    }
+  ]);
 
-    debugMsg(`/api/get-list: found routes`);
-    res.status(201).json( {list: getListData(docs[0].list), count} );
+  console.log(docs[0].list[0])
+  
+  let count; 
+  try {
+    count = docs[0].count[0].count;
+  } catch {
+    count = 0;
+  }   
+
+  debugMsg(`/api/get-list: found routes`);
+  res.status(201).json( {list: docs[0].list, count} );
 
 })
 

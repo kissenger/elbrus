@@ -120,7 +120,8 @@ export class PanelListComponent implements OnInit, OnDestroy {
     // } else {
 
       this.isLoading = true;
-      this.listListener = this.http.getPathsList('route', this.listType === 'public', this.offset, this.limit, this.boundingBox)
+      this.listListener =
+        this.http.getPathsList('route', this.listType === 'public', this.offset, this.limit, 'alphabetical', this.boundingBox)
         .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
           this.listItems.merge(result.list);

@@ -27,6 +27,7 @@ const pathSchema = mongoose.Schema({
 
   // user entered information to describe/tag route
   info: {
+    // isPublic: {$isPublic},
     createdBy: {type: String},
     direction: {type: String},
     category: {type: String},

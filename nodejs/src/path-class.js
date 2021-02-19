@@ -13,10 +13,10 @@ const jael = require('jael');
 jael.setPath(process.env.GEOTIFF_PATH);
 
 
-const SHORT_PATH_THRESHOLD            = require('./globals').SHORT_PATH_THRESHOLD;
-const LONG_PATH_THRESHOLD            = require('./globals').LONG_PATH_THRESHOLD;
-const SIMPLIFICATION_FACTOR_PASS_1   = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
-const SIMPLIFICATION_FACTOR_PASS_2   = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
+const SHORT_PATH_THRESHOLD         = require('./globals').SHORT_PATH_THRESHOLD;
+const LONG_PATH_THRESHOLD          = require('./globals').LONG_PATH_THRESHOLD;
+const SIMPLIFICATION_FACTOR_PASS_1 = require('./globals').SIMPLIFICATION_FACTOR_PASS_1;
+const SIMPLIFICATION_FACTOR_PASS_2 = require('./globals').SIMPLIFICATION_FACTOR_PASS_2;
 
 
 

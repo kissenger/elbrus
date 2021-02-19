@@ -65,7 +65,7 @@ export class HttpService {
       .pipe( catchError(this.errorService.handleError) );
   }
 
-  getPathsList(type: string, isPublic: boolean, offset: number, limit: number, bbox: Array<number>) {
+  getPathsList(type: string, isPublic: boolean, offset: number, limit: number, sort: 'alphabetical' | 'proximity', bbox: Array<number>) {
     let query: string;
     if (bbox.length === 0) {
       query = '?bbox=0';
@@ -76,8 +76,9 @@ export class HttpService {
         if (index !== bbox.length - 1) { query += '&'; }
       });
     }
+    console.log(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}/${sort}${query}`);
     return this.http
-      .get<any>(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}${query}`)
+      .get<any>(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}/${sort}${query}`)
       .pipe( catchError(this.errorService.handleError) );
   }
 
