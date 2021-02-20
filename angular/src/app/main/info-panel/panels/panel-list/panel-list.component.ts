@@ -45,12 +45,13 @@ export class PanelListComponent implements OnInit, OnDestroy {
   };
 
 
-  // keep track of the number of routes available compared to the number loades
+  // keep track of the number of routes available compared to the number loaded
   public nAvailableRoutes: number;
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
   public listType: 'public' | 'private' = null;
+  public listSort = '{"sort": "date", "direction" : "-1"}';
   private boundingBox: TsBoundingBox = null;    // current view
   private startPathId: string;
 
@@ -113,33 +114,27 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   addPathsToList() {
 
-    // dont do anything if in overlay mode and there is no active path selected
-    // if ( this.callingPage === 'list' && this.tabName === 'overlay' && !this.data.getPath()) {
-      // do nothing
+    this.isLoading = true;
+    const sort = JSON.parse(this.listSort);
+    this.listListener =
+      this.http.getPathsList('route', this.listType === 'public', this.offset, this.limit, sort.sort, sort.direction, this.boundingBox)
+      .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
-    // } else {
-
-      this.isLoading = true;
-      this.listListener =
-        this.http.getPathsList('route', this.listType === 'public', this.offset, this.limit, 'a-z', '1', this.boundingBox)
-        .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
-
-          this.listItems.merge(result.list);
-          this.nLoadedRoutes = this.listItems.length;
-          this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
-          this.isLoading = false;
-
-          if (this.startPathId) {
-            this.listItems.select(this.startPathId, null);
-            this.startPathId = null;
-          }
-
-      }, (error) => {
+        this.listItems.merge(result.list);
+        this.nLoadedRoutes = this.listItems.length;
+        this.nAvailableRoutes = Math.max(this.listItems.length, result.count);
         this.isLoading = false;
-        // console.log(error);
-        // this.alert.showAsElement(`${error.name}: ${error.statusText} `, error.message, true, false).subscribe( () => {});
-      });
-    // }
+
+        if (this.startPathId) {
+          this.listItems.select(this.startPathId, null);
+          this.startPathId = null;
+        }
+
+    }, (error) => {
+      this.isLoading = false;
+      // console.log(error);
+      // this.alert.showAsElement(`${error.name}: ${error.statusText} `, error.message, true, false).subscribe( () => {});
+    });
   }
 
 
@@ -149,7 +144,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   }
 
 
-  onSelectMenuChange() {
+  onSelectListType() {
     this.offset = 0;
     this.listItems.clear();
     this.data.pathCommandEmitter.emit({ command: 'clear' });
@@ -157,6 +152,13 @@ export class PanelListComponent implements OnInit, OnDestroy {
     this.addPathsToList();
   }
 
+  onSelectSortType() {
+    this.offset = 0;
+    this.listItems.clear();
+    this.data.pathCommandEmitter.emit({ command: 'clear' });
+    this.highlightColours.reset();
+    this.addPathsToList();
+  }
 
   async listAction(idFromClick: string) {
 

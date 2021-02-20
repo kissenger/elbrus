@@ -70,7 +70,7 @@ export class HttpService {
     isPublic: boolean,
     offset: number,
     limit: number,
-    sort: 'a-z' | 'prox' | 'dist' | 'lump' | 'date',
+    sort: 'a-z' | 'dist' | 'lump' | 'date',
     direction: '1' | '-1',
     bbox: Array<number>
     ) {
@@ -85,7 +85,7 @@ export class HttpService {
         if (index !== bbox.length - 1) { query += '&'; }
       });
     }
-console.log(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}/${sort}/${direction}${query}`);
+
     return this.http
       .get<any>(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}/${sort}/${direction}${query}`)
       .pipe( catchError(this.errorService.handleError) );

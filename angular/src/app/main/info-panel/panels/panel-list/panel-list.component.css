@@ -26,14 +26,15 @@
 }
 
 
-.custom-select {
+.form-select {
   border: 1px #dee2e6 solid;
   border-radius: 0px;
   font-size: small;
   cursor: pointer;
+  height: 30px;
 }
 
-.custom-select:focus {
+.form-select:focus {
   box-shadow: none;
 }
 

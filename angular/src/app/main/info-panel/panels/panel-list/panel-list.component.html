@@ -4,15 +4,29 @@
   <!-- PUBLIC/PRIVATE DROPDOWN -->
 
   <form>
+    <div class="row no-gutters">
+      <div class="col-6 m-0 p-0 pr-1">
+        <select [(ngModel)]="listType" name="route type"
+          (ngModelChange)="onSelectListType()" class="form-select form-select-sm my-1 pl-2 w-100">
+          <option *ngIf="isRegisteredUser" value="private">My routes</option>
+          <option value="public">Public routes</option>
+        </select>
+      </div>
 
-    <!-- <div class="form-group m-0 p-0"> -->
-      <select [(ngModel)]="listType" name="gordon"
-        (ngModelChange)="onSelectMenuChange()" class="custom-select custom-select-sm my-1">
-        <option *ngIf="isRegisteredUser" value="private">My routes</option>
-        <option value="public">Public routes</option>
-      </select>
-    <!-- </div> -->
-
+      <div class="col-6 m-0 p-0">
+        <select [(ngModel)]="listSort" name="sort"
+          (ngModelChange)="onSelectSortType()" class="form-select form-select-sm my-1 pl-2 w-100">
+          <option value='{"sort": "a-z", "direction" : "1"}'>  A - Z</option>
+          <option value='{"sort": "a-z", "direction" : "-1"}'> Z - A</option>
+          <option value='{"sort": "date", "direction" : "-1"}'> Newest first</option>
+          <option value='{"sort": "date", "direction" : "1"}'>  Oldest first</option>
+          <option value='{"sort": "dist", "direction" : "-1"}'> Longest first</option>
+          <option value='{"sort": "dist", "direction" : "1"}'>  Shortest first</option>
+          <option value='{"sort": "lump", "direction" : "-1"}'> Hilliest first</option>
+          <option value='{"sort": "lump", "direction" : "1"}'>  Flattest first</option>
+        </select>
+      </div>
+    </div>
   </form>
 
   <!-- EMPTY ROUTE LIST -->

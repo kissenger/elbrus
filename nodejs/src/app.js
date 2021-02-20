@@ -249,31 +249,10 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort/:direction', aut
     throw new Error('Unauthorised request from guest');
   }
 
-
   const pathType = req.params.pathType;
-  const point = { type: 'Point', coordinates: bbox2Point(req.query.bbox) };
   const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
   const query = { geometry: { $geoIntersects: { $geometry: box} } };
-  const facet = { 
-    $facet: {
-      count: [{ $count: "count" }],
-      list: [
-        { $skip: req.params.limit * req.params.offset }, 
-        { $limit: req.params.limit * 1 }
-      ]
-    } 
-  }
-  const project = { 
-    $project: {
-      "lowerCaseName": {$toLower: "$info.name"},
-      creationDate: 1,
-      name: "$info.name",
-      info: 1,
-      stats: 1,
-      pathId: "$_id",
-      isPublic: 1 },
-  }
-
+ 
   // adjust query for public/private routes
   if ( req.params.isPublic === 'true') {
     query.isPublic = true;
@@ -281,35 +260,24 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort/:direction', aut
     query.userId = req.userId;
   }
 
-
-  let docs;
-  if (req.params.sort === 'prox') {
-
-    // sort by distance to centre of bounding box
-    docs = await mongoModel(pathType).aggregate([
-      {
-        $geoNear: {
-          near: point,
-          spherical: false,
-          distanceField: 'distance',
-          query: query 
-        }
-      },
-      project,
-      facet
-    ]);
-
-  } else {
-
-    // sort by other parameter
-    docs = await mongoModel(pathType).aggregate([
-      { $match: query },
-      project,
-      sort(req.params.sort, req.params.direction), 
-      facet
-    ]);
-
-  }
+  const docs = await mongoModel(pathType).aggregate([
+    { $match: query },
+    { $project: {
+        "lowerCaseName": {$toLower: "$info.name"},
+        creationDate: 1,
+        name: "$info.name",
+        info: 1,
+        stats: 1,
+        pathId: "$_id",
+        isPublic: 1 }, },
+    sort(req.params.sort, req.params.direction), 
+    { $facet: {
+        count: [{ $count: "count" }],
+        list: [
+          { $skip: req.params.limit * req.params.offset }, 
+          { $limit: req.params.limit * 1 }
+        ] } }
+  ]);
 
   let count; 
   try {
