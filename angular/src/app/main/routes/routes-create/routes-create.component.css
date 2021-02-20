@@ -3,7 +3,7 @@
      see - https://stackoverflow.com/questions/33636796/chrome-safari-not-filling-100-height-of-flex-parent
 */
 
-.map-div {
+#map {
   /* border: 1px red solid; */
   position: absolute;
   top: 0px;

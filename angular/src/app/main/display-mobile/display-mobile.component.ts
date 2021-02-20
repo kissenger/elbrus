@@ -14,12 +14,17 @@ export class DisplayMobileComponent implements OnInit {
   @Input() map: mapboxgl.Map;
 
   public isMenuOpen = true;
+  public vh: number;
 
   constructor(
     public data: DataService
    ) { }
 
   ngOnInit() {
+    // https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+    this.vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${this.vh}px`);
+
     if (this.callingPage === 'create') {
       this.isMenuOpen = false;
     }
