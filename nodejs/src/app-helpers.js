@@ -131,6 +131,5 @@ function checkBoxBounds(bbox) {
 module.exports = {
   mongoModel,
   bbox2Polygon,
-  bbox2Point,
-  getListData
+  bbox2Point
 }

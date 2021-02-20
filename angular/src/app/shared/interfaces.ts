@@ -63,6 +63,7 @@ export interface TsListItem {
   pathId: string;
   isActive?: boolean;
   colour?: string;
+  creationDate?: string;
 }
 
 
