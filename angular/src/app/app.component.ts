@@ -10,7 +10,7 @@ import { SpinnerComponent } from 'src/app/shared/components/spinner/spinner.comp
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'cotopaxi';
+  // title = 'cotopaxi';
 
   constructor(
     injector: Injector

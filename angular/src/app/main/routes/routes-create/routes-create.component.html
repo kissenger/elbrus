@@ -1,5 +1,8 @@
 
-<div id="map"></div>
+<app-header></app-header>
 
+<div>
+  <div id="map"></div>
+</div>
 <app-display-mobile *ngIf="windowWidth < BREAKPOINT" callingPage="create" [map]="map"></app-display-mobile>
 <app-display-desktop *ngIf="windowWidth >= BREAKPOINT" callingPage="create" [map]="map"></app-display-desktop>

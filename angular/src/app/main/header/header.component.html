@@ -1,0 +1,11 @@
+
+<div class="header-container position-relative w-100">
+
+  <img src="../../assets/images/ts_header.svg" class="h-100 py-1 px-2" (click)="onLogoClick()">
+
+  <div class="profile-block" (click)="onProfileClick()">
+    <span *ngIf="windowWidth>=BREAKPOINT">{{auth.user.userName}}</span>
+    <img src="assets/images/icon-header-profile.svg" class='py-2 pr-2 h-100 ' title="Profile">
+  </div>
+
+</div>

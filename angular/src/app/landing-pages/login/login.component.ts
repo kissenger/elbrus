@@ -1,4 +1,4 @@
-import { DataService } from './../../shared/services/data.service';
+import { DataService } from '../../shared/services/data.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TsUser } from '../../shared/interfaces';
@@ -123,7 +123,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   notValidUserName() {
-    return this.userName.length < 2;
+    // regex matches whitespace at front or end to avoid username typo
+    return this.userName.length < 4 || this.userName.match(/(^\s)|(\s$)/);
   }
 
   notValidPassword() {

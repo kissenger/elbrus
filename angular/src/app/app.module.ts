@@ -8,10 +8,10 @@ import { FormsModule } from '@angular/forms';
 
 // Components
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './secondary/header/header.component';
+import { LandingComponent } from './landing-pages/landing/landing.component';
+import { HeaderComponent } from './main/header/header.component';
 import { RoutesCreateComponent } from './main/routes/routes-create/routes-create.component';
 import { RoutesListComponent } from './main/routes/routes-list/routes-list.component';
-import { FooterComponent } from './secondary/footer/footer.component';
 import { InfoPanelComponent } from './main/info-panel/info-panel.component';
 import { MenuBarComponent } from './main/menu-bar/menu-bar.component';
 import { PanelsInjectorComponent } from './main/info-panel/panels-injector/panels-injector.component';
@@ -23,10 +23,10 @@ import { PanelOptionsComponent } from './main/info-panel/panels/panel-options/pa
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { AlertBoxComponent } from './shared/components/alert-box/alert-box.component';
 import { RoutesReviewComponent } from './main/routes/routes-review/routes-review.component';
-import { WelcomeComponent } from './secondary/welcome/welcome.component';
-import { LoginComponent } from './secondary/login/login.component';
-import { MapSelectLocationComponent } from './secondary/map-select-location/map-select-location.component';
-import { ProfileComponent } from './secondary/profile/profile.component';
+import { WelcomeComponent } from './landing-pages/welcome/welcome.component';
+import { LoginComponent } from './landing-pages/login/login.component';
+import { MapSelectLocationComponent } from './main/map-select-location/map-select-location.component';
+import { ProfileComponent } from './main/profile/profile.component';
 import { DisplayMobileComponent } from './main/display-mobile/display-mobile.component';
 import { DisplayDesktopComponent } from './main/display-desktop/display-desktop.component';
 
@@ -56,10 +56,10 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
 @NgModule({
   declarations: [
     AppComponent,
+    LandingComponent,
     HeaderComponent,
     RoutesCreateComponent,
     RoutesListComponent,
-    FooterComponent,
     InfoPanelComponent,
     MenuBarComponent,
     UnitsStringPipe,

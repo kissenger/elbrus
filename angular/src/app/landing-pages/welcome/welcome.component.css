@@ -1,0 +1,61 @@
+
+/* div { border: 1px red solid; } */
+
+
+.text-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.text-header {
+  font-size: 2pc;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+}
+
+.text-header-wide {
+  font-size: 3pc;
+}
+
+.text-subheader {
+  font-size: 1pc;
+  color: white;
+  text-align: center;
+  transform: translateY(0px);
+}
+
+.text-subheader-wide {
+  font-size: 1.4pc;
+  transform: translateY(-10px);
+}
+
+.text-continue-guest {
+  font-size: 0.8pc;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.text-continue-guest:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.btn-container {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+}
+
+.btn-container-wide {
+  right: 0px;
+  left: auto;
+  transform: translateX(0px);
+}
+
+

@@ -1,0 +1,12 @@
+
+
+<div class="text-container">
+  <div class="text-header" [ngClass]="windowWidth>=BREAKPOINT ? 'text-header-wide' : ''">Find your adventure</div>
+  <div class="text-subheader" [ngClass]="windowWidth>=BREAKPOINT ? 'text-subheader-wide' : ''">Create, discover and share amazing trail routes</div>
+</div>
+
+
+<div class="btn-container m-3" [ngClass]="windowWidth>=BREAKPOINT ? 'btn-container-wide' : ''">
+  <button class="btn btn-md btn-primary w-100" type="button" (click)="onLoginClick()">Login or Register</button>
+  <div class="text-continue-guest my-1" (click)="onGuestClick()">Continue as Guest</div>
+</div>

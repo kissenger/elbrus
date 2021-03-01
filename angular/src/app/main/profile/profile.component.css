@@ -1,11 +1,14 @@
 /* div {border: 1px red solid;} */
 
 .profile-container {
-  background-color: rgba(255,255,255,1.0);
   position: absolute;
-  top: 0px;
-  bottom: 0px;
+  top: 50px;
+  bottom: 50px;
   left: 0px;
   right: 0px;
+}
+
+img {
+  height: 30px;
 }
 

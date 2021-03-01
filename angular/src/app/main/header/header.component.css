@@ -1,0 +1,19 @@
+
+.header-container {
+  background-color: white;
+  height: 55px;
+}
+
+.profile-block {
+  position: absolute;
+  color: var(--ts-brown);
+  right: 0px;
+  top: 0px;
+  height: 100%;
+  display:inline;
+  cursor: pointer;
+}
+
+img {
+  cursor: pointer;
+}

@@ -6,17 +6,24 @@ import { TsCallingPage } from 'src/app/shared/interfaces';
 import { RoutesCreateComponent } from './main/routes/routes-create/routes-create.component';
 import { RoutesListComponent } from './main/routes/routes-list/routes-list.component';
 import { RoutesReviewComponent } from './main/routes/routes-review/routes-review.component';
-import { LoginComponent } from './secondary/login/login.component';
-import { ProfileComponent } from './secondary/profile/profile.component';
-import { MapSelectLocationComponent } from './secondary/map-select-location/map-select-location.component';
-import { WelcomeComponent } from './secondary/welcome/welcome.component';
+import { LoginComponent } from './landing-pages/login/login.component';
+import { ProfileComponent } from './main/profile/profile.component';
+import { MapSelectLocationComponent } from './main/map-select-location/map-select-location.component';
+import { WelcomeComponent } from './landing-pages/welcome/welcome.component';
 import { AuthGuard } from './auth.guard';
+import { LandingComponent } from './landing-pages/landing/landing.component';
 
 const appRoutes: Routes = [
   // { path: 'welcome', component: WelcomeComponent},
-  { path: '', redirectTo: 'welcome', pathMatch: 'prefix'},
-  { path: 'welcome', component: WelcomeComponent},
-  { path: 'login', component: LoginComponent},
+  // { path: '', redirectTo: 'welcome', pathMatch: 'prefix'},
+  { path: '',
+    component: LandingComponent,
+    children: [
+      { path: 'welcome', component: WelcomeComponent},
+      { path: 'login',   component: LoginComponent}
+    ]},
+  // { path: 'welcome', component: WelcomeComponent, outlet: 'welcome'},
+  { path: 'login', component: LoginComponent, outlet: 'welcome'},
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
   { path: 'profile/select-home', component: MapSelectLocationComponent, canActivate: [AuthGuard]},
   { path: ':pathType/list', component: RoutesListComponent, canActivate: [AuthGuard]},

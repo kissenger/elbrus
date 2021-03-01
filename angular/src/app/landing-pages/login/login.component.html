@@ -1,9 +1,11 @@
 
-<div class="outer small h-100 w-100">
 
-  <div class="login-box border rounded d-flex flex-column">
 
-    <div class="d-flex flex-column flex-grow-1 m-3">
+<div class="outer d-flex flex-column small">
+
+  <div class="login-box d-flex flex-column col-6 offset-3 h-50 my-auto">
+
+    <div class="d-flex flex-column flex-grow-1 m-4 test">
 
       <!-- TABS -->
       <ul class="nav nav-tabs p-0 nav-justified" id="myTab" role="tablist">
@@ -23,10 +25,8 @@
 
           <form class="form-signin d-flex flex-column" name="login-form">
 
-            <div class="input-group input-group-sm">
+            <div class="input-group input-group-sm my-2">
               <div class="input-group-prepend">
-
-
                 <span class="input-group-text m-0 p-0">
                   <img src="assets/images/icon-login-person.svg" class="m-auto">
                 </span>
@@ -34,7 +34,7 @@
               <input type="text" name="userName" class="form-control" placeholder="Username" required>
             </div>
 
-            <div class="input-group input-group-sm mt-2 flex-grow-1">
+            <div class="input-group input-group-sm my-2 flex-grow-1">
               <div class="input-group-prepend">
                 <span class="input-group-text m-0 p-0">
                   <img src="assets/images/icon-login-padlock.svg" class="m-auto">
@@ -51,9 +51,9 @@
         <!-- REGISTER -->
         <div class="tab-pane fade m-3" id="register" role="tabpanel">
 
-          <form class="form-signin" name="register-form">
+          <form class="form-signin d-flex flex-column" name="register-form">
 
-            <div class="input-group input-group-sm">
+            <div class="input-group input-group-sm my-2">
               <div class="input-group-prepend">
                 <span class="input-group-text m-0 p-0">
                   <img src="assets/images/icon-login-person.svg" class="m-auto">
@@ -62,7 +62,7 @@
               <input type="text" name="userName" class="form-control" [ngClass]="{'form-control-danger': notValidUserName()}"  [(ngModel)]="userName" placeholder="Username" required>
             </div>
 
-            <div class="input-group input-group-sm mt-2">
+            <div class="input-group input-group-sm my-2">
               <div class="input-group-prepend">
                 <span class="input-group-text m-0 p-0">
                   <img src="assets/images/icon-login-email.svg" class="m-auto">
@@ -71,7 +71,7 @@
               <input type="email" name="email" class="form-control" [ngClass]="{'form-control-danger': notValidEmail()}"  [(ngModel)]="email" placeholder="Email address" required>
             </div>
 
-            <div class="input-group input-group-sm mt-2">
+            <div class="input-group input-group-sm my-2">
               <div class="input-group-prepend">
                 <span class="input-group-text m-0 p-0">
                   <img src="assets/images/icon-login-padlock.svg" class="m-auto">
@@ -80,7 +80,7 @@
               <input type="password" name="password" class="form-control" [ngClass]="{'form-control-danger': notValidPassword()}" placeholder="Password (6 or more characters)" [(ngModel)]="password" required>
             </div>
 
-            <div class="input-group input-group-sm mt-2">
+            <div class="input-group input-group-sm my-2">
               <div class="input-group-prepend">
                 <span class="input-group-text m-0 p-0">
                   <img src="assets/images/icon-login-padlock.svg" class="m-auto">
@@ -97,11 +97,11 @@
 
     <!-- BUTTONS -->
 
-    <div class="row justify-content-center mb-2">
-      <div class="col-4 m-0 p-0 m-1">
+    <div class="row no-gutters justify-content-center mx-4 mb-4">
+      <div class="col-6 pr-1">
         <button class="btn btn-sm btn-outline-secondary btn-block" type="submit" (click)="onCancel()">Cancel</button>
       </div>
-      <div class="col-4 m-0 p-0 m-1">
+      <div class="col-6 pl-1">
         <button class="btn btn-sm btn-primary btn-block" type="submit" (click)="onSubmit()">Submit</button>
       </div>
     </div>
