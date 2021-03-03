@@ -8,7 +8,8 @@ import { FormsModule } from '@angular/forms';
 
 // Components
 import { AppComponent } from './app.component';
-import { LandingComponent } from './landing-pages/landing/landing.component';
+import { MainComponent } from './main/main.component';
+import { LandingComponent } from './landing/landing.component';
 import { HeaderComponent } from './main/header/header.component';
 import { RoutesCreateComponent } from './main/routes/routes-create/routes-create.component';
 import { RoutesListComponent } from './main/routes/routes-list/routes-list.component';
@@ -23,12 +24,11 @@ import { PanelOptionsComponent } from './main/info-panel/panels/panel-options/pa
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { AlertBoxComponent } from './shared/components/alert-box/alert-box.component';
 import { RoutesReviewComponent } from './main/routes/routes-review/routes-review.component';
-import { WelcomeComponent } from './landing-pages/welcome/welcome.component';
-import { LoginComponent } from './landing-pages/login/login.component';
-import { MapSelectLocationComponent } from './main/map-select-location/map-select-location.component';
+import { WelcomeComponent } from './landing/welcome/welcome.component';
+import { LoginComponent } from './landing/login/login.component';
 import { ProfileComponent } from './main/profile/profile.component';
-import { DisplayMobileComponent } from './main/display-mobile/display-mobile.component';
-import { DisplayDesktopComponent } from './main/display-desktop/display-desktop.component';
+import { DisplayNarrowComponent } from './main/display-mobile/display-narrow.component';
+import { DisplayWideComponent } from './main/display-desktop/display-wide.component';
 
 // Services
 import { HttpService } from './shared/services/http.service';
@@ -56,6 +56,7 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
 @NgModule({
   declarations: [
     AppComponent,
+    MainComponent,
     LandingComponent,
     HeaderComponent,
     RoutesCreateComponent,
@@ -82,9 +83,8 @@ import { CoordsPipe } from './shared/pipes/coords.pipe';
     LoginComponent,
     WelcomeComponent,
     ProfileComponent,
-    MapSelectLocationComponent,
-    DisplayMobileComponent,
-    DisplayDesktopComponent
+    DisplayNarrowComponent,
+    DisplayWideComponent
   ],
   imports: [
     BrowserModule,

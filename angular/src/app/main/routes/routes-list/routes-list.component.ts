@@ -98,7 +98,8 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
     if ( this.auth.isGuest ) {
       this.alert.showAsElement(`Welcome Guest!`,
-      'Just to let you know, as a guest you\'ll only have a limited set of features.  Register an to access all features that trailscape.cc has to offer.'
+      'Thanks for having a look at trailscape.  Just to let you know, as a guest you\'ll only have a limited set of features.' +
+      '  When you\'re ready, log in for full access.'
       , true, false).subscribe( () => {});
     }
 
@@ -160,12 +161,6 @@ export class RoutesListComponent implements OnInit, OnDestroy {
 
   }
 
-  // addPathToMap(pathAsGeojson: TsFeatureCollection, style: TsLineStyle, options: TsPlotPathOptions) {
-  //   this.map.add(pathAsGeojson, style, options );
-
-  // }
-
-
 
   ngOnDestroy() {
     if (this.pathIdListener) { this.pathIdListener.unsubscribe(); }
@@ -173,6 +168,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
     if (this.chartPointListener) { this.chartPointListener.unsubscribe(); }
     if (this.positionListener) { this.positionListener.unsubscribe(); }
     this.position.unwatch();
+    this.alert.removeElement();
 
   }
 

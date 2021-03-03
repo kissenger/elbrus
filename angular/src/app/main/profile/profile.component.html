@@ -1,70 +1,50 @@
 
+<div class="profile-container d-flex flex-column p-2">
 
+  <div class="flex-grow-1 position-relative">
 
-<div class="profile-container col-lg-8 offset-lg-2 small bg-white d-flex flex-column p-3 ">
+    <div class="profile-inner overflow-auto">
 
-  <div class="d-flex flex-column">
+      <div class="col-md-6 col-12 mx-auto h-100">
 
-    <div class="mx-auto d-flex">
-      <!-- <h4>My Settings</h4> -->
-      <h4 class="m-0 p-0">{{auth.user.userName}}</h4>
-      <span class="text-like-link my-auto p-2" (click)="onLogoutClick()">(logout)</span>
-    </div>
+        <div class="h6 text-left border-bottom py-2">Preferences</div>
 
-    <!-- INFO BLOCK -->
+        <div class="row no-gutters">
+          <div class="col-4 p-1 text-right">email</div>
+          <div class="col-4 offset-1 p-1"> {{auth.user.email}} </div>
+        </div>
 
-    <div class="h6 text-left border-bottom m-0 mt-5 p-2">My Information</div>
+        <div class="row no-gutters">
+          <div class="col-4 p-1 text-right">distance units</div>
+          <div class="col-4 offset-1 p-1 text-like-link" (click)="onChangeDistanceUnits()"> {{ auth.user.units.distance | unitsLongName }}</div>
+        </div>
 
-    <div class="row no-gutters align-items-center">
-      <div class="col-3 py-2 text-right font-weight-bold">Home</div>
-      <div class="col-6 text-center"> {{auth.user.homeLngLat | coords}}</div>
-      <div class="col-3 text-left">
-        <span class="text-like-link" (click)="onChangeLocationClick()">edit</span>
+        <div class="row no-gutters mb-2">
+          <div class="col-4 p-1 text-right">elevation units</div>
+          <div class="col-4 offset-1 p-1 text-like-link" (click)="onChangeElevationUnits()">{{ auth.user.units.elevation | unitsLongName }}</div>
+        </div>
+
+        <div class="h6 text-left border-bottom py-2">Home Location {{home | coords}}</div>
+
+        <div class="flex-grow-1 py-2 w-100 position-relative">
+          <div id="map"></div>
+        </div>
+
       </div>
-    </div>
 
-    <div class="row no-gutters align-items-center">
-      <div class="col-3 py-2 text-right font-weight-bold">email</div>
-      <div class="col-6 text-center"> {{auth.user.email}} </div>
-    </div>
-
-    <!-- PREFERENCES BLOCK -->
-
-    <div class="h6 text-left border-bottom m-0 mt-5 p-2">My Preferences</div>
-
-    <div class="row no-gutters align-items-center">
-      <div class="col-3 py-2 text-right font-weight-bold">Distance</div>
-      <div class="col-6 text-center"> {{ auth.user.units.distance | unitsLongName }}</div>
-      <div class="col-3 text-left">
-        <span class="text-like-link" (click)="onChangeDistanceUnits()">toggle</span>
-      </div>
-    </div>
-
-    <div class="row no-gutters align-items-center">
-      <div class="col-3 py-2 text-right font-weight-bold">Elevation</div>
-      <div class="col-6 text-center"> {{ auth.user.units.elevation | unitsLongName }}</div>
-      <div class="col-3 text-left">
-        <span class="text-like-link" (click)="onChangeElevationUnits()">toggle</span>
-      </div>
     </div>
 
   </div>
 
 
-
-  <!-- BUTTONS -->
-
-  <div class="d-flex w-100 mt-5">
-
-    <!-- <div class="col-6 col-md-3 m-0 p-1">
-      <button class="btn w-100 btn-outline-secondary" type="button" (click)="onLogoutClick()">Logout</button>
-    </div> -->
-
-    <div class="col-6 col-md-3 mx-auto p-1">
-      <button class="btn w-100 btn-outline-primary" type="button" (click)="onClose()">Close</button>
+    <div class="btn-width row no-gutters mx-auto py-2">
+      <div class="col-6 pr-1">
+        <button class="btn btn-sm btn-outline-secondary btn-block" type="button" (click)="onLogoutClick()">Logout</button>
+      </div>
+      <div class="col-6 pl-1">
+        <button class="btn btn-sm btn-primary btn-block" type="button" (click)="onClose()">Close</button>
+      </div>
     </div>
 
-  </div>
 
 </div>
-

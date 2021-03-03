@@ -94,6 +94,10 @@
       Go to home
     </div>
 
+    <div  [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.goto(position)">
+      Go to current location
+    </div>
+
     <div [ngClass]="map.getType==='terrain' ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="map.setType('terrain')">
       Show terrain map
     </div>

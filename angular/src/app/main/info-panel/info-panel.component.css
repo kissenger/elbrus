@@ -1,47 +1,22 @@
 
-/* VARIABLES */
-div{
-  --top-margin: 10px;
-  --bottom-margin: 30px;
+
+ul {
+  /* padding-bottom: -10px; */
+  /* border-bottom: 1px var(--ts-bootstrap-border-grey) solid; */
+
 }
 
-.outer-container {
-  top: 10px;
-  bottom: 30px;
-  right: 0px;
-  left: 0px;
-  font-size: smaller;
-  pointer-events: none;
+li {
+  /* border-bottom: 1px red solid; */
+
 }
 
-.inner-container {
-  box-shadow: -4px 0px 8px 0px rgba(0,0,0,0.2);
-  right: 0px;
-  width: 225px;
-  background: white;
-  pointer-events: auto;
-  /* border: 1px purple solid; */
-}
-
-.hidden-view {
-  display: none;
-  pointer-events: none;
-  /* below is apparently better for 'screen readers' ...
-  position: absolute !important;
-  top: 50px !important;
-  left: -50px !important; */
-}
-
-/* COLLAPSE BAR */
-
-.collapse-btn {
-  pointer-events: auto;
+.nav-tabs {
+  margin-left: -1px;
+  margin-right: -1px;
+  margin-bottom: -1px;
+  /* padding-bottom: -1px; */
   background-color: var(--ts-grey-background);
-  cursor: pointer;
-  /* height: 15px; */
-  vertical-align: middle;
-  font-size: smaller;
-  color: rgb(110, 110, 110);
 }
 
 .content-inner {
@@ -51,24 +26,6 @@ div{
   right: 0px;
 }
 
-
-/* remove hover effect on small screens */
-@media only screen and (min-width: 900px) {
-  .collapse-btn:hover {
-    cursor: pointer;
-    background: white;
-  }
-}
-
-
-/* NAV TABS */
-
-.nav-tabs {
-  margin-left: -1px;
-  margin-right: -1px;
-  background-color: var(--ts-grey-background);
-}
-
 /* this is needed to ensure that the tabs which are hidden and overlay
 the active tab, do not interfere with the active tab inputs */
 .tab-panel:not(.active) {
@@ -76,16 +33,5 @@ the active tab, do not interfere with the active tab inputs */
 }
 
 
-/* FIX BORDER AROUND TABS */
-
-.border-fix {
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  margin-left: -1px;
-  margin-right: -1px;
-  pointer-events: none;
-}
 
 

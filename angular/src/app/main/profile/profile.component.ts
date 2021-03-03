@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../../shared/services/auth.service';
-import { TsUser } from '../../shared/interfaces';
+import { TsCoordinate, TsUser } from '../../shared/interfaces';
 import { HttpService } from '../../shared/services/http.service';
 import { Subscription } from 'rxjs';
 import { DataService } from '../../shared/services/data.service';
 import { SpinnerService } from '../../shared/services/spinner.service';
 import { Router } from '@angular/router';
+import { MapService } from 'src/app/shared/services/map.service';
 
 @Component({
   selector: 'app-profile',
@@ -15,31 +16,45 @@ import { Router } from '@angular/router';
 export class ProfileComponent implements OnInit, OnDestroy {
 
   private httpSubscription: Subscription;
+  private newLocationListener: Subscription;
+  public home: TsCoordinate;
 
   constructor(
     public auth: AuthService,
     private http: HttpService,
+    private map: MapService,
     private data: DataService,
     private spinner: SpinnerService,
     private router: Router
-  ) { }
+  ) {  }
 
-  /**
-   * We can arrive here from menu, or after use has selected new home location, so
-   * we check for data stored in dataService and if its there then thats the new location
-   * and we use it, otherwise use the location stored in auth.user
-   */
+
   async ngOnInit() {
 
-    const newLocation = this.data.get('newHomeLocation');
-    this.data.clearKey('newHomeLocation');
+    // initialise map with home location
+    this.home = this.auth.user.homeLngLat;
+    await this.map.newMap(this.home, 12);
 
-    if ( !!newLocation ) {
+    // set up listener to catch response from map
+    this.newLocationListener = this.data.clickedCoordsEmitter.subscribe( async (newHome: TsCoordinate) => {
       const user = this.auth.user;
-      user.homeLngLat = newLocation;
+      user.homeLngLat = newHome;
       await this.updateUser(user);
-    }
+      this.map.updateHomeMarker(newHome);
+    });
 
+    // request map to catch location clicks
+    this.map.getLocationOnClick();
+
+  }
+
+  onOK () {
+    this.data.set({newHomeLocation: this.home});
+    this.router.navigate(['profile']);
+  }
+
+  onCancel () {
+    this.router.navigate(['profile']);
   }
 
   onChangeLocationClick() {
@@ -98,6 +113,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.data.unitsUpdateEmitter.emit();
     if (this.httpSubscription) { this.httpSubscription.unsubscribe(); }
+    if (this.newLocationListener) { this.newLocationListener.unsubscribe(); }
   }
 
 }

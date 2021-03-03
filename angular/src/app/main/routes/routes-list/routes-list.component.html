@@ -1,13 +1,6 @@
 
+<div id="map"></div>
 
-<div class="d-flex flex-column h-100">
-
-  <app-header></app-header>
-  <div class="flex-grow-1 position-relative">
-    <div id="map"></div>
-    <app-display-mobile *ngIf="windowWidth < BREAKPOINT" callingPage="list" [map]="map"></app-display-mobile>
-    <app-display-desktop *ngIf="windowWidth >= BREAKPOINT" callingPage="list" [map]="map"></app-display-desktop>
-  </div>
-
-</div>
+<app-display-narrow *ngIf="windowWidth < BREAKPOINT" callingPage="list" [map]="map"></app-display-narrow>
+<app-display-wide *ngIf="windowWidth >= BREAKPOINT" callingPage="list" [map]="map"></app-display-wide>
 

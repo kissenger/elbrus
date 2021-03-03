@@ -1,9 +1,8 @@
 
 
 
-<div class="outer d-flex flex-column small">
 
-  <div class="login-box d-flex flex-column col-6 offset-3 h-50 my-auto">
+  <div class="login-box d-flex flex-column" [ngClass]="windowWidth>=BREAKPOINT ? 'login-box-wide' : ''">
 
     <div class="d-flex flex-column flex-grow-1 m-4 test">
 
@@ -107,4 +106,4 @@
     </div>
 
   </div>
-</div>
+<!-- </div> -->

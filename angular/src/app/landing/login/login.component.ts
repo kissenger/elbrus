@@ -6,6 +6,8 @@ import { AlertService } from '../../shared/services/alert.service';
 import { AuthService } from '../../shared/services/auth.service';
 import * as globals from '../../shared/globals';
 import { Location } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +16,10 @@ import { Location } from '@angular/common';
 })
 
 export class LoginComponent implements OnInit, OnDestroy {
+
+  public windowWidth: number;
+  private windowWidthListener: Subscription;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   public password = '';
   public passwordConfirm = '';
@@ -26,8 +32,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     private alert: AlertService,
     private router: Router,
     private location: Location,
-    private data: DataService
-    ) {}
+    private data: DataService,
+    private screenSize: ScreenSizeService
+  ) {
+   this.windowWidth = this.screenSize.width;
+   this.windowWidthListener =  this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+     this.windowWidth = newWidth.width;
+   });
+  }
 
   ngOnInit() {}
 
@@ -135,6 +147,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.password !== this.passwordConfirm;
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() {
+    if (this.windowWidthListener) { this.windowWidthListener.unsubscribe(); }
+  }
 
 }

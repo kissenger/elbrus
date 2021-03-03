@@ -4,7 +4,7 @@
   bottom: 0px;
   left: 0px;
   right: 0px;
-  background-image: url("../../../assets/images/ts_background1.jpg");
+  background-image: url("../../assets/images/ts_background1.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -12,9 +12,9 @@
 
 .landing-banner {
   background-color: rgba(0,0,0,0.7);
-  position: absolute;
+  /* position: absolute;
   top: 0px;
   left: 0px;
-  right: 0px;
+  right: 0px; */
   height: 80px;
 }

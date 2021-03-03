@@ -3,26 +3,22 @@
   border: 0px red dashed;
 } */
 
-.outer {
+
+.login-box {
   position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 450px;
+  transform: translate(-50%, -50%);
+  background:rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
+
+  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
 }
 
-/* position only, more done by bootstrap, and indeed this could now be done that way too */
-.login-box {
-  /* position: absolute; */
-  /* top: 50%; */
-  /* left: 50%; */
-  /* width: 300px; */
-  /* height: 450px; */
-  /* transform: translate(-50%, -50%); */
-  /* background: var(--ts-grey-background); */
-  background:rgba(0, 0, 0, 0.7);
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-
+.login-box-wide {
+  width: 350px;
 }
 
 .test {

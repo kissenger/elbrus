@@ -4,16 +4,16 @@ import { Component, Input, OnInit } from '@angular/core';
 import { TsCallingPageType } from 'src/app/shared/interfaces';
 
 @Component({
-  selector: 'app-display-mobile',
-  templateUrl: './display-mobile.component.html',
-  styleUrls: ['./display-mobile.component.css']
+  selector: 'app-display-narrow',
+  templateUrl: './display-narrow.component.html',
+  styleUrls: ['./display-narrow.component.css']
 })
-export class DisplayMobileComponent implements OnInit {
+export class DisplayNarrowComponent implements OnInit {
 
   @Input() callingPage: TsCallingPageType;
   @Input() map: mapboxgl.Map;
 
-  public isMenuOpen = true;
+  public isMenuOpen = false;
   public vh: number;
 
   constructor(

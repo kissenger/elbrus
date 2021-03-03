@@ -14,31 +14,40 @@ import { Observable } from 'rxjs';
 
 export class AlertService {
 
+  private alertBox: NgElement & WithProperties<AlertBoxComponent>;
+
   constructor() { }
+
+  removeElement() {
+    if (document.body.contains(this.alertBox)) {
+      document.body.removeChild(this.alertBox);
+      this.alertBox = null;
+    }
+  }
 
   showAsElement(title: string, message: string, okBtn: boolean, cancelBtn: boolean) {
 
     // Create element
-    const alertBox: NgElement & WithProperties<AlertBoxComponent> = document.createElement('alert-box') as any;
-    alertBox.message = message;
-    alertBox.title = title;
-    alertBox.okBtn = okBtn;
-    alertBox.cancelBtn = cancelBtn;
+    this.alertBox = document.createElement('alert-box') as any;
+    this.alertBox.message = message;
+    this.alertBox.title = title;
+    this.alertBox.okBtn = okBtn;
+    this.alertBox.cancelBtn = cancelBtn;
 
     // Add to the DOM
-    document.body.appendChild(alertBox);
+    document.body.appendChild(this.alertBox);
 
     return new Observable( (observer) => {
 
       // Listen to the cancel event
-      alertBox.addEventListener('cancel', () => {
-        document.body.removeChild(alertBox);
+      this.alertBox.addEventListener('cancel', () => {
+        document.body.removeChild(this.alertBox);
         return observer.next(false);
       });
 
       // Listen to the ok event
-      alertBox.addEventListener('ok', () => {
-        document.body.removeChild(alertBox);
+      this.alertBox.addEventListener('ok', () => {
+        document.body.removeChild(this.alertBox);
         return observer.next(true);
       });
     });
