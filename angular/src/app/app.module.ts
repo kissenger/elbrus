@@ -27,8 +27,8 @@ import { RoutesReviewComponent } from './main/routes/routes-review/routes-review
 import { WelcomeComponent } from './landing/welcome/welcome.component';
 import { LoginComponent } from './landing/login/login.component';
 import { ProfileComponent } from './main/profile/profile.component';
-import { DisplayNarrowComponent } from './main/display-mobile/display-narrow.component';
-import { DisplayWideComponent } from './main/display-desktop/display-wide.component';
+import { DisplayNarrowComponent } from './main/display-narrow/display-narrow.component';
+import { DisplayWideComponent } from './main/display-wide/display-wide.component';
 
 // Services
 import { HttpService } from './shared/services/http.service';

@@ -105,7 +105,7 @@ class PathWithStats extends Path{
         debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 1`);
       } else {
         // path is 'short', but simplify with low threshold to remove any duplicates
-        path.simplify(0.1);
+        path.simplify(0.01);
         debugMsg(`PathWithStats:preFlight --> ${path.length} points after simplification pass 0`);
       }
 

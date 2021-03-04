@@ -31,6 +31,7 @@ export class MapCreateService extends MapService {
   private pathToEdit: TsFeatureCollection;
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
+  private popup: mapboxgl.Popup;
 
   constructor(
     http: HttpService,
@@ -286,6 +287,12 @@ export class MapCreateService extends MapService {
 
   private onClickGetCoords = async (e) => {
 
+    // do nothing if popup is active
+    if (this.popup) {
+      this.popup = null;
+      return;
+    }
+
     // first ensure we didnt click on a point - if so assume we didnt want a new path segment and ignore click
     const isClickedOnPoint = this.tsMap.queryRenderedFeatures(e.point).some(point => point.source === 'points');
     if (!isClickedOnPoint) {
@@ -324,7 +331,7 @@ export class MapCreateService extends MapService {
   private onMove = (e: mapboxgl.MapLayerMouseEvent) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
-    console.log(this.points.features);
+    // console.log(this.points.features);
     this.points.features[this.selectedPointId].geometry.coordinates = coords;
 
     if (this.selectedLineIds) {
@@ -355,23 +362,53 @@ export class MapCreateService extends MapService {
   // Delete a point on right-click
   private onRightClick = async (e: mapboxgl.MapLayerMouseEvent) => {
 
-    this.spinner.showAsElement();
+    if (this.popup) {
+      this.popup.remove();
+      this.popup = null;
+    }
 
-    try {
+    const pathCoords = this.history.coords;
+    const pointId = <number>e.features[0].id;
 
-      const pathCoords = this.history.coords;
-      pathCoords.splice(<number>e.features[0].id, 1);
-      const backendResult = await this.getPathFromBackend(pathCoords);
+    let html = '<span id="delete-point">Delete point</span>';
+    html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
+    html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
+
+    // store on the class so other functions can know if popup exists or not
+    this.popup = new mapboxgl.Popup({ closeOnClick: true })
+      .setLngLat(e.lngLat)
+      .setHTML(html)
+      .addTo(this.tsMap);
+
+    document.getElementById('delete-point').addEventListener('click', async () => {
+      pathCoords.splice(pointId, 1);
+      processNewPoints(pathCoords);
+    });
+
+    document.getElementById('add-point-before')?.addEventListener('click', async () => {
+      // rounding is done to 5pd to introduce small error, which prevents new point being simplified out
+      const newLng = Math.ceil((pathCoords[pointId - 1][0] + pathCoords[pointId][0]) / 2 * 1E5) / 1E5;
+      const newLat = Math.ceil((pathCoords[pointId - 1][1] + pathCoords[pointId][1]) / 2 * 1E5) / 1E5;
+      pathCoords.splice(pointId, 0, [newLng, newLat]);
+      processNewPoints(pathCoords);
+    });
+
+    document.getElementById('add-point-after')?.addEventListener('click', async () => {
+      // rounding is done to 5pd to introduce small error, which prevents new point being simplified out
+      const newLng = Math.ceil((pathCoords[pointId + 1][0] + pathCoords[pointId][0]) / 2 * 1E5) / 1E5;
+      const newLat = Math.ceil((pathCoords[pointId + 1][1] + pathCoords[pointId][1]) / 2 * 1E5) / 1E5;
+      pathCoords.splice(pointId + 1, 0, [newLng, newLat]);
+      processNewPoints(pathCoords);
+    });
+
+    const processNewPoints = async(coords: Array<TsPosition>) => {
+      const backendResult = await this.getPathFromBackend(coords);
       this.history.add( new Path (backendResult) );
       this.updateMap();
       this.tsMap.removeFeatureState( {source: '0000pts'} );
-
-    } catch (error) {
-
-    }
-
-    this.spinner.removeElement();
-
+      this.popup.remove();
+      this.popup = null;
+    };
   }
 
 
@@ -406,7 +443,6 @@ export class MapCreateService extends MapService {
 
       this.tsMap.getCanvas().style.cursor = 'pointer';
 
-
       if (this.selectedLineIds) {
         // we moved some lines
 
@@ -429,7 +465,9 @@ export class MapCreateService extends MapService {
         try {
 
           if (this._snapType === 'none') {
-            backendResult = await this.getPathFromBackend(coords);
+
+            const newCoords = this.points.features.map(f => f.geometry.coordinates);
+            backendResult = await this.getPathFromBackend(<Array<TsPosition>>newCoords);
 
           } else {
 

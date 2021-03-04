@@ -393,15 +393,15 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
 
 
-    let coords;
-    if (req.body.options.simplify) {
-      coords = geoFunctions.simplifyPath(req.body.coords, 5).points;
-    } else {
-      coords = req.body.coords;
-    }
+  let coords;
+  if (req.body.options.simplify) {
+    coords = geoFunctions.simplifyPath(req.body.coords, 5).points;
+  } else {
+    coords = req.body.coords;
+  }
 
-    // TODO: is it really needed to convert from {lat:, lng:} to lngLat?
-    const lngLats = coords.map(coord => [coord.lng, coord.lat]);
+  // TODO: is it really needed to convert from {lat:, lng:} to lngLat?
+  const lngLats = coords.map(coord => [coord.lng, coord.lat]);
 
   try {
     let routeInstance;
