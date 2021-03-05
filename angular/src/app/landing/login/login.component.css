@@ -1,10 +1,5 @@
 
-/* div {
-  border: 0px red dashed;
-} */
-
-
-.login-box {
+.login-box-container {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -13,17 +8,15 @@
   transform: translate(-50%, -50%);
   background:rgba(0, 0, 0, 0.7);
   border-radius: 5px;
+}
 
-  /* box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); */
+.login-box-inner {
+  background-color: var(--ts-grey-background);
+  border-radius: 5px;
 }
 
 .login-box-wide {
   width: 350px;
-}
-
-.test {
-  background-color: var(--ts-grey-background);
-  border-radius: 5px;
 }
 
 .input-group-text {
@@ -38,7 +31,3 @@
 img {
   height: 15px;
 }
-/*
-.nav-tabs {
-  background-color: var(--ts-grey-background);
-} */

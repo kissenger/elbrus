@@ -331,11 +331,9 @@ export class MapCreateService extends MapService {
   private onMove = (e: mapboxgl.MapLayerMouseEvent) => {
 
     const coords: TsPosition = [e.lngLat.lng, e.lngLat.lat];
-    // console.log(this.points.features);
     this.points.features[this.selectedPointId].geometry.coordinates = coords;
 
     if (this.selectedLineIds) {
-      // if there is a line plotted to move (ie not just the first point)
       this.selectedLineIds.forEach( ids => this.line.features[ids.featureIndex].geometry.coordinates[ids.coordIndex] = coords );
     }
 
@@ -370,15 +368,20 @@ export class MapCreateService extends MapService {
     const pathCoords = this.history.coords;
     const pointId = <number>e.features[0].id;
 
-    let html = '<span id="delete-point">Delete point</span>';
+    let html = '<div id="popup-menu"><span id="delete-point">Delete point</span>';
     html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
     html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
+    html += '</div>';
+    console.log(html)
 
     // store on the class so other functions can know if popup exists or not
     this.popup = new mapboxgl.Popup({ closeOnClick: true })
       .setLngLat(e.lngLat)
       .setHTML(html)
       .addTo(this.tsMap);
+
+      document.getElementById('popup-menu').style.cursor = 'pointer';
+
 
     document.getElementById('delete-point').addEventListener('click', async () => {
       pathCoords.splice(pointId, 1);
