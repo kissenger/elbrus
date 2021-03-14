@@ -24,6 +24,7 @@ export class PanelDetailsSummaryComponent implements OnInit, OnDestroy {
   public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
   public givenName: string = null;     // name given to the path in the details form; overrides the default name
   public units: TsUnits;
+  public isElevations: boolean;
 
   constructor(
     private auth: AuthService,
@@ -53,6 +54,7 @@ export class PanelDetailsSummaryComponent implements OnInit, OnDestroy {
     if ( this.data.isPath() ) {
 
       this.geoJson = this.data.getPath();
+      this.isElevations = this.geoJson.properties.info.isElevations && !this.geoJson.properties.info.isLong;
 
       if (this.geoJson?.properties?.info?.name) {
         this.givenName = this.geoJson.properties.info.name;

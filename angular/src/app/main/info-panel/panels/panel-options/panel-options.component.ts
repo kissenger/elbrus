@@ -61,6 +61,7 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   /** virtually clicks the hidden form element to launch the select file dialogue */
   onImportGpxClick() {
+    console.log('ferf');
     if (!this.auth.isRegistered) { return; }
     document.getElementById('file-select-single').click();
   }

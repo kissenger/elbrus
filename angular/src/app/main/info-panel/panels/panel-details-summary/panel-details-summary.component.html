@@ -13,7 +13,7 @@
     <div class="col-3 m-0 text-center">
       {{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}
     </div>
-    <div class="col-3 m-0 text-center">
+    <div *ngIf="isElevations" class="col-3 m-0 text-center">
       {{geoJson.properties.stats.elevations.lumpiness | unitsString: 'lumpiness': units.elevation: units.distance}}
     </div>
   </div>
