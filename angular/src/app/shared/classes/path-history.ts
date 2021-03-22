@@ -4,7 +4,7 @@
   import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
   import { Injector } from '@angular/core';
 
-  const UNDO_BUFFER = 20;
+  const UNDO_BUFFER = 5;
 
   export class PathHistory {
 

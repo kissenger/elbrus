@@ -27,6 +27,10 @@ export class AlertService {
 
   showAsElement(title: string, message: string, okBtn: boolean, cancelBtn: boolean) {
 
+    if (this.alertBox) {
+      this.removeElement();
+    }
+
     // Create element
     this.alertBox = document.createElement('alert-box') as any;
     this.alertBox.message = message;
