@@ -227,19 +227,32 @@
 
 
     // remove the most recent item in the history and return true is something was removed, false if no more to undo
+    // TODO: Logic is confused with pop, needs a rethink
     undo() {
 
-      // if pop was successful, then carry on
-      if (this.pop()) {
-        return true;
-
-      // if failed there are no more line left to remove; only remove the firstPoint if buffer wasnt exceeded
-      } else {
-        if (!this.isBufferReached) {
-          this.firstPoint = null;
+      if (!this._firstPoint) {
+        // this is an edited route, so firstPoint lastPoint etc not set - different behaviour
+        if (this.length > 1) {
+          this.pop();
           return true;
         } else {
           return false;
+        }
+
+      } else {
+
+        // if pop was successful, then carry on
+        if (this.pop()) {
+          return true;
+
+        // if failed there are no more line left to remove; only remove the firstPoint if buffer wasnt exceeded
+        } else {
+          if (!this.isBufferReached) {
+            this.firstPoint = null;
+            return true;
+          } else {
+            return false;
+          }
         }
       }
     }
