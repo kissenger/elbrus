@@ -11,6 +11,7 @@ import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import * as mapboxgl from 'mapbox-gl';
 import { TsMarkers } from '../classes/ts-markers';
+import { ThisReceiver } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -69,6 +70,12 @@ export class MapCreateService extends MapService {
     // update the map with the last path in the history class
     this.tsMap.once('idle', (e) => {
       const geoJson = this.history.geoJson;
+      if (this.pathToEdit) {
+        geoJson.properties.info.name = this.pathToEdit.properties.info.name;
+        geoJson.properties.info.description = this.pathToEdit.properties.info.description;
+        geoJson.properties.pathId = this.pathToEdit.properties.pathId;
+
+      }
       this.data.setPath(geoJson);  // send regardless of whether geojson is valid, as a null will disable menu bar items
       if (this.isDev) { console.log(geoJson); }
     });
@@ -128,8 +135,6 @@ export class MapCreateService extends MapService {
     });
 
   }
-
-
 
    /**
    * gets the coordinates for a given start and end point
@@ -198,8 +203,8 @@ export class MapCreateService extends MapService {
   public async reversePath() {
 
     const reversedCoords = this.history.coords.map( (c, i, arr) => arr[this.history.nPoints - i - 1]);
-    const backendResult = await this.getPathFromBackend( reversedCoords );
-    this.history.add( new Path(backendResult) );
+    const fromBackend = await this.getPathFromBackend( reversedCoords );
+    this.history.add( new Path(fromBackend) );
     this.updateMap();
 
   }

@@ -146,7 +146,6 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
     }
 
     let isPublic;
-
     if (req.body.pathId !== '0000') {
       // we are saving an edited path, need to know isPublic, and to delete it
       const oldPath = await mongoModel('route').findOne( {_id: req.body.pathId});
@@ -482,33 +481,6 @@ app.post('/api/copy-path/', auth.verifyToken, async (req, res) => {
   }
 
 })
-
-
-
-/*****************************************************************
- * Return the reverse of a route
- *****************************************************************/
-
-app.get('/api/reverse-route/:pathType/:pathId', auth.verifyToken, async (req, res) => {
-
-  try {
-
-    const sourceDoc = await mongoModel(req.params.pathType).findOne({_id: req.params.pathId});
-    const {lngLats, elevs} = getReverseOfRoute(sourceDoc.geometry.coordinates, sourceDoc.params.elev);
-    const routeInstance = await getRouteInstance(null, null, lngLats, elevs);
-    const newDoc = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false) );
-    res.status(201).json( {hills: new GeoJSON().fromDocument(newDoc).toGeoHills()} );
-
-  } catch (error) {
-
-    debugMsg('ERROR: ' + error);
-    res.status(500).send(error.message);
-
-  }
-
-})
-
-
 
 
 

@@ -158,10 +158,4 @@ export class HttpService {
       .pipe( catchError(this.errorService.handleError) );
   }
 
-  reverseRoute(pathType: string, pathId: string) {
-    return this.http
-      .get<any>(`${this.backendURL}/reverse-route/${pathType}/${pathId}`)
-      .pipe( catchError(this.errorService.handleError) );
-  }
-
 }
