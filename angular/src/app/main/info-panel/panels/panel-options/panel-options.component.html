@@ -21,7 +21,7 @@
     <div class="w-100 text-center h6 mb-3 mt-3">New Routes</div>
 
     <div [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top" (click)="onImportGpxClick()">
-      Import .gpx file
+      Upload a .gpx file
     </div>
 
     <div class="ts-menu-item p-1 border-top border-bottom mb-3" (click)="onCreateClick()">
@@ -73,7 +73,7 @@
         [ngClass]="!auth.isRegistered ? 'ts-menu-item-disabled' : ''"
         class="ts-menu-item p-1 border-top"
         (click)="onExportGpxClick()">
-        Export to .gpx file
+        Download as .gpx file
       </div>
 
     </div>

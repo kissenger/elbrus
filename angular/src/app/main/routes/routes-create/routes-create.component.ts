@@ -6,10 +6,11 @@ import { MapCreateService } from 'src/app/shared/services/map-create.service';
 import { DataService } from 'src/app/shared/services/data.service';
 import { Subscription } from 'rxjs';
 import { HttpService } from 'src/app/shared/services/http.service';
-import { TsPlotPathOptions, TsFeatureCollection, TsLineStyle, TsMapRequest } from 'src/app/shared/interfaces';
+import { TsPlotPathOptions, TsFeatureCollection, TsLineStyle, TsMapRequest, TsCallingPage } from 'src/app/shared/interfaces';
 import { AlertService } from 'src/app/shared/services/alert.service';
 import * as globals from 'src/app/shared/globals';
 import { ScreenSizeService } from 'src/app/shared/services/screen-size.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 @Component({
@@ -23,12 +24,15 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
   private httpListener: Subscription;
   private chartPointListener: Subscription;
   private positionListener: Subscription;
+  private routeListener: Subscription;
 
   public windowWidth: number;
   public BREAKPOINT = globals.BREAKPOINTS.MD;
 
   constructor(
     private data: DataService,
+    private route: ActivatedRoute,
+    private router: Router,
     public map: MapCreateService,
     private http: HttpService,
     private alert: AlertService,
@@ -43,6 +47,13 @@ export class RoutesCreateComponent implements OnInit, OnDestroy {
      }
 
   async ngOnInit() {
+
+    // redirect if in edit mode and there is no stored route (browser was refreshed)
+    this.routeListener = this.route.data.subscribe( data => {
+      if (data.callingPage === 'edit' && !this.data.getPath()) {
+        this.router.navigate(['/routes/list']);
+      }
+    })
 
     // initialise the map and launch create route
     if (this.map.isMap()) { this.map.kill(); }

@@ -1,4 +1,4 @@
-import { TsPosition } from './../../../shared/interfaces';
+import { TsCallingPageType, TsPosition } from './../../../shared/interfaces';
 import { ScreenSizeService } from './../../../shared/services/screen-size.service';
 import { AuthService } from './../../../shared/services/auth.service';
 import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
@@ -7,7 +7,7 @@ import { TsFeatureCollection, TsMapRequest } from 'src/app/shared/interfaces';
  * map-service to make the desired changes to the plot
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { MapService } from 'src/app/shared/services/map.service';
 import { DataService } from 'src/app/shared/services/data.service';
@@ -24,6 +24,8 @@ import * as globals from 'src/app/shared/globals';
 })
 
 export class RoutesListComponent implements OnInit, OnDestroy {
+
+  @Input() callingPage: TsCallingPageType;
 
   private pathIdListener: Subscription;
   private httpListener: Subscription;
