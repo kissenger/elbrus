@@ -132,7 +132,7 @@
       Reverse route
     </div>
 
-    <div [ngClass]="!position ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.simplify()">
+    <div [ngClass]="!isData ? 'ts-menu-item-disabled' : ''" class="ts-menu-item p-1 border-top border-bottom" (click)="map.simplify()">
       Simplify route
     </div>
 
