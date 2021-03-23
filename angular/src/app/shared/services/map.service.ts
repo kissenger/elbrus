@@ -10,6 +10,7 @@ import { ActivePathLayers } from '../classes/active-layers';
 import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import { TsMarkers } from '../classes/ts-markers';
+import { ScreenSizeService } from './screen-size.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,8 @@ export class MapService {
   private _mapType: TsMapType = this.mapDefaultType;
   public pathLayers: ActivePathLayers;
   public markers: TsMarkers;
+  private windowWidth: number;
+  public BREAKPOINT = globals.BREAKPOINTS.MD;
   private padding = {
     wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
     narrowScreen: {top: 10, left: 10, bottom: 10, right: 10}
@@ -38,9 +41,14 @@ export class MapService {
     public http: HttpService,
     public data: DataService,
     private auth: AuthService,
-    private geoJsonPipe: GeoJsonPipe
+    private geoJsonPipe: GeoJsonPipe,
+    private screenSize: ScreenSizeService
   ) {
     Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.mapboxToken);
+    this.windowWidth = this.screenSize.width;
+    this.screenSize.resize.subscribe( (newWidth: {width: number, height: number}) => {
+      this.windowWidth = newWidth.width;
+    });
   }
 
   get context() {
@@ -184,7 +192,7 @@ export class MapService {
     bbox = [ [ boundingBox[0], boundingBox[1] ], [ boundingBox[2], boundingBox[3] ] ];
 
     const options = {
-      padding: this.padding.wideScreen,
+      padding: this.windowWidth < this.BREAKPOINT ? this.padding.narrowScreen : this.padding.wideScreen,
       linear: true
     };
 
@@ -221,7 +229,10 @@ export class MapService {
 
     return new Promise<void>( (resolve, reject) => {
 
-      if (this.isDev) { console.log(pathAsGeoJSON); }
+      if (this.isDev) {
+        console.log(pathAsGeoJSON, styleOptions, plotOptions);
+      }
+
       const path = new Path( pathAsGeoJSON );
       const pathId = pathAsGeoJSON.properties.pathId;
       const bbox: TsBoundingBox = pathAsGeoJSON.bbox;

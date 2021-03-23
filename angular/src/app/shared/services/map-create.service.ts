@@ -1,3 +1,4 @@
+import { ScreenSizeService } from './screen-size.service';
 import { Injectable } from '@angular/core';
 import { MapService } from './map.service';
 import { HttpService } from './http.service';
@@ -11,7 +12,6 @@ import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import * as mapboxgl from 'mapbox-gl';
 import { TsMarkers } from '../classes/ts-markers';
-import { ThisReceiver } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -39,10 +39,11 @@ export class MapCreateService extends MapService {
     data: DataService,
     auth: AuthService,
     geoJsonPipe: GeoJsonPipe,
+    screenSize: ScreenSizeService,
     private spinner: SpinnerService,
-    private alert: AlertService
+    private alert: AlertService,
   ) {
-    super(http, data, auth, geoJsonPipe);
+    super(http, data, auth, geoJsonPipe, screenSize);
   }
 
   public get snapType() {

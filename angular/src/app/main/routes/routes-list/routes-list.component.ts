@@ -76,7 +76,7 @@ export class RoutesListComponent implements OnInit, OnDestroy {
         this.data.setPath(path);
         this.data.set({startPath: true}); // tells panel-list that we are showing a shared path
         this.tsMap = await this.map.newMap(null, null, path.bbox );
-        this.map.add(path, {}, {plotType: 'active'});
+        this.map.add(path, {}, {plotType: 'active', resizeView: true});
 
       } else {
         this.alert.showAsElement('Error: Path not found', 'Couldn\'t find requested path, or not authorised', true, false)
