@@ -57,7 +57,9 @@ class PathWithStats extends Path{
         description,
         isLong: this.length > LONG_PATH_THRESHOLD,
         isElevations: this._isElevations,
-        activityType: activityType
+        activityType: activityType,
+        startPoint: this.lngLats[0],
+        endPoint: this.lngLats[this.lngLats.length - 1]
       },
       stats: {
         dDistance: deltaDistance,
