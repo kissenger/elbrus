@@ -29,8 +29,7 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
   const distance = path.pathData.stats.distance;
   const cumDistance = path.pathData.params.cumDistance;
 
-  // const elevations = this.getParamFromPoints('elev');
-  const smoothedElevations = getSmoothedElevations(path.pathData.params.elev);
+  const smoothedElevations = getSmoothedElevations(path.pathData.params.elevs);
   const grads = smoothedElevations.map( (e, i, eArr) => i === 0 ? 0 : (e - eArr[i-1]) / dDistance[i] * 100 );
 
   // initilise loop variables
@@ -112,14 +111,14 @@ const MOVING_AVERAGE_PERIOD =    require('./globals').MOVING_AVERAGE_PERIOD;
 }
 
 
-function getSmoothedElevations(elev) {
+function getSmoothedElevations(elevs) {
 
-  const isPathReallyShort = () => elev.length < (MOVING_AVERAGE_PERIOD * 2);
+  const isPathReallyShort = () => elevs.length < (MOVING_AVERAGE_PERIOD * 2);
 
   if (isPathReallyShort()) {
-    return elev;
+    return elevs;
   } else {
-    const moveAve = movingAverage(elev, MOVING_AVERAGE_PERIOD);
+    const moveAve = movingAverage(elevs, MOVING_AVERAGE_PERIOD);
     return moveAve.map( e => e.toFixed(1)*1);
   }
 

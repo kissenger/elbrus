@@ -26,14 +26,14 @@ const SIMPLIFICATION_FACTOR_PASS_2 = require('./globals').SIMPLIFICATION_FACTOR_
 
 class PathWithStats extends Path{
 
-  constructor(name, description, lngLat, elev, pathType) {
+  constructor(name, description, activityType, lngLats, elevs, pathType) {
 
 
     debugMsg('PathWithStats');
 
-    super(lngLat);
+    super(lngLats);
 
-    if (elev.length > 0) {
+    if (elevs.length > 0) {
       // this.addParam('elev', elev);
       this._isElevations = true;
     } else {
@@ -56,7 +56,8 @@ class PathWithStats extends Path{
         name,
         description,
         isLong: this.length > LONG_PATH_THRESHOLD,
-        isElevations: this._isElevations
+        isElevations: this._isElevations,
+        activityType: activityType
       },
       stats: {
         dDistance: deltaDistance,
@@ -72,7 +73,7 @@ class PathWithStats extends Path{
         simplificationRatio: this.simplificationRatio,
       },
       params: {
-        elev,
+        elevs,
         cumDistance: this.cumulativeDistance
       }
     }
@@ -81,7 +82,7 @@ class PathWithStats extends Path{
 
 
   // Perform pre-flight checks on provided points and elevations - get elevations from jael if needed
-  static preFlight(lngLats, elev) {
+  static preFlight(lngLats, elevs) {
 
     debugMsg('PathWithStats.preflight');
 
@@ -89,14 +90,14 @@ class PathWithStats extends Path{
 
       // check quality of elevations - for now dump elevations if there are any nulls
       // TODO: In future fill in if there are minor gaps in elevation profile
-      if (elev) {
-        elev = elev.every(e => !!e) ? elev : null;
+      if (elevs) {
+        elevs = elevs.every(e => !!e) ? elevs : null;
       }
 
-      const isElevationsProvided = !!elev;
+      const isElevationsProvided = !!elevs;
       const path = new Path(lngLats);
       if (isElevationsProvided) {
-        path.addParam('elev', elev);
+        path.addParam('elevs', elevs);
       };
 
       if (path.length > SHORT_PATH_THRESHOLD) {
@@ -118,16 +119,16 @@ class PathWithStats extends Path{
       if (path.length < LONG_PATH_THRESHOLD) {
         if (!isElevationsProvided) {
           jael.getElevs( {points: path.pointLikes} )
-            .then(elev => {
-              resolve( {lngLat: path.lngLats, elev: elev.map(e => e.elev)} )
+            .then(elevs => {
+              resolve( {lngLats: path.lngLats, elevs: elevs.map(e => e.elev)} )
             })
             .catch(error => reject(error))
             
         } else {
-          resolve( {lngLat: path.lngLats, elev: path.getParam('elev')} );
+          resolve( {lngLats: path.lngLats, elevs: path.getParam('elevs')} );
         }
       } else {
-        resolve( {lngLat: path.lngLats, elev: []});
+        resolve( {lngLats: path.lngLats, elevs: []});
       }
     })
 
@@ -137,8 +138,8 @@ class PathWithStats extends Path{
 
 class Route extends PathWithStats {
 
-  constructor(name, description, lngLat, elev){
-    super(name, description, lngLat, elev, 'route');
+  constructor(name, description, activityType, lngLats, elevs){
+    super(name, description, activityType, lngLats, elevs, 'route');
   }
 
 }

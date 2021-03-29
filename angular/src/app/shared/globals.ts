@@ -93,10 +93,12 @@ const emptyProps: TsGeoJsonProperties = {
     isLong: false,
     isPublic: false,
     createdBy: '',
-    isElevations: false
+    isElevations: false,
+    startPoint: null,
+    activityType: 'running'
   },
   params: {
-    elev: [],
+    elevs: [],
     time: [],
     heartRate: [],
     cadence: [],

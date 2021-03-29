@@ -20,6 +20,8 @@ export interface TsUnits {
     elevation: 'm' | 'ft';
 }
 
+export type TsActivityType = 'running' | 'cycling' | 'bikepacking' | 'fastpacking' | 'skitouring' | 'canicross' | 'walking';
+
 export type TsCallingPageType = 'list' | 'create' | 'edit' | 'review';
 export interface TsCallingPage {
   callingPage: TsCallingPageType;
@@ -64,6 +66,8 @@ export interface TsListItem {
   isActive?: boolean;
   colour?: string;
   creationDate?: string;
+  activityType?: string;
+  // startPoint?: TsPosition;
 }
 
 
@@ -188,6 +192,7 @@ export interface TsGeoJsonProperties {
     latitude?: number;   // front need, used by map service when creating points geoJson
     matched?: boolean;
     title?: string;
+
 }
 
 export interface TsMapboxProperties {
@@ -207,10 +212,12 @@ export interface TsInfo {
     isPublic: boolean;
     createdBy: string;
     isElevations: boolean;
+    activityType: TsActivityType;
+    startPoint: TsPosition;
 }
 
 export interface TsParams {
-    elev: number[];
+    elevs: number[];
     time: number[];
     heartRate: number[];
     cadence: number[];

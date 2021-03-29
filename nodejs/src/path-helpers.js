@@ -28,28 +28,46 @@ function getReverseOfRoute(coords, elevs) {
   return {lngLats: revCoords, elevs: revElevs};
 }
 
-
-
 /**
  * Get a fully populated route instance from basic route data
  * Performs all the actions requires including pre-flight checks, class instantiations
  * and offloading the cpu intensive tasks to the thread pool
+ * 
+ * expects an object as ...
+ * {
+ *    lngLats: [[lng, lat], ...],   Mandatory
+ *    elevs: [elev, ...],           Optional
+ *    name: string,                 Optional
+ *    description: string,          Optional
+ *    activityType: string          Optional - defaults to 'running'
+ * }
  */
-function getRouteInstance(name, description, lngLat, elevs) {
+function getRouteInstance(dataObject) {
   
   return new Promise ( async (resolve, reject) => {
 
+    const lngLats = dataObject.lngLats || null;
+    if (!lngLats) {
+      reject(new Error('Cannot get route instance without lngLats'))
+    }
+    const name = dataObject.name || null;
+    const description = dataObject.description || null;
+    const activityType = dataObject.activityType || 'running';
+    const elevs = dataObject.elevs || null;
+
     try {
 
-      const prePath = await Route.preFlight(lngLat, elevs);
-      const path = new Route(name, description, prePath.lngLat, prePath.elev);
+      const prePath = await Route.preFlight(lngLats, elevs);
+      const path = new Route(name, description, activityType, prePath.lngLats, prePath.elevs);
 
       const {cw, category, direction, matchedPoints} = analysePath(path);
       path.pathData.info.cw = cw;
       path.pathData.info.category = category;
       path.pathData.info.direction = direction;
       path.pathData.info.isPublic = false;
-      path.pathData.params.matchedPoints = matchedPoints; 
+      path.pathData.info.activityType = activityType;
+      path.pathData.params.matchedPoints = matchedPoints;
+      path.pathData.params.elev = prePath.elevs;  //backward compatibility since change to elevs
 
       if (path.pathData.info.isElevations) {
         path.pathData.stats = {

@@ -21,6 +21,7 @@ const DOWN_COLOUR =   require('./globals').DOWN_COLOUR;
 class GeoJSON {
   constructor() {
     debugMsg(`GeoJSON`);
+  
     
   }
 
@@ -35,7 +36,8 @@ class GeoJSON {
     this._lngLats = path.pathData.geometry.coordinates;
     this._properties = path.pathData;
     this._properties.pathId = path.pathData.pathId;
-    this._elevs = this._properties.params.elev;
+    // backward compatibility after change to storing as elevs
+    this._elevs = this._properties.params.elevs || this._properties.params.elev;
     this._bbox = this._properties.stats.bbox;
     this._features = [];
     delete this._properties.geometry;
@@ -48,7 +50,7 @@ class GeoJSON {
   fromDocument(doc) {
     this._checkIsDocument(doc);
     this._lngLats = doc.geometry.coordinates;
-    this._elevs = doc.params.elev;
+
     this._properties = {
       pathId: doc._id,
       params: doc.params,
@@ -58,6 +60,7 @@ class GeoJSON {
       },
       stats: doc.stats
     };
+    this._elevs = this._properties.params.elev;
     this._bbox = doc.stats.bbox;
     this._features = [];
     return this;
@@ -170,7 +173,7 @@ class GeoJSON {
         lineOpacity: 0.5,
         params: {
           cumDistance: cumd,
-          elev: elevs
+          elevs: elevs
         }
       }
     }

@@ -5,7 +5,7 @@ import { DataService } from 'src/app/shared/services/data.service';
 import { Router } from '@angular/router';
 import { HttpService } from 'src/app/shared/services/http.service';
 import { Subscription } from 'rxjs';
-import { TsUnits, TsFeature, TsFeatureCollection, TsPosition, TsCallingPageType } from 'src/app/shared/interfaces';
+import { TsUnits, TsFeature, TsFeatureCollection, TsPosition, TsCallingPageType, TsActivityType } from 'src/app/shared/interfaces';
 import { AuthService} from 'src/app/shared/services/auth.service';
 import { Color, Label } from 'ng2-charts';
 import { ChartDataSets, ChartOptions } from 'chart.js';
@@ -28,7 +28,6 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
   private pathListener: Subscription;
   private unitsListener: Subscription;
 
-
   // charting variables
   public chartData: ChartDataSets[] = [];
   public chartLabels: Label[] = [];
@@ -38,13 +37,13 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
 
   // geoJson variables
   public geoJson: TsFeatureCollection;
-  public pathName: string;          // name of path provided with the incoming data, OR a created default if that is null
-  public givenName: string = null;     // name given to the path in the details form; overrides the default name
-  public pathDescription = '';
+  public name: string = null;     // name given to the path in the details form; overrides the default name
+  public description: string = null
   public isElevations: boolean;
   public units: TsUnits;
   public pathType: string;
   public pathDirection: string;
+  public activityType: TsActivityType = 'running';
   // public isData = false;
 
   constructor(
@@ -80,10 +79,16 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
       this.geoJson = this.data.getPath();
 
       if (this.geoJson?.properties?.info?.name) {
-        this.givenName = this.geoJson.properties.info.name;
+        this.name = this.geoJson.properties.info.name;
       } else {
-        this.givenName = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+        this.name = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
       }
+
+      if (this.geoJson?.properties?.info?.description) {
+        this.description = this.geoJson.properties.info.description;
+      }
+
+      this.activityType = this.geoJson.properties.info.activityType;
 
       this.updateChart();
     }
@@ -99,10 +104,10 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
 
       // Get data for each feature/segment of graph...
       const localData =  [];
-      for (let i = 0; i < feature.properties.params.elev.length; i++) {
+      for (let i = 0; i < feature.properties.params.elevs.length; i++) {
         localData.push({
           x: this.unitConvertPipe.transform(feature.properties.params.cumDistance[i], 'distance', this.units.distance),
-          y: this.unitConvertPipe.transform(feature.properties.params.elev[i], 'elevation', this.units.elevation)
+          y: this.unitConvertPipe.transform(feature.properties.params.elevs[i], 'elevation', this.units.elevation)
         });
       }
 
@@ -225,18 +230,20 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
     const newPath = this.data.getPath();
-    const pathName = this.givenName ? this.givenName :
+    const pathName = this.name ? this.name :
       this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+    // const pathDescription = this.description || null;
 
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if ( this.callingPage === 'create' || this.callingPage === 'edit' ) {
 
       const sendObj = {
         pathId: newPath.properties.pathId,
-        coords: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
-        elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elev), []),
+        lngLats: newPath.features.reduce( (coords, feature ) => coords.concat(feature.geometry.coordinates), []),
+        elevs: newPath.features.reduce( (elevs, feature) => elevs.concat(feature.properties.params.elevs), []),
         name: pathName,
-        description: this.pathDescription
+        description: this.description,
+        activityType: this.activityType
       };
 
       this.http.saveRoute( sendObj ).subscribe(
@@ -253,7 +260,8 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
         pathId: newPath.properties.pathId,
         pathType: newPath.properties.info.pathType,
         name: pathName,
-        description: this.pathDescription
+        description: this.description,
+        activityType: this.activityType
       };
       this.http.saveImportedPath(sendObj).subscribe(
         (response) => { this.router.navigate(['/routes/list/' + response.pathId]); },

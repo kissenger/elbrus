@@ -58,17 +58,19 @@
       <form>
 
         <div class="input-group input-group-sm my-1">
-            <input class='form-control' type='text' [(ngModel)]="givenName" name="path_name">
+            <input class='form-control' type='text' [(ngModel)]="name" name="path_name">
         </div>
 
         <div class="input-group input-group-sm my-1">
           <textarea
             class='form-control'
             placeholder='Give your route a description'
-            [(ngModel)]="pathDescription"
+            [(ngModel)]="description"
             name="description">
           </textarea>
         </div>
+
+
 
       </form>
 
@@ -80,6 +82,25 @@
       <div class="px-2 pt-2 pb-0">
 
         <div class="row no-gutters">
+
+            <div class="col-5 px-1">Activity</div>
+            <div *ngIf="callingPage!=='list'" class="col-7 px-1">
+              <div class="input-group input-group-sm">
+                <form>
+                  <select [(ngModel)]="activityType" name="activity type" class="form-select form-select-sm w-100">
+                    <option value="bikepacking">Bikepacking</option>
+                    <option value="canicross">Canicross</option>
+                    <option value="cycling">Cyling</option>
+                    <option value="fastpacking">Fastpacking</option>
+                    <option value="running">Running</option>
+                    <option value="skitouring">Skitouring</option>
+                    <option value="walking">Walking</option>
+                  </select>
+                </form>
+              </div>
+            </div>
+
+          <div *ngIf="callingPage==='list'" class="col-7 px-1">{{geoJson.properties.info.activityType}}</div>
 
           <div class="col-5 px-1">Distance</div>
           <div class="col-7 px-1">{{geoJson.properties.stats.distance | unitsString: 'distance': units.distance}}</div>
@@ -96,8 +117,8 @@
           <div class="col-5 px-1">Public</div>
           <div class="col-7 px-1">{{geoJson.properties.info.isPublic}}</div>
 
-          <div *ngIf="geoJson.properties.info.isPublic" class="col-6 px-1">Created by</div>
-          <div *ngIf="geoJson.properties.info.isPublic" class="col-6 px-1">{{geoJson.properties.info.createdBy}}</div>
+          <div *ngIf="geoJson.properties.info.isPublic" class="col-5 px-1">Created by</div>
+          <div *ngIf="geoJson.properties.info.isPublic" class="col-7 px-1">{{geoJson.properties.info.createdBy}}</div>
 
         </div>
 

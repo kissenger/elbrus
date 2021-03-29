@@ -1,185 +1,109 @@
 "use strict"
 
-/**
- * Module provides GPX file read/write functions
- * TODO: Refactor long overdue
- * https://github.com/sports-alliance/sports-lib
- * Or use a generic xml parser as a base to build on??
- *
- * Suggested new approach:
- * Catch one point in turn, and catch all named params on that point, regardless of what
- * they are.  Save result as json:
- * [{lng: xxx, lat: xxx, HR: xxx, elev:xxx},
- *  {lng: xxx, lat: xxx, elev:xxx},
- *   ...etc]
- * That way we immediately associate params with points, and we can use geoPointsAndPaths to
- * strip them out as needed.
- * Maybe then deprecate load by lngLat from geoPointsAndPaths as not needed - check impact on
- * the front end.
- * Could also produce a meta-data object:
- * {
- *  name: 'mendip-Way',
- *  source: 'gpx import',
- *  ...etc
- * }
- * This could be used in Path substantiation and in Mongo save to ensure we track the srouce of
- * parameters
- */
-
-const createWriteStream = require('fs').createWriteStream;
-const debugMsg = require('./debug').debugMsg;
-
-/**
-* readGPX(data)
-* @param {*} data input data from multer file read
-* @param return object containing path name, coords, elevs and timestamp
-* Parses track data from a provided GPX file.
-* Does not distiguish between a route and a track - it disguards this knowledge
-* and simplyy returns an object with supported parameters
-*
-*
-* For paramaters other than lngLat, the following behaviour is expected:
-*   > During the search, if a paramater is not found on a point it will store '' in the param array
-*   > If at the end of the search all array values are '', the paramater is set to null
-*   > If at the end of the search only some array values are '', those blank values are set to null
-*/
+const { DOMParser } = require('xmldom');
 
 
-function gpxRead(data) {
-  // data = data.slice(0,100);
-  debugMsg('gpxRead()');
-  // console.log(data);
+class ParseGPX {
 
-  // declare function variables
-  const MAX_LOOPS = 1000000;
-  let a = 0;                          // start of interesting feature
-  let b = data.indexOf("\r",a);       // end of interesting feature
-  let c;
-  let latValue, lngValue, eleValue, timeValue;
-  let lngLat = [];
-  let time = [];
-  let elev = [];
-  let nameOfPath = '';
-  let lineData;
-  let typeOfPath;   // value does not get read at the moment
-  let typeTag;
-  let ptStart, ptEnd, ptData;
+  constructor(gpxString) {
 
-
-  /**
-   * Loop through each line until we find track or route start
-   */
-  for (let i = 0; i < MAX_LOOPS; i++) {
-
-    lineData = data.slice(a,b)
-
-    a = b + 2;
-    b = data.indexOf("\r",a);
-
-    if ( lineData.indexOf("<trk>") !== -1 ) {
-      typeOfPath = "track";
-      typeTag = "trkpt";
-      break;
-    }
-
-    if ( lineData.indexOf("<rte>") !== -1 ) {
-      typeOfPath = "route";
-      typeTag = "rtept";
-      break;
-    }
+    const root = new DOMParser().parseFromString(gpxString, 'text/xml');
+    const parsed = this.parseChild(root.documentElement);
+    return this.getPointData(parsed);
 
   }
 
-  //  Try to find a name
-  lineData = data.slice(a,b)
-  a = lineData.indexOf("<name>");
-  b = lineData.indexOf("</name>");
-  if ( a > 0 && b > 0 ) {
-    nameOfPath = lineData.slice(a + 6, b);
-  }
+  // reads the xml and returns a json structured object
+  parseChild(elm) {
 
-  /**
-   *  Loop through each point in this segment
-   */
+    const attrs = {};
+    const attributes = elm.attributes;
 
-  ptEnd = b;
-  for (let i = 0; i < MAX_LOOPS; i++) {
-
-    // get the start and end of the current track point, break from loop if not found
-    ptStart = data.indexOf('<' + typeTag,ptEnd);  // find the next tag opener
-    a = data.indexOf('</' + typeTag,ptStart);     // find regular tag closure
-    b = data.indexOf('/>',ptStart);               // find self-closing tag
-
-    if ( ptStart == -1 || ( a == -1 && b == -1) ) break;  // one of the above wasnt found
-
-    if ( a != -1 && b != -1 ) {
-      // if both closures are found, take the nearest one
-      ptEnd = Math.min(a,b);
-    } else if ( a == -1 || b == -1 ) {
-      // if one or other closure was not found, take the one that was found
-      ptEnd = Math.max(a,b);
-    };
-
-    ptData = data.slice(ptStart,ptEnd)
-
-    // lat and long
-    a = ptData.indexOf("lat=");
-    b = ptData.indexOf("lon=");
-    c = ptData.indexOf(">");         // end of line lat/long line to ensure elev numbers arent captured
-
-    if ( a !== -1 && b !== -1 ) {
-      if ( b > a ) {
-        latValue = parseFloat(ptData.slice(a, b).match(/[-0123456789.]/g).join(""));
-        lngValue = parseFloat(ptData.slice(b, c).match(/[-0123456789.]/g).join(""));
-      } else {
-        lngValue = parseFloat(ptData.slice(b, a).match(/[-0123456789.]/g).join(""));
-        latValue = parseFloat(ptData.slice(a, c).match(/[-0123456789.]/g).join(""));
+    for (let i = 0; i < attributes.length; i++) {
+      const attr = attributes[i];
+      if (attr && attr.value) {
+        attrs[attr.name] = attr.value
       }
     }
-    lngLat.push([lngValue, latValue]);
 
-    // elevation
-    eleValue = '';
-    a = ptData.indexOf("<ele>");
-    b = ptData.indexOf("</ele>");
-    if (a != -1 && b != -1) {
-      eleValue = parseFloat(ptData.slice(a,b).match(/[-0123456789.]/g).join(""));
-      // isElev = true;
-    }
-    elev.push(eleValue === '' ? null : eleValue);
+    if (elm.childNodes) {
 
-    // time
-    timeValue = '';
-    a = ptData.indexOf("<time>");
-    b = ptData.indexOf("</time>");
-    if (a != -1 && b != -1) {
-      timeValue = ptData.slice(a,b).match(/[-0123456789.TZ:]/g).join("");
-      // isTime = true;
+      const children = elm.childNodes;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        const name = child.localName;
+        if (!name) {
+          continue
+        }
+
+        if (!attrs[name]) {
+          attrs[name] = []
+        }
+        attrs[name].push(this.parseChild(child))
+      }
     }
-    time.push(timeValue === '' ? null : timeValue);
+
+    if (Object.keys(attrs).length === 0) {
+      return elm.textContent
+    }
+    return attrs
   }
 
+  /**
+   * takes the destructured xml and returns the points arrays needed for instantiating a Path
+   * where there is more than one trk or seg, only the first is considered
+   * If there are more than one segment in that trk or seg, then they are merged
+   */
+  getPointData(xml) {
 
-  if (lngLat.length === 0) {
-    throw new Error('Error reading .gpx file');
+    let tag;
+    if (xml.rte) {
+      tag = 'rte';
+    } else if (xml.trk) {
+      tag = 'trk'
+    } else {
+      throw new Error('trk or rte tag not found')
+    }
+
+    // get the first segment only
+    const firstTrkOrRte = xml[tag][0];
+    const name = firstTrkOrRte.name || null;
+    const description = firstTrkOrRte.desc || null;
+    const lngLats = [];
+    const elevs = [];
+    const time = [];
+
+    // get an array of the point on the first trk/rte - if trk then likely to be segments so combine them
+    let points = [];
+    if (firstTrkOrRte[tag+'seg']) { 
+      for (let seg of firstTrkOrRte[tag+'seg']) {
+        points.push(...seg.trkpt);
+      }
+    } else {
+      points = firstTrkOrRte.rtept;
+    }
+
+    // get the data into the desired format
+    for (let pt of points) {
+      lngLats.push([Math.round(pt.lon*1e6)/1e6, Math.round(pt.lat*1e6)/1e6]);
+      elevs.push(pt.ele ? Math.round(pt.ele*10)/10 : null);
+      time.push(pt.time ? pt.time[0] : null);
+    }
+
+    return {
+      name: name[0] ? name[0] : name,
+      description: description ? (description[0] ? description[0] : description) : null,
+      lngLats,
+      elevs: elevs.every( e => e === null) ? null : elevs,
+      time: time.every( e => e === null) ? null : time
+    };
+  
   }
 
-  // form return object so we can use it for debugMsg as well as return
-  const returnObject = {
-    name: nameOfPath,
-    lngLat: lngLat,
-    elev: elev.every( e => e === null) ? null : elev,
-    time: time.every( t => t === null) ? null : time,
-  };
-
-  // print to console and dump to file to support testing/debugging
-  // if (globals.DEBUG) {
-  //   debugMsg('readGPX() finished!');
-  //   writeFile("../gpx_dump.js", JSON.stringify(returnObject), (err) => {} );
-  // };
-
-  return returnObject;
 }
+
+
+
 
 
 /**
@@ -270,6 +194,6 @@ function gpxWrite(writeObject){
 }
 
 module.exports = {
-  gpxRead,
+  ParseGPX,
   gpxWriteFromDocument
 }

@@ -117,9 +117,9 @@ export class HttpService {
   }
 
   getPathFromPoints(positions: Array<TsPosition>, options: {simplify: boolean} = {simplify: false}) {
-    const coords = positions.map(p => ({lng: p[0], lat: p[1]}) );
+    const lngLats = positions.map(p => ({lng: p[0], lat: p[1]}) );
     return this.http
-      .post<any>(`${this.backendURL}/get-path-from-points/`, {coords, options})
+      .post<any>(`${this.backendURL}/get-path-from-points/`, {lngLats, options})
       .pipe( catchError(this.errorService.handleError) );
 
   }

@@ -130,6 +130,9 @@ export class PanelListComponent implements OnInit, OnDestroy {
           this.startPathId = null;
         }
 
+        // this.data.pathCommandEmitter.emit(command);
+
+
     }, (error) => {
       this.isLoading = false;
       // console.log(error);

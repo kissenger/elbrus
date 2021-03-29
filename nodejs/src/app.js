@@ -19,20 +19,15 @@ if (dotenv.error) {
 
 const app = express(); 
 const fs = require('fs');
-
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
-const gpxRead = require('./gpx').gpxRead;  
+const ParseGPX = require('./gpx').ParseGPX;  
 const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
 const debugMsg = require('./debug').debugMsg;
 const mongoModel = require('./app-helpers.js').mongoModel;
 const bbox2Polygon = require('./app-helpers.js').bbox2Polygon;
-const bbox2Point = require('./app-helpers.js').bbox2Point; 
-const getListData = require('./app-helpers.js').getListData;
 const getRouteInstance = require('./path-helpers.js').getRouteInstance;
 const getMongoObject = require('./path-helpers.js').getMongoObject;
-const getReverseOfRoute = require('./path-helpers.js').getReverseOfRoute;
-const geoFunctions = require('geo-points-and-paths').geoFunctions;
 
 let threadPool;
 if (process.env.USE_THREADS) {
@@ -86,11 +81,11 @@ app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), asyn
     const bufferString = req.file.buffer.toString();
     let routeInstance;
     if (process.env.USE_THREADS) {
-      const gpxData = await threadPool.addTaskToQueue('gpxRead', bufferString);
-      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData.name, null, gpxData.lngLat, gpxData.elev);
+      const gpxData = await threadPool.addTaskToQueue('ParseGPX', bufferString);
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData);
     } else {
-      const gpxData = gpxRead(bufferString);
-      routeInstance = await getRouteInstance(gpxData.name, null, gpxData.lngLat, gpxData.elev);  
+      const gpxData = new ParseGPX(bufferString);
+      routeInstance = await getRouteInstance(gpxData);  
     }
     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
@@ -140,9 +135,9 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
 
     let routeInstance;
     if (process.env.USE_THREADS) {
-      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body.name, req.body.description, req.body.coords, req.body.elev);
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body);
     } else {
-      routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
+      routeInstance = await getRouteInstance(req.body);  
     }
 
     let isPublic;
@@ -390,24 +385,12 @@ app.get('/api/download-file/:fname', auth.verifyToken, async (req, res) => {
  *****************************************************************/
 app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
 
-
-
-  let coords;
-  if (req.body.options.simplify) {
-    coords = geoFunctions.simplifyPath(req.body.coords, 5).points;
-  } else {
-    coords = req.body.coords;
-  }
-
-  // TODO: is it really needed to convert from {lat:, lng:} to lngLat?
-  const lngLats = coords.map(coord => [coord.lng, coord.lat]);
-
   try {
     let routeInstance;
     if (process.env.USE_THREADS) {
-      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', null, null, lngLats, null);
+      routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body);
     } else {
-      routeInstance = await getRouteInstance(null, null, lngLats, null);  
+      routeInstance = await getRouteInstance(req.body);  
     }
 
     res.status(201).json({
