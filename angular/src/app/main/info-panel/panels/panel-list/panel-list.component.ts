@@ -52,6 +52,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   private offset = 0;
   public listType: 'public' | 'private' = null;
   public listSort = '{"sort": "date", "direction" : "-1"}';
+  public searchText = '';
   private boundingBox: TsBoundingBox = null;    // current view
   private startPathId: string;
 
@@ -116,9 +117,18 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     const sort = JSON.parse(this.listSort);
+
     this.listListener =
-      this.http.getPathsList('route', this.listType === 'public', this.offset, this.limit, sort.sort, sort.direction, this.boundingBox)
-      .subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
+      this.http.getPathsList(
+        'route',
+        this.listType === 'public',
+        this.offset,
+        this.limit,
+        sort.sort,
+        sort.direction,
+        this.searchText,
+        this.boundingBox
+      ).subscribe( ( result: {list: Array<TsListItem>, count: number} ) => {
 
         this.listItems.merge(result.list);
         this.nLoadedRoutes = this.listItems.length;
@@ -157,6 +167,13 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   onSelectSortType() {
     this.offset = 0;
+    this.listItems.clear();
+    this.data.pathCommandEmitter.emit({ command: 'clear' });
+    this.highlightColours.reset();
+    this.addPathsToList();
+  }
+
+  onSearchType() {
     this.listItems.clear();
     this.data.pathCommandEmitter.emit({ command: 'clear' });
     this.highlightColours.reset();

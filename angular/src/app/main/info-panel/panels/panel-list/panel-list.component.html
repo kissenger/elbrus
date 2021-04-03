@@ -27,6 +27,14 @@
         </select>
       </div>
     </div>
+
+    <div class="row no-gutters">
+      <div class="col-12 mb-1 p-0">
+        <input [(ngModel)]="searchText" (ngModelChange)="onSearchType()" autocomplete="off"
+          name="search" class="form-control form-control-sm" placeholder="Search terms (username, activity type...)">
+      </div>
+    </div>
+
   </form>
 
   <!-- EMPTY ROUTE LIST -->

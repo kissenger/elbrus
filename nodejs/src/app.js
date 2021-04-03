@@ -17,11 +17,11 @@ if (dotenv.error) {
   process.exit(0);
 }
 
-const app = express(); 
+const app = express();
 const fs = require('fs');
 const auth = require('./auth');
 const GeoJSON = require('./geojson').GeoJSON;
-const ParseGPX = require('./gpx').ParseGPX;  
+const ParseGPX = require('./gpx').ParseGPX;
 const gpxWriteFromDocument = require('./gpx').gpxWriteFromDocument;
 const debugMsg = require('./debug').debugMsg;
 const mongoModel = require('./app-helpers.js').mongoModel;
@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 // mongo as a service
 // console.log(process.env.MONGODB_PASSWORD)
 mongoose.connect(`mongodb+srv://root:${process.env.MONGODB_PASSWORD}@cluster0-5h6di.gcp.mongodb.net/test?retryWrites=true&w=majority`,
-  {useUnifiedTopology: true, useNewUrlParser: true }); 
+  {useUnifiedTopology: true, useNewUrlParser: true });
 
 mongoose.connection
   .on('error', console.error.bind(console, 'connection error:'))
@@ -85,7 +85,7 @@ app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), asyn
       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', gpxData);
     } else {
       const gpxData = new ParseGPX(bufferString);
-      routeInstance = await getRouteInstance(gpxData);  
+      routeInstance = await getRouteInstance(gpxData);
     }
     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, false, false) );
     res.status(201).json( {hills: new GeoJSON().fromDocument(document).toGeoHills()} );
@@ -97,7 +97,7 @@ app.post('/api/import-route/', auth.verifyToken, upload.single('filename'), asyn
 
   }
 
-}); 
+});
 
 
 /*****************************************************************
@@ -137,7 +137,7 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
     if (process.env.USE_THREADS) {
       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body);
     } else {
-      routeInstance = await getRouteInstance(req.body);  
+      routeInstance = await getRouteInstance(req.body);
     }
 
     let isPublic;
@@ -147,7 +147,7 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
       isPublic = oldPath.isPublic;
       console.log(oldPath)
       await mongoModel('route').deleteOne( {_id: req.body.pathId} );
-    } 
+    }
 
     // now save the new path
     const newPath = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true, !!isPublic) );
@@ -178,7 +178,7 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
 //     if (process.env.USE_THREADS) {
 //       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body.name, req.body.description, req.body.coords, req.body.elev);
 //     } else {
-//       routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);  
+//       routeInstance = await getRouteInstance(req.body.name, req.body.description, req.body.coords, req.body.elev);
 //     }
 //     const document = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true) );
 //     res.status(201).json( {pathId: document._id} )
@@ -209,7 +209,7 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
     res.status(201).json({
       hills: new GeoJSON().fromDocument(document).toGeoHills(),
       basic: new GeoJSON().fromDocument(document).toBasic()
-    }) 
+    })
 
   } catch (error) {
 
@@ -230,12 +230,12 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
  * pathType is the type of path (obvs)
  * offset is used by list to request chunks of x paths at a time
  *****************************************************************
- * v2 change - return all routes regardless of window, and add 
+ * v2 change - return all routes regardless of window, and add
  * boolean to identify those that are within the window
  *****************************************************************/
 
 
-app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort/:direction', auth.verifyToken, async (req, res) => {
+app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort/:direction/:searchText', auth.verifyToken, async (req, res) => {
 
 
   if ( req.role === 'guest' && req.params.isPublic === 'false' ) {
@@ -245,8 +245,13 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort/:direction', aut
 
   const pathType = req.params.pathType;
   const box = { type: 'Polygon', coordinates: bbox2Polygon(req.query.bbox) };
-  const query = { geometry: { $geoIntersects: { $geometry: box} } };
- 
+  let query = { geometry: { $geoIntersects: { $geometry: box} } };
+  if (req.params.searchText !== ' ') {
+    const searchString = '\"' + req.params.searchText.split(' ').join('\" \"') + '\"'
+    query= {$and: [query, { $text: {$search: searchString, $caseSensitive: false} }]};
+  }
+
+
   // adjust query for public/private routes
   if ( req.params.isPublic === 'true') {
     query.isPublic = true;
@@ -256,29 +261,34 @@ app.get('/api/get-list/:pathType/:isPublic/:offset/:limit/:sort/:direction', aut
 
   const docs = await mongoModel(pathType).aggregate([
     { $match: query },
-    { $project: {
-        "lowerCaseName": {$toLower: "$info.name"},
+    { $project:
+      {
+        "lowerCaseName": {
+          $toLower: "$info.name"
+        },
         creationDate: 1,
         name: "$info.name",
         info: 1,
         stats: 1,
         pathId: "$_id",
-        isPublic: 1 }, },
-    sort(req.params.sort, req.params.direction), 
+        isPublic: 1
+      },
+    },
+    sort(req.params.sort, req.params.direction),
     { $facet: {
         count: [{ $count: "count" }],
         list: [
-          { $skip: req.params.limit * req.params.offset }, 
+          { $skip: req.params.limit * req.params.offset },
           { $limit: req.params.limit * 1 }
         ] } }
   ]);
 
-  let count; 
+  let count;
   try {
     count = docs[0].count[0].count;
   } catch {
     count = 0;
-  }   
+  }
 
   debugMsg(`/api/get-list: found routes`);
   res.status(201).json( {list: docs[0].list, count} );
@@ -314,7 +324,7 @@ app.delete('/api/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
 
     await mongoModel(req.params.type).deleteOne( {_id: req.params.id} );
     res.status(201).json( {'result': 'delete ok'} );
-  
+
   } catch (error) {
 
     debugMsg('ERROR: ' + error);
@@ -364,7 +374,7 @@ app.get('/api/download-file/:fname', auth.verifyToken, async (req, res) => {
       }
 
       fs.unlink(fname, () => {});
-    
+
     });
 
   } catch (error) {
@@ -390,7 +400,7 @@ app.post('/api/get-path-from-points/', auth.verifyToken, async (req, res) => {
     if (process.env.USE_THREADS) {
       routeInstance = await threadPool.addTaskToQueue('getRouteInstance', req.body);
     } else {
-      routeInstance = await getRouteInstance(req.body);  
+      routeInstance = await getRouteInstance(req.body);
     }
 
     res.status(201).json({
@@ -423,7 +433,7 @@ app.post('/api/toggle-path-public/', auth.verifyToken, async (req, res) => {
     await mongoModel(req.body.pathType).updateOne( {_id: req.body.pathId}, {$set: {isPublic: !result.isPublic}} );
     res.status(201).json({isPathPublic: !result.isPublic});
 
-  } 
+  }
   catch (error) {
 
     debugMsg('ERROR: ' + error);
@@ -452,7 +462,7 @@ app.post('/api/copy-path/', auth.verifyToken, async (req, res) => {
     document.info.createdBy = req.userName;
     document._id = mongoose.Types.ObjectId();
     document.isNew = true;
-    
+
     const newDoc = await mongoModel(req.body.pathType).create(document);
     res.status(201).json({pathId: newDoc._id});
 

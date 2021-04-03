@@ -375,6 +375,8 @@ export class MapCreateService extends MapService {
     const pointId = <number>e.features[0].id;
 
     let html = '<div id="popup-menu"><span id="delete-point">Delete point</span>';
+    html += '<div id="popup-menu"><span id="delete-points-before">Delete all points before</span>';
+    html += '<div id="popup-menu"><span id="delete-points-after">Delete all points after</span>';
     html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
     html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
     html += '</div>';
@@ -407,6 +409,16 @@ export class MapCreateService extends MapService {
       const newLng = Math.ceil((pathCoords[pointId + 1][0] + pathCoords[pointId][0]) / 2 * 1E5) / 1E5;
       const newLat = Math.ceil((pathCoords[pointId + 1][1] + pathCoords[pointId][1]) / 2 * 1E5) / 1E5;
       pathCoords.splice(pointId + 1, 0, [newLng, newLat]);
+      processNewPoints(pathCoords);
+    });
+
+    document.getElementById('delete-points-before')?.addEventListener('click', async () => {
+      pathCoords.splice(0, pointId);
+      processNewPoints(pathCoords);
+    });
+
+    document.getElementById('delete-points-after')?.addEventListener('click', async () => {
+      pathCoords.splice(pointId + 1, pathCoords.length - pointId);
       processNewPoints(pathCoords);
     });
 

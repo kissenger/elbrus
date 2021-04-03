@@ -89,6 +89,13 @@ const pathSchema = mongoose.Schema({
 })
 
 pathSchema.index({ userId: 1, creationDate: 1});
+pathSchema.index({
+  "info.name": "text", 
+  "info.description": "text", 
+  "info.activityType": "text", 
+  "info.category": "text", 
+  "info.createdBy": "text"
+});
 pathSchema.index({ userId: 1, startTime: 1});
 pathSchema.index({ geometry: "2dsphere" });
 

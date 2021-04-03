@@ -95,7 +95,10 @@ export class PanelOptionsComponent implements OnInit, OnDestroy {
 
   onDeleteClick() {
     if (!this.auth.isRegistered) { return; }
-    this.alert.showAsElement('Are you sure?', 'Cannot undo delete!', true, true).subscribe( (alertBoxResponse: boolean) => {
+
+    const pathName = this.data.getPath().properties.info.name;
+    this.alert.showAsElement(`Delete '${pathName}'?`, `Are you sure? This cannot be undone.`,
+        true, true).subscribe( (alertBoxResponse: boolean) => {
       if (alertBoxResponse) {
         this.http.deletePath(this.pathId).subscribe( () => {
           this.data.clearPath();

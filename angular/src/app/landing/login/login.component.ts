@@ -135,8 +135,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   notValidUserName() {
-    // regex matches whitespace at front or end to avoid username typo
-    return this.userName.length < 4 || this.userName.match(/(^\s)|(\s$)/);
+    // regex matches whitespace at front or end to avoid username typo - disallow all spaces, aids search by username
+    // return this.userName.length < 4 || this.userName.match(/(^\s)|(\s$)/);
+    return this.userName.length < 4 || this.userName.match(/\s/);
   }
 
   notValidPassword() {

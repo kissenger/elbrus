@@ -38,6 +38,19 @@
   box-shadow: none;
 }
 
+.form-control {
+  border: 1px #dee2e6 solid;
+  border-radius: 0px;
+  font-size: small;
+  cursor: pointer;
+  height: 30px;
+}
+
+.form-control:focus {
+  box-shadow: none;
+}
+
+
 .spinner-outer {
   /* border: 1px red solid; */
   position: absolute;
