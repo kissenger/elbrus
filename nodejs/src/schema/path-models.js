@@ -36,7 +36,7 @@ const pathSchema = mongoose.Schema({
     pathType: {type: String},           // 'route' or 'track'
     isLong: {type: Boolean},
     isElevations: {type: Boolean},
-    activityType: {type: String, enum: ['running', 'walking', 'cannicross', 'cycling', 'bikepacking', 'fastpacking', 'skitouring']},
+    activityType: {type: String, enum: ['running', 'walking', 'cannicross', 'cycling', 'bikepacking', 'fastpacking', 'skitouring', 'gravelbiking']},
     startPoint: {type: [Number]},
     endPoint: {type: [Number]}    
   },

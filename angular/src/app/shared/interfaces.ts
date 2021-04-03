@@ -20,7 +20,7 @@ export interface TsUnits {
     elevation: 'm' | 'ft';
 }
 
-export type TsActivityType = 'running' | 'cycling' | 'bikepacking' | 'fastpacking' | 'skitouring' | 'canicross' | 'walking';
+export type TsActivityType = 'running' | 'cycling' | 'bikepacking' | 'fastpacking' | 'skitouring' | 'canicross' | 'walking' | 'gravelbiking';
 
 export type TsCallingPageType = 'list' | 'create' | 'edit' | 'review';
 export interface TsCallingPage {
