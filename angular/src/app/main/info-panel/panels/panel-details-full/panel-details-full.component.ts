@@ -12,6 +12,7 @@ import { ChartDataSets, ChartOptions } from 'chart.js';
 import 'chartjs-plugin-zoom';
 import { UnitsConvertPipe } from 'src/app/shared/pipes/units-convert.pipe';
 import { UnitsLongNamePipe } from 'src/app/shared/pipes/units-longname.pipe';
+import { AlertService } from 'src/app/shared/services/alert.service';
 
 @Component({
   selector: 'app-panel-details-full',
@@ -38,12 +39,12 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
   // geoJson variables
   public geoJson: TsFeatureCollection;
   public name: string = null;     // name given to the path in the details form; overrides the default name
-  public description: string = null
+  public description: string = null;
   public isElevations: boolean;
   public units: TsUnits;
   public pathType: string;
   public pathDirection: string;
-  public activityType: TsActivityType = 'running';
+  public activityType: TsActivityType = null;
   // public isData = false;
 
   constructor(
@@ -53,7 +54,8 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
     public auth: AuthService,
     private unitConvertPipe: UnitsConvertPipe,
     private unitLongNamePipe: UnitsLongNamePipe,
-    private autoNamePipe: AutoNamePipe
+    private autoNamePipe: AutoNamePipe,
+    private alert: AlertService,
 
   ) {}
 
@@ -81,14 +83,18 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
       if (this.geoJson?.properties?.info?.name) {
         this.name = this.geoJson.properties.info.name;
       } else {
-        this.name = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+        if (!this.name) {
+          this.name = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
+        }
       }
 
       if (this.geoJson?.properties?.info?.description) {
         this.description = this.geoJson.properties.info.description;
       }
 
-      this.activityType = this.geoJson.properties.info.activityType;
+      if (this.geoJson?.properties?.info?.activityType) {
+        this.activityType = this.geoJson.properties.info.activityType;
+      }
 
       this.updateChart();
     }
@@ -229,11 +235,15 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
     // activePath is stored from two locations - both are full geoJSON descriptions of the path:
     // - when a route is created on the map,  mapCreateService saves each time a new chunk of path is added
     // - when a route is imported, the backend sends the geoJSON, which is in turned saved by panel-routes-list-options
+    if (!this.activityType) {
+      this.alert.showAsElement(`Error`, `Please set Activity Type`, true, false).subscribe( (alertBoxResponse: boolean) => {} );
+      return;
+    }
+
+
     const newPath = this.data.getPath();
     const pathName = this.name ? this.name :
       this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
-    // const pathDescription = this.description || null;
-
     // path created on map, backend needs the whole shebang but as new path object will be created, we should only send it what it needs
     if ( this.callingPage === 'create' || this.callingPage === 'edit' ) {
 

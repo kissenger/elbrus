@@ -50,9 +50,10 @@ function getRouteInstance(dataObject) {
     if (!lngLats) {
       reject(new Error('Cannot get route instance without lngLats'))
     }
+    console.log(dataObject.activityType);
     const name = dataObject.name || null;
     const description = dataObject.description || null;
-    const activityType = dataObject.activityType || 'running';
+    const activityType = dataObject.activityType || null;
     const elevs = dataObject.elevs || null;
 
     try {

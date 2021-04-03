@@ -3,17 +3,14 @@
     <div id="{{item.pathId}}" class="list-item px-1 py-0 m-0 w-100">
 
         <div class="row m-0 p-0">
+
           <div class="col m-0 p-0 name">
             {{item.info.name | shortName: 24}}
           </div>
 
-          <div *ngIf="listType==='private'">
-            <img *ngIf="item.isPublic" src="assets/images/icon-list-public.svg" class="icon mt-1" title="Public route">
-          </div>
+          <img *ngIf="listType==='private'&&item.isPublic" src="assets/images/icon-list-public.svg" class="mt-1" title="Public route">
+          <img *ngIf="listType==='public'&&item.info.createdBy===auth.user.userName" src="assets/images/icon-list-owner.svg" class="mt-1" title="Created by me">
 
-          <div *ngIf="listType==='public'">
-            <img *ngIf="item.info.createdBy===auth.user.userName" src="assets/images/icon-list-owner.svg" class="icon mt-1" title="Created by me">
-          </div>
         </div>
 
         <!-- route stats -->

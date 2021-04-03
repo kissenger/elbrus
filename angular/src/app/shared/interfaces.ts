@@ -67,6 +67,7 @@ export interface TsListItem {
   colour?: string;
   creationDate?: string;
   activityType?: string;
+  isPublic?: boolean;
   // startPoint?: TsPosition;
 }
 

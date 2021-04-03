@@ -58,7 +58,11 @@
       <form>
 
         <div class="input-group input-group-sm my-1">
-            <input class='form-control' type='text' [(ngModel)]="name" name="path_name">
+          <input
+            class='form-control'
+            type='text'
+            [(ngModel)]="name"
+            name="path_name">
         </div>
 
         <div class="input-group input-group-sm my-1">
@@ -69,8 +73,6 @@
             name="description">
           </textarea>
         </div>
-
-
 
       </form>
 
@@ -87,14 +89,17 @@
             <div *ngIf="callingPage!=='list'" class="col-7 px-1">
               <div class="input-group input-group-sm">
                 <form>
-                  <select [(ngModel)]="activityType" name="activity type" class="form-select form-select-sm w-100">
-                    <option value="bikepacking">Bikepacking</option>
-                    <option value="canicross">Canicross</option>
-                    <option value="cycling">Cyling</option>
-                    <option value="fastpacking">Fastpacking</option>
-                    <option value="running">Running</option>
-                    <option value="skitouring">Skitouring</option>
-                    <option value="walking">Walking</option>
+                  <select
+                    [(ngModel)]="activityType"
+                    name="activity type"
+                    class="form-select form-select-sm w-100">
+                      <option value="bikepacking">Bikepacking</option>
+                      <option value="canicross">Canicross</option>
+                      <option value="cycling">Cyling</option>
+                      <option value="fastpacking">Fastpacking</option>
+                      <option value="running">Running</option>
+                      <option value="skitouring">Skitouring</option>
+                      <option value="walking">Walking</option>
                   </select>
                 </form>
               </div>

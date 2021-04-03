@@ -14,7 +14,7 @@ import { AuthService} from 'src/app/shared/services/auth.service';
 import { ListItems } from 'src/app/shared/classes/list-items';
 
 const LIST_ITEM_HEIGHT = 37;
-const LIST_HEIGHT_CORRECTION = 350;  // higher number results in fewer routes loaded
+const LIST_HEIGHT_CORRECTION = 375;  // higher number results in fewer routes loaded
 
 @Component({
   selector: 'app-panel-list',
@@ -50,7 +50,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
-  public listType: 'public' | 'private' = null;
+  public listType: 'public' | 'private' = 'private';
   public listSort = '{"sort": "date", "direction" : "-1"}';
   public searchText = '';
   private boundingBox: TsBoundingBox = null;    // current view

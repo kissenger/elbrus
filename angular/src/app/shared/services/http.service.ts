@@ -88,8 +88,7 @@ export class HttpService {
     }
 
     searchText = searchText ? searchText : ' ';
-console.log(searchText)
-console.log(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}/${sort}/${direction}/${searchText}${query}`);
+
     return this.http
       .get<any>(`${this.backendURL}/get-list/${type}/${isPublic}/${offset}/${limit}/${sort}/${direction}/${searchText}${query}`)
       .pipe( catchError(this.errorService.handleError) );
