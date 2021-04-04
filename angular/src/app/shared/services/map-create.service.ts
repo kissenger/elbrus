@@ -12,6 +12,7 @@ import { Path } from '../classes/path-class';
 import { GeoJsonPipe } from 'src/app/shared/pipes/geojson.pipe';
 import * as mapboxgl from 'mapbox-gl';
 import { TsMarkers } from '../classes/ts-markers';
+import { UnitsStringPipe } from '../pipes/units-string.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -39,11 +40,12 @@ export class MapCreateService extends MapService {
     data: DataService,
     auth: AuthService,
     geoJsonPipe: GeoJsonPipe,
+    unitsStringPipe: UnitsStringPipe,
     screenSize: ScreenSizeService,
     private spinner: SpinnerService,
     private alert: AlertService,
   ) {
-    super(http, data, auth, geoJsonPipe, screenSize);
+    super(http, data, auth, geoJsonPipe, unitsStringPipe, screenSize);
   }
 
   public get snapType() {
@@ -380,7 +382,6 @@ export class MapCreateService extends MapService {
     html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
     html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
     html += '</div>';
-    console.log(html)
 
     // store on the class so other functions can know if popup exists or not
     this.popup = new mapboxgl.Popup({ closeOnClick: true })
@@ -388,7 +389,7 @@ export class MapCreateService extends MapService {
       .setHTML(html)
       .addTo(this.tsMap);
 
-      document.getElementById('popup-menu').style.cursor = 'pointer';
+    document.getElementById('popup-menu').style.cursor = 'pointer';
 
 
     document.getElementById('delete-point').addEventListener('click', async () => {

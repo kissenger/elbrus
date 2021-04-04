@@ -1,3 +1,4 @@
+import { UnitsStringPipe } from './../pipes/units-string.pipe';
 import { HttpService } from './http.service';
 import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
@@ -36,12 +37,15 @@ export class MapService {
     wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
     narrowScreen: {top: 10, left: 10, bottom: 10, right: 10}
   };
+  private mouseoverPopup: mapboxgl.Popup;
+
 
   constructor(
     public http: HttpService,
     public data: DataService,
     private auth: AuthService,
     private geoJsonPipe: GeoJsonPipe,
+    private unitsStringPipe: UnitsStringPipe,
     private screenSize: ScreenSizeService
   ) {
     Object.getOwnPropertyDescriptor(mapboxgl, 'accessToken').set(this.mapboxToken);
@@ -129,6 +133,8 @@ export class MapService {
           this.data.mapBoundsEmitter.emit(this.getMapBounds());
           resolve(this.tsMap);
         });
+
+
       }
 
     });
@@ -184,6 +190,42 @@ export class MapService {
 
   }
 
+
+
+  private onMouseOver = (e: mapboxgl.MapLayerMouseEvent) => {
+
+    this.tsMap.setFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts', id: e.features[0].id}, {hover: true} );
+
+    if (this.mouseoverPopup) {
+      this.mouseoverPopup.remove();
+      this.mouseoverPopup = null;
+    }
+
+    const distString = this.unitsStringPipe.transform(<number>e.features[0].properties.cumDist, 'distance', this.auth.user.units.distance);
+    const elevString = this.unitsStringPipe.transform(<number>e.features[0].properties.elev, 'elevation', this.auth.user.units.elevation);
+
+    const html = `
+      <div id="popup-menu"><span>Distance: ${distString}</span></div>
+      <div id="popup-menu"><span>Elevation: ${elevString}</span></div>
+      `;
+
+    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: false, closeButton: false, offset: 5})
+      .setLngLat(e.lngLat)
+      .setHTML(html)
+      .addTo(this.tsMap);
+
+    this.tsMap.getCanvas().style.cursor = 'pointer';
+    document.getElementById('popup-menu').style.cursor = 'pointer';
+
+  }
+
+  private onMouseOut = (e: mapboxgl.MapLayerMouseEvent) => {
+    this.tsMap.getCanvas().style.cursor = 'grab';
+    this.mouseoverPopup.remove();
+    this.mouseoverPopup = null;
+    this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
+
+  }
 
 
   private set bounds(boundingBox: TsBoundingBox) {
@@ -250,9 +292,36 @@ export class MapService {
 
       this.pathLayers.add(pathId, bbox);
       this.addLineLayer(pathId + 'line', styleOptions, pathAsGeoJSON);
-      // this.addSymbolLayer(pathId + 'sym', path.startEndPoints);
+
+      // for main route (not overlay)
       if (plotOptions.plotType !== 'overlay') {
+
         this.addStartEndMarkers(pathId, path.firstPoint, path.lastPoint);
+        this.addPointsLayer(pathId + 'pts', {
+          'circle-radius': 4,
+          'circle-stroke-opacity':
+            [ 'case',
+              ['boolean', ['feature-state', 'enabled'], false ],
+              1,
+              ['boolean', ['feature-state', 'hover'], false ],
+              1,
+              0
+          ],
+          'circle-stroke-width': 1,
+          'circle-opacity': 0
+          // 'circle-color':
+          //   [ 'case',
+          //     ['boolean', ['feature-state', 'enabled'], false ],
+          //     'blue',
+          //     ['boolean', ['feature-state', 'hover'], false ],
+          //     'black',
+          //     'white'
+          //   ]
+        });
+        this.setLayerData(pathId + 'pts', 'Point', path.positionsList, path.pointData);
+
+        this.tsMap.on('mouseenter', pathId + 'pts', this.onMouseOver);
+        this.tsMap.on('mouseleave', pathId + 'pts', this.onMouseOut);
       }
 
     });
@@ -314,7 +383,7 @@ export class MapService {
   }
 
   public setLayerData(layerId: string, dataType: 'Point' | 'LineString', data: Array<TsPosition>, properties?: Array<Object>) {
-    const _data = this.geoJsonPipe.transform(data, dataType, properties ? properties : undefined);
+    const _data = this.geoJsonPipe.transform(data, dataType, properties || null);
     (this.tsMap.getSource(layerId) as mapboxgl.GeoJSONSource).setData(_data);
   }
 

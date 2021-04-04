@@ -32,7 +32,7 @@ export class GeoJsonPipe implements PipeTransform {
       let pointFeatures: any;
 
       if (coords) {
-        pointFeatures = coords.map( (coord, index) => getPointFeature(coord, `${index}`, properties ? properties[index] : undefined ) );
+        pointFeatures = coords.map( (coord, index) => getPointFeature(coord, `${index}`, properties ? properties[index] : null ) );
       } else {
         pointFeatures =  getPointFeature([], '0', {});
       }

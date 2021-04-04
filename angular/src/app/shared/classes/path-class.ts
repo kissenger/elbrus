@@ -11,6 +11,7 @@ export class Path {
   public firstPoint: TsPosition;
   public lastPoint: TsPosition;
   private nFeatures: number;
+  public pointData: Array<{cumDist: number, elev: number}>;
 
   constructor( geoJson: TsFeatureCollection ) {
 
@@ -18,6 +19,7 @@ export class Path {
     const injector = Injector.create({ providers: [ { provide: GeoJsonPipe, deps: [] } ] });
     this.geoJsonPipe = Object.getPrototypeOf(injector.get(GeoJsonPipe));
     this.positionsList = this.getPositionsArray;
+    this.pointData = this.getPointDataArray;
     this.firstPoint = this.positionsList[0];
     this.lastPoint = this.positionsList[this.positionsList.length - 1];
     this.nFeatures = this._geoJson.features.length;
@@ -75,6 +77,29 @@ export class Path {
     });
 
     return coordsArray;
+
+  }
+
+  // outputs array in the form [{cumDist: xx, elev: yy}, {cumDist: xx, elev: yy} ...] for each point
+  get getPointDataArray(): Array<{cumDist: number, elev: number}> {
+
+    const outArray = [];
+    this._geoJson.features.forEach( (feature, fi) => {
+      for (let ci = 0; ci < feature.geometry.coordinates.length; ci++) {
+
+        if (fi !== 0 && ci === 0 ) {
+          // prevents duplicating first point
+        } else {
+          outArray.push({
+            cumDist: feature.properties.params.cumDistance[ci],
+            elev: feature.properties.params.elevs[ci]
+          });
+        }
+
+      }
+    });
+
+    return outArray;
 
   }
 

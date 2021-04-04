@@ -45,4 +45,8 @@ export class ActivePathLayers {
     return this._layers;
   }
 
+  public get topLayer() {
+    return this._layers[0];
+  }
+
 }
