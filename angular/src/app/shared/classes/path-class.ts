@@ -80,7 +80,7 @@ export class Path {
 
   }
 
-  // outputs array in the form [{cumDist: xx, elev: yy}, {cumDist: xx, elev: yy} ...] for each point
+  // outputs array in the form [{cumDist: xx, elev: yy, totalDist: zz}, {cumDist: xx, elev: yy, totalDist: zz} ...] for each point
   get getPointDataArray(): Array<{cumDist: number, elev: number}> {
 
     const outArray = [];
@@ -91,8 +91,10 @@ export class Path {
           // prevents duplicating first point
         } else {
           outArray.push({
-            cumDist: feature.properties.params.cumDistance[ci],
-            elev: feature.properties.params.elevs[ci]
+            distanceCovered: feature.properties.params.cumDistance[ci],
+            distanceRemaining: this._geoJson.properties.stats.distance - feature.properties.params.cumDistance[ci],
+            elevation: feature.properties.params.elevs[ci],
+            latLng: [feature.geometry.coordinates[ci][1], feature.geometry.coordinates[ci][0]]
           });
         }
 

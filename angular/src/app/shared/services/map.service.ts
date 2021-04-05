@@ -201,12 +201,18 @@ export class MapService {
       this.mouseoverPopup = null;
     }
 
-    const distString = this.unitsStringPipe.transform(<number>e.features[0].properties.cumDist, 'distance', this.auth.user.units.distance);
-    const elevString = this.unitsStringPipe.transform(<number>e.features[0].properties.elev, 'elevation', this.auth.user.units.elevation);
+    const distanceUnits = this.auth.user.units.distance;
+    const elevationUnits = this.auth.user.units.elevation;
+
+    const distanceCovered = this.unitsStringPipe.transform(e.features[0].properties.distanceCovered, 'distance', distanceUnits);
+    const distanceRemaining = this.unitsStringPipe.transform(e.features[0].properties.distanceRemaining, 'distance', distanceUnits);
+    const elevation = this.unitsStringPipe.transform(<number>e.features[0].properties.elevation, 'elevation', elevationUnits);
 
     const html = `
-      <div id="popup-menu"><span>Distance: ${distString}</span></div>
-      <div id="popup-menu"><span>Elevation: ${elevString}</span></div>
+      <div id="popup-menu"><span>Position: ${e.features[0].properties.latLng}</span></div>
+      <div id="popup-menu"><span>Distance Covered: ${distanceCovered}</span></div>
+      <div id="popup-menu"><span>Distance Remaining: ${distanceRemaining}</span></div>
+      <div id="popup-menu"><span>Elevation: ${elevation}</span></div>
       `;
 
     this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: false, closeButton: false, offset: 5})
@@ -309,14 +315,6 @@ export class MapService {
           ],
           'circle-stroke-width': 1,
           'circle-opacity': 0
-          // 'circle-color':
-          //   [ 'case',
-          //     ['boolean', ['feature-state', 'enabled'], false ],
-          //     'blue',
-          //     ['boolean', ['feature-state', 'hover'], false ],
-          //     'black',
-          //     'white'
-          //   ]
         });
         this.setLayerData(pathId + 'pts', 'Point', path.positionsList, path.pointData);
 
