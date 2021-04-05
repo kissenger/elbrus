@@ -192,47 +192,6 @@ export class MapService {
 
 
 
-  private onMouseOver = (e: mapboxgl.MapLayerMouseEvent) => {
-
-    this.tsMap.setFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts', id: e.features[0].id}, {hover: true} );
-
-    if (this.mouseoverPopup) {
-      this.mouseoverPopup.remove();
-      this.mouseoverPopup = null;
-    }
-
-    const distanceUnits = this.auth.user.units.distance;
-    const elevationUnits = this.auth.user.units.elevation;
-
-    const distanceCovered = this.unitsStringPipe.transform(e.features[0].properties.distanceCovered, 'distance', distanceUnits);
-    const distanceRemaining = this.unitsStringPipe.transform(e.features[0].properties.distanceRemaining, 'distance', distanceUnits);
-    const elevation = this.unitsStringPipe.transform(<number>e.features[0].properties.elevation, 'elevation', elevationUnits);
-
-    const html = `
-      <div id="popup-menu"><span>Position: ${e.features[0].properties.latLng}</span></div>
-      <div id="popup-menu"><span>Distance Covered: ${distanceCovered}</span></div>
-      <div id="popup-menu"><span>Distance Remaining: ${distanceRemaining}</span></div>
-      <div id="popup-menu"><span>Elevation: ${elevation}</span></div>
-      `;
-
-    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: false, closeButton: false, offset: 5})
-      .setLngLat(e.lngLat)
-      .setHTML(html)
-      .addTo(this.tsMap);
-
-    this.tsMap.getCanvas().style.cursor = 'pointer';
-    document.getElementById('popup-menu').style.cursor = 'pointer';
-
-  }
-
-  private onMouseOut = (e: mapboxgl.MapLayerMouseEvent) => {
-    this.tsMap.getCanvas().style.cursor = 'grab';
-    this.mouseoverPopup.remove();
-    this.mouseoverPopup = null;
-    this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
-
-  }
-
 
   private set bounds(boundingBox: TsBoundingBox) {
 
@@ -323,6 +282,49 @@ export class MapService {
       }
 
     });
+
+  }
+
+
+
+  private onMouseOver = (e: mapboxgl.MapLayerMouseEvent) => {
+
+    this.tsMap.setFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts', id: e.features[0].id}, {hover: true} );
+
+    if (this.mouseoverPopup) {
+      this.mouseoverPopup.remove();
+      this.mouseoverPopup = null;
+    }
+
+    const distanceUnits = this.auth.user.units.distance;
+    const elevationUnits = this.auth.user.units.elevation;
+
+    const distanceCovered = this.unitsStringPipe.transform(e.features[0].properties.distanceCovered, 'distance', distanceUnits);
+    const distanceRemaining = this.unitsStringPipe.transform(e.features[0].properties.distanceRemaining, 'distance', distanceUnits);
+    const elevation = this.unitsStringPipe.transform(<number>e.features[0].properties.elevation, 'elevation', elevationUnits);
+
+    const html = `
+      <div id="popup-menu"><span>Position: ${e.features[0].properties.latLng}</span></div>
+      <div id="popup-menu"><span>Distance Covered: ${distanceCovered}</span></div>
+      <div id="popup-menu"><span>Distance Remaining: ${distanceRemaining}</span></div>
+      <div id="popup-menu"><span>Elevation: ${elevation}</span></div>
+      `;
+
+    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: false, closeButton: false, offset: 5})
+      .setLngLat(e.lngLat)
+      .setHTML(html)
+      .addTo(this.tsMap);
+
+    this.tsMap.getCanvas().style.cursor = 'pointer';
+    document.getElementById('popup-menu').style.cursor = 'pointer';
+
+  }
+
+  private onMouseOut = (e: mapboxgl.MapLayerMouseEvent) => {
+    this.tsMap.getCanvas().style.cursor = 'grab';
+    this.mouseoverPopup.remove();
+    this.mouseoverPopup = null;
+    this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
 
   }
 
