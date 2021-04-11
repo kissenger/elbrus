@@ -1,7 +1,8 @@
 "use strict"
 
 const { DOMParser } = require('xmldom');
-
+const debugMsg = require('./debug').debugMsg;
+const createWriteStream = require('fs').createWriteStream;
 
 class ParseGPX {
 

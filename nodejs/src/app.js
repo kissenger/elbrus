@@ -145,7 +145,6 @@ app.post('/api/save-created-route/', auth.verifyToken, async (req, res) => {
       // we are saving an edited path, need to know isPublic, and to delete it
       const oldPath = await mongoModel('route').findOne( {_id: req.body.pathId});
       isPublic = oldPath.isPublic;
-      console.log(oldPath)
       await mongoModel('route').deleteOne( {_id: req.body.pathId} );
     }
 
@@ -345,7 +344,7 @@ app.delete('/api/delete-path/:type/:id', auth.verifyToken, async (req, res) => {
  // Step 1, write the data to gpx file
 app.get('/api/write-path-to-gpx/:type/:id', auth.verifyToken, async (req, res) => {
 
-  try {
+try {
 
     const document = await mongoModel(req.params.type).findOne({_id: req.params.id});
     const fileName = await gpxWriteFromDocument(document);
