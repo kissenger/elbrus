@@ -175,7 +175,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
 
   onSearchType() {
     this.listItems.clear();
-    this.data.pathCommandEmitter.emit({ command: 'clear' });
+    // this.data.pathCommandEmitter.emit({ command: 'clear' });
     this.highlightColours.reset();
     this.addPathsToList();
   }
