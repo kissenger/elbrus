@@ -90,7 +90,25 @@ const tests = [
     },
     isTime: false,
     isElev: true,
-  }  
+  },
+  {
+    fileName: 'salcent2.gpx',
+    expectedName: 'Salisbury Gravel Century (June 2020 edit)',
+    expectedDescription: 'A Gravel Bike Century ride exploring many of the best gravel riding and most scenic areas around Salisbury.',
+    expectedLength: 2891,
+    firstPoint: {
+      lngLats: [-1.78699, 51.17036],
+      elevs: 68.9,
+      time: false
+    },
+    lastPoint: {
+      lngLats: [-1.786640, 51.170410],
+      elevs: 68.7,
+      time: false
+    },
+    isTime: false,
+    isElev: true,
+  },
 ];
 
 // const testItem = tests[0];
