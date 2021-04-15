@@ -50,7 +50,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
   public nLoadedRoutes: number;
   private limit: number;
   private offset = 0;
-  public listType: 'public' | 'private' = 'private';
+  public listType: 'public' | 'private';
   public listSort = '{"sort": "date", "direction" : "-1"}';
   public searchText = '';
   private boundingBox: TsBoundingBox = null;    // current view
@@ -87,6 +87,7 @@ export class PanelListComponent implements OnInit, OnDestroy {
         this.listType = this.data.getPath().properties.info.isPublic ? 'public' : 'private';
       } else {
         // if there is no startPath, need some logic to set the dropdown  (if already set, dont change it)
+        console.log(this.listType);
         if (!this.listType) {
           this.listType = this.isRegisteredUser ? 'private' : 'public';
         }
