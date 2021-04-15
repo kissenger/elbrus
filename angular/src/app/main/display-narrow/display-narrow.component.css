@@ -76,11 +76,21 @@ div{
   box-shadow: 2px 2px 8px 0px rgba(0,0,0,0.2);
 }
 
-.toggle {
+/* .toggle {
   width: 50px;
   height: 4px;
   border-radius: 2px;
   background-color: var(--ts-green);
+} */
+
+.arrow-icon {
+  transform: rotate(0turn);
+  transition: transform var(--transition-time);
+}
+
+.arrow-icon-open {
+  transition: transform var(--transition-time);
+  transform: rotate(0.5turn);
 }
 
 

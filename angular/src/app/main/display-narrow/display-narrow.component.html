@@ -18,8 +18,10 @@
   </div>
 
   <div class="toggle-bar d-flex mx-auto" (click)="onToggleClick()">
-    <div class="toggle my-auto mx-auto">
-    </div>
+    <!-- <div class="toggle my-auto mx-auto">
+    </div> -->
+    <img src="assets/images/icon-arrow.svg" height="10" [ngClass]="isMenuOpen ? 'arrow-icon-open' : ''" class="arrow-icon m-auto">
+
   </div>
 
 </div>
