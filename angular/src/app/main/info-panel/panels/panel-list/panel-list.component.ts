@@ -87,7 +87,6 @@ export class PanelListComponent implements OnInit, OnDestroy {
         this.listType = this.data.getPath().properties.info.isPublic ? 'public' : 'private';
       } else {
         // if there is no startPath, need some logic to set the dropdown  (if already set, dont change it)
-        console.log(this.listType);
         if (!this.listType) {
           this.listType = this.isRegisteredUser ? 'private' : 'public';
         }

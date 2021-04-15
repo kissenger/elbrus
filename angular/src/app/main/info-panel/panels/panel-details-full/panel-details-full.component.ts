@@ -83,9 +83,7 @@ export class PanelDetailsFullComponent implements OnInit, OnDestroy {
       if (this.geoJson?.properties?.info?.name) {
         this.name = this.geoJson.properties.info.name;
       } else {
-        if (!this.name) {
-          this.name = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
-        }
+        this.name = this.autoNamePipe.transform(null, this.geoJson.properties.info.category, this.geoJson.properties.info.pathType);
       }
 
       if (this.geoJson?.properties?.info?.description) {
