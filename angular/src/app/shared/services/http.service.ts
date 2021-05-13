@@ -124,8 +124,14 @@ export class HttpService {
     return this.http
       .post<any>(`${this.backendURL}/get-path-from-points/`, {lngLats, options})
       .pipe( catchError(this.errorService.handleError) );
-
   }
+
+  addRemoveCheckpoint(pathId: string, position: TsPosition, action: string) {
+    return this.http
+      .get<any>(`${this.backendURL}/add-remove-checkpoint/${pathId}/${position}/${action}`)
+      .pipe( catchError(this.errorService.handleError) );
+  }
+
 
   register(userData) {
     return this.http

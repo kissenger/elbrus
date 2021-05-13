@@ -220,6 +220,47 @@ app.get('/api/get-path-by-id/:type/:id', auth.verifyToken, async (req, res) => {
 })
 
 
+/*****************************************************************
+ *  Retrieve a single path from database
+ *  id of required path is supplied
+ *****************************************************************/
+ app.get('/api/add-remove-checkpoint/:pathId/:coord/:action', auth.verifyToken, async (req, res) => {
+
+  try {
+
+    // const document = await mongoModel(req.params.type).findOne( {_id: req.params.id});
+
+    // res.status(201).json({
+    //   hills: new GeoJSON().fromDocument(document).toGeoHills(),
+    //   basic: new GeoJSON().fromDocument(document).toBasic()
+    // })
+
+    if (req.params.action === 'add') {
+
+      await mongoModel('route').updateOne( 
+        {_id: req.params.pathId},
+        { $push: {"info.checkpoints": req.params.coord.split(',').map(a => a*1)} } 
+      );
+      // isPublic = oldPath.isPublic;
+      // await mongoModel('route').deleteOne( {_id: req.body.pathId} );
+
+    }
+
+    // now save the new path
+    // const newPath = await mongoModel('route').create( getMongoObject(routeInstance, req.userId, req.userName, true, !!isPublic) );
+    res.status(201).json( {sucess: true} )
+
+
+
+  } catch (error) {
+
+    debugMsg('ERROR: ' + error);
+    res.status(500).send(error.message);
+
+  }
+
+})
+
 
 /*****************************************************************
  * Retrieve a list of paths from database - if bbox is supplied it

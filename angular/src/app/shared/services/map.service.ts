@@ -299,18 +299,23 @@ export class MapService {
     const distanceUnits = this.auth.user.units.distance;
     const elevationUnits = this.auth.user.units.elevation;
 
+    const latLngString = e.features[0].properties.latLng.substring(1, e.features[0].properties.latLng.length - 1);
     const distanceCovered = this.unitsStringPipe.transform(e.features[0].properties.distanceCovered, 'distance', distanceUnits);
     const distanceRemaining = this.unitsStringPipe.transform(e.features[0].properties.distanceRemaining, 'distance', distanceUnits);
     const elevation = this.unitsStringPipe.transform(<number>e.features[0].properties.elevation, 'elevation', elevationUnits);
+    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${latLngString}`;
+    const osMapsLink = `https://osmaps.ordnancesurvey.co.uk/${latLngString},16/pin`;
 
     const html = `
       <div id="popup-menu"><span>Position: ${e.features[0].properties.latLng}</span></div>
       <div id="popup-menu"><span>Distance Covered: ${distanceCovered}</span></div>
       <div id="popup-menu"><span>Distance Remaining: ${distanceRemaining}</span></div>
       <div id="popup-menu"><span>Elevation: ${elevation}</span></div>
+      <div id="popup-menu"><span><a href="${googleMapsLink}" target="_blank">Show point in google maps</a></span></div>
+      <div id="popup-menu"><span><a href="${osMapsLink}" target="_blank">Show point in OS maps</a></span></div>
       `;
 
-    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: false, closeButton: false, offset: 5})
+    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: true, closeButton: false, offset: 5})
       .setLngLat(e.lngLat)
       .setHTML(html)
       .addTo(this.tsMap);
@@ -322,8 +327,8 @@ export class MapService {
 
   private onMouseOut = (e: mapboxgl.MapLayerMouseEvent) => {
     this.tsMap.getCanvas().style.cursor = 'grab';
-    this.mouseoverPopup.remove();
-    this.mouseoverPopup = null;
+    // this.mouseoverPopup.remove();
+    // this.mouseoverPopup = null;
     this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
 
   }

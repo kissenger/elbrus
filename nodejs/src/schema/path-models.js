@@ -38,7 +38,8 @@ const pathSchema = mongoose.Schema({
     isElevations: {type: Boolean},
     activityType: {type: String, enum: ['running', 'walking', 'cannicross', 'cycling', 'bikepacking', 'fastpacking', 'skitouring', 'gravelbiking', null]},
     startPoint: {type: [Number]},
-    endPoint: {type: [Number]}    
+    endPoint: {type: [Number]},
+    checkpoints: {type: [[Number]]}
   },
 
   // statistics calculated from the device data

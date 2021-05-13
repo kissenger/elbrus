@@ -34,6 +34,7 @@ export class MapCreateService extends MapService {
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
   private popup: mapboxgl.Popup;
+  private pathId: string;
 
   constructor(
     http: HttpService,
@@ -77,7 +78,7 @@ export class MapCreateService extends MapService {
         geoJson.properties.info.name = this.pathToEdit.properties.info.name;
         geoJson.properties.info.description = this.pathToEdit.properties.info.description;
         geoJson.properties.pathId = this.pathToEdit.properties.pathId;
-
+        this.pathId = this.pathToEdit.properties.pathId;
       }
       this.data.setPath(geoJson);  // send regardless of whether geojson is valid, as a null will disable menu bar items
       if (this.isDev) { console.log(geoJson); }
@@ -373,7 +374,7 @@ export class MapCreateService extends MapService {
       this.popup = null;
     }
 
-    const pathCoords = this.history.coords;
+    const pathCoords = JSON.parse(JSON.stringify(this.history.coords));
     const pointId = <number>e.features[0].id;
 
     let html = '<div id="popup-menu"><span id="delete-point">Delete point</span>';
@@ -381,6 +382,7 @@ export class MapCreateService extends MapService {
     html += '<div id="popup-menu"><span id="delete-points-after">Delete all points after</span>';
     html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
     html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
+    html += '<br /><span id="add-checkpoint">Convert to checkpoint</span>';
     html += '</div>';
 
     // store on the class so other functions can know if popup exists or not
@@ -391,24 +393,23 @@ export class MapCreateService extends MapService {
 
     document.getElementById('popup-menu').style.cursor = 'pointer';
 
-
     document.getElementById('delete-point').addEventListener('click', async () => {
       pathCoords.splice(pointId, 1);
       processNewPoints(pathCoords);
     });
 
     document.getElementById('add-point-before')?.addEventListener('click', async () => {
-      // rounding is done to 5pd to introduce small error, which prevents new point being simplified out
-      const newLng = Math.ceil((pathCoords[pointId - 1][0] + pathCoords[pointId][0]) / 2 * 1E5) / 1E5;
-      const newLat = Math.ceil((pathCoords[pointId - 1][1] + pathCoords[pointId][1]) / 2 * 1E5) / 1E5;
+      // rounding is done to 4pd to introduce small error, which prevents new point being simplified out
+      const newLng = Math.ceil((pathCoords[pointId - 1][0] + pathCoords[pointId][0]) / 2 * 1E4) / 1E4;
+      const newLat = Math.ceil((pathCoords[pointId - 1][1] + pathCoords[pointId][1]) / 2 * 1E4) / 1E4;
       pathCoords.splice(pointId, 0, [newLng, newLat]);
       processNewPoints(pathCoords);
     });
 
     document.getElementById('add-point-after')?.addEventListener('click', async () => {
-      // rounding is done to 5pd to introduce small error, which prevents new point being simplified out
-      const newLng = Math.ceil((pathCoords[pointId + 1][0] + pathCoords[pointId][0]) / 2 * 1E5) / 1E5;
-      const newLat = Math.ceil((pathCoords[pointId + 1][1] + pathCoords[pointId][1]) / 2 * 1E5) / 1E5;
+      // rounding is done to 4pd to introduce small error, which prevents new point being simplified out
+      const newLng = Math.ceil((pathCoords[pointId + 1][0] + pathCoords[pointId][0]) / 2 * 1E4) / 1E4;
+      const newLat = Math.ceil((pathCoords[pointId + 1][1] + pathCoords[pointId][1]) / 2 * 1E4) / 1E4;
       pathCoords.splice(pointId + 1, 0, [newLng, newLat]);
       processNewPoints(pathCoords);
     });
@@ -421,6 +422,14 @@ export class MapCreateService extends MapService {
     document.getElementById('delete-points-after')?.addEventListener('click', async () => {
       pathCoords.splice(pointId + 1, pathCoords.length - pointId);
       processNewPoints(pathCoords);
+    });
+
+    document.getElementById('add-checkpoint')?.addEventListener('click', async () => {
+      console.log('add-checkpoint');
+      this.http.addRemoveCheckpoint(this.pathId, pathCoords.splice(pointId, 1), 'add').subscribe(
+        result => console.log(result),
+        error => console.log(error)
+      );
     });
 
     const processNewPoints = async(coords: Array<TsPosition>) => {
