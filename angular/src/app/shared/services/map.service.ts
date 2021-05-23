@@ -113,6 +113,8 @@ export class MapService {
 
         this.tsMap.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
+        this.tsMap.on('contextmenu', this.onRightClick);
+
         this.tsMap.on('moveend', (event) => {
           // conditional ensures we dont update list if the screensize changes, thereby minimising calls to the backend
           if (event.originalEvent?.type === 'resize') {
@@ -270,52 +272,91 @@ export class MapService {
               1,
               ['boolean', ['feature-state', 'hover'], false ],
               1,
-              0
+              0.2
           ],
           'circle-stroke-width': 1,
-          'circle-opacity': 0
+          'circle-opacity':
+            [ 'case',
+              ['boolean', ['feature-state', 'enabled'], false ],
+              1,
+              ['boolean', ['feature-state', 'hover'], false ],
+              1,
+              0
+          ],
         });
+
         this.setLayerData(pathId + 'pts', 'Point', path.positionsList, path.pointData);
 
-        this.tsMap.on('mouseenter', pathId + 'pts', this.onMouseOver);
-        this.tsMap.on('mouseleave', pathId + 'pts', this.onMouseOut);
+        this.tsMap.on('mouseenter', pathId + 'pts', this.onMouseOverPoint);
+        this.tsMap.on('contextmenu', pathId + 'pts', this.onRightClick);
+        this.tsMap.on('touchstart', pathId + 'pts', this.onRightClick);
+        this.tsMap.on('mouseleave', pathId + 'pts', this.onMouseLeavePoint);
       }
 
     });
 
   }
 
-
-
-  private onMouseOver = (e: mapboxgl.MapLayerMouseEvent) => {
-
+  private onMouseOverPoint = (e: mapboxgl.MapLayerMouseEvent) => {
+    this.tsMap.getCanvas().style.cursor = 'pointer';
     this.tsMap.setFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts', id: e.features[0].id}, {hover: true} );
+    this.tsMap.off('contextmenu', this.onRightClick);
+  }
+
+  private onMouseLeavePoint = (e: mapboxgl.MapLayerMouseEvent) => {
+    this.tsMap.getCanvas().style.cursor = 'grab';
+    // this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
+    this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
+    this.tsMap.on('contextmenu', this.onRightClick);
+
+  }
+
+  private onRightClick = (e: mapboxgl.MapLayerMouseEvent | mapboxgl.MapLayerTouchEvent) => {
 
     if (this.mouseoverPopup) {
       this.mouseoverPopup.remove();
       this.mouseoverPopup = null;
     }
 
-    const distanceUnits = this.auth.user.units.distance;
-    const elevationUnits = this.auth.user.units.elevation;
+    // if clicked on route then gather route information
+    let routeHtml = '';
+    let latLngString = '';
 
-    const latLngString = e.features[0].properties.latLng.substring(1, e.features[0].properties.latLng.length - 1);
-    const distanceCovered = this.unitsStringPipe.transform(e.features[0].properties.distanceCovered, 'distance', distanceUnits);
-    const distanceRemaining = this.unitsStringPipe.transform(e.features[0].properties.distanceRemaining, 'distance', distanceUnits);
-    const elevation = this.unitsStringPipe.transform(<number>e.features[0].properties.elevation, 'elevation', elevationUnits);
-    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${latLngString}`;
-    const osMapsLink = `https://osmaps.ordnancesurvey.co.uk/${latLngString},16/pin`;
+    if (e.features) {
+      // right click on point, so route data is available
 
-    const html = `
-      <div id="popup-menu"><span>Position: ${e.features[0].properties.latLng}</span></div>
-      <div id="popup-menu"><span>Distance Covered: ${distanceCovered}</span></div>
-      <div id="popup-menu"><span>Distance Remaining: ${distanceRemaining}</span></div>
-      <div id="popup-menu"><span>Elevation: ${elevation}</span></div>
-      <div id="popup-menu"><span><a href="${googleMapsLink}" target="_blank">Show point in google maps</a></span></div>
-      <div id="popup-menu"><span><a href="${osMapsLink}" target="_blank">Show point in OS maps</a></span></div>
+      latLngString = e.features[0].properties.latLng.substring(1, e.features[0].properties.latLng.length - 1);
+      const distanceUnits = this.auth.user.units.distance;
+      const elevationUnits = this.auth.user.units.elevation;
+      const distanceCovered = this.unitsStringPipe.transform(e.features[0].properties.distanceCovered, 'distance', distanceUnits);
+      const distanceRemaining = this.unitsStringPipe.transform(e.features[0].properties.distanceRemaining, 'distance', distanceUnits);
+
+      let elevation = 'N/A';
+      if (e.features[0].properties.elevation) {
+        elevation = this.unitsStringPipe.transform(<number>e.features[0].properties.elevation, 'elevation', elevationUnits);
+      }
+
+      routeHtml = `
+        <div id="popup-menu">Distance Covered: ${distanceCovered}</div>
+        <div id="popup-menu">Distance Remaining: ${distanceRemaining}</div>
+        <div id="popup-menu">Elevation: ${elevation}</div>
       `;
 
-    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: true, closeButton: false, offset: 5})
+    } else {
+      // right clisk on map, use click position rather than point position
+      latLngString = `${Math.round(e.lngLat.lat * 1e6) / 1e6},${Math.round(e.lngLat.lng * 1e6) / 1e6}`;
+
+    }
+
+    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${latLngString}`;
+    const osMapsLink = `https://osmaps.ordnancesurvey.co.uk/${latLngString},16/pin`;
+    const html = `
+      <div id="popup-menu">Lat,Lng: ${latLngString}</div>
+      ${routeHtml}
+      <div id="popup-menu">Show point in <a href="${googleMapsLink}" target="_blank"> google maps</a> | <a href="${osMapsLink}" target="_blank">OS maps</a></div>
+      `;
+
+    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: true, closeButton: true, offset: 5})
       .setLngLat(e.lngLat)
       .setHTML(html)
       .addTo(this.tsMap);
@@ -325,13 +366,6 @@ export class MapService {
 
   }
 
-  private onMouseOut = (e: mapboxgl.MapLayerMouseEvent) => {
-    this.tsMap.getCanvas().style.cursor = 'grab';
-    // this.mouseoverPopup.remove();
-    // this.mouseoverPopup = null;
-    this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
-
-  }
 
   addStartEndMarkers(pathId: string, startPoint: TsPosition, endPoint: TsPosition) {
     this.markers.add(pathId + 'start', 'start', startPoint, this.tsMap);

@@ -275,7 +275,7 @@ export class MapCreateService extends MapService {
     this.tsMap.on('click', this.onClickGetCoords);
     this.tsMap.on('mousedown', '0000pts', this.onMouseDown);
     this.tsMap.on('mouseup', '0000pts', this.onMouseUp);
-    this.tsMap.on('contextmenu', '0000pts', this.onRightClick);
+    this.tsMap.on('contextmenu', '0000pts', this.onRightClickEdit);
     this.tsMap.on('mouseenter', '0000pts', this.onMouseEnter);
     this.tsMap.on('mouseleave', '0000pts', this.onMouseLeave);
     this.tsMap.on('mousedown', () => {
@@ -366,8 +366,8 @@ export class MapCreateService extends MapService {
   }
 
 
-  // Delete a point on right-click
-  private onRightClick = async (e: mapboxgl.MapLayerMouseEvent) => {
+  // Show menu on right-click
+  private onRightClickEdit = async (e: mapboxgl.MapLayerMouseEvent) => {
 
     if (this.popup) {
       this.popup.remove();
@@ -377,13 +377,21 @@ export class MapCreateService extends MapService {
     const pathCoords = JSON.parse(JSON.stringify(this.history.coords));
     const pointId = <number>e.features[0].id;
 
+    const latLngString = `${pathCoords[pointId][1]},${pathCoords[pointId][0]}`;
+    const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${latLngString}`;
+    const osMapsLink = `https://osmaps.ordnancesurvey.co.uk/${latLngString},16/pin`;
+
     let html = '<div id="popup-menu"><span id="delete-point">Delete point</span>';
     html += '<div id="popup-menu"><span id="delete-points-before">Delete all points before</span>';
     html += '<div id="popup-menu"><span id="delete-points-after">Delete all points after</span>';
     html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
     html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
-    html += '<br /><span id="add-checkpoint">Convert to checkpoint</span>';
+    // html += '<br /><span id="add-checkpoint">Convert to checkpoint</span>';
+    html += `<div id="popup-menu">Show point in <a href="${googleMapsLink}" target="_blank"> google maps</a> | <a href="${osMapsLink}" target="_blank">OS maps</a></div>`;
+
     html += '</div>';
+
+
 
     // store on the class so other functions can know if popup exists or not
     this.popup = new mapboxgl.Popup({ closeOnClick: true })
