@@ -33,7 +33,7 @@ export class MapCreateService extends MapService {
   private pathToEdit: TsFeatureCollection;
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
-  private popup: mapboxgl.Popup;
+  // private popup: mapboxgl.Popup;
   private pathId: string;
 
   constructor(
@@ -297,8 +297,8 @@ export class MapCreateService extends MapService {
   private onClickGetCoords = async (e) => {
 
     // do nothing if popup is active
-    if (this.popup) {
-      this.popup = null;
+    if (this.mouseoverPopup) {
+      this.mouseoverPopup = null;
       return;
     }
 
@@ -356,6 +356,7 @@ export class MapCreateService extends MapService {
     this.selectedPointId = <number>e.features[0].id;
     this.tsMap.getCanvas().style.cursor = 'pointer';
     this.tsMap.setFeatureState( {source: '0000pts', id: e.features[0].id}, {hover: true} );
+    this.tsMap.off('contextmenu', this.onRightClick);
   }
 
 
@@ -363,43 +364,53 @@ export class MapCreateService extends MapService {
   private onMouseLeave = (e: mapboxgl.MapLayerMouseEvent) => {
     this.tsMap.getCanvas().style.cursor = 'crosshair';
     this.tsMap.removeFeatureState( {source: '0000pts'} );
+    this.tsMap.on('contextmenu', this.onRightClick);
   }
 
 
   // Show menu on right-click
   private onRightClickEdit = async (e: mapboxgl.MapLayerMouseEvent) => {
 
-    if (this.popup) {
-      this.popup.remove();
-      this.popup = null;
+    if (this.mouseoverPopup) {
+      this.mouseoverPopup.remove();
+      this.mouseoverPopup = null;
     }
+
+
 
     const pathCoords = JSON.parse(JSON.stringify(this.history.coords));
     const pointId = <number>e.features[0].id;
-
     const latLngString = `${pathCoords[pointId][1]},${pathCoords[pointId][0]}`;
     const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${latLngString}`;
     const osMapsLink = `https://osmaps.ordnancesurvey.co.uk/${latLngString},16/pin`;
 
-    let html = '<div id="popup-menu"><span id="delete-point">Delete point</span>';
-    html += '<div id="popup-menu"><span id="delete-points-before">Delete all points before</span>';
-    html += '<div id="popup-menu"><span id="delete-points-after">Delete all points after</span>';
-    html += pointId > 0 ? '<br /><span id="add-point-before">Add point before</span>' : '';
-    html += pointId < pathCoords.length - 1 ? '<br /><span id="add-point-after">Add point after</span>' : '';
-    // html += '<br /><span id="add-checkpoint">Convert to checkpoint</span>';
-    html += `<div id="popup-menu">Show point in <a href="${googleMapsLink}" target="_blank"> google maps</a> | <a href="${osMapsLink}" target="_blank">OS maps</a></div>`;
-
-    html += '</div>';
-
-
+    const html = `
+      <div class="menu-item" id="delete-point" style="padding-left:3px">Delete point</div>
+      ${pointId > 0 ?                     '<div class="menu-item" id="delete-points-before" style="padding-left:3px">Delete all points before</div>' : ''}
+      ${pointId < pathCoords.length - 1 ? '<div class="menu-item" id="delete-points-after" style="padding-left:3px">Delete all points after</div>' : ''}
+      ${pointId > 0 ?                     '<div class="menu-item" id="add-point-before" style="padding-left:3px">Add point before</div>' : ''}
+      ${pointId < pathCoords.length - 1 ? '<div class="menu-item" id="add-point-after" style="padding-left:3px">Add point after</div>' : ''}
+      <div style="padding-left:3px">
+        Show point in <a href="${googleMapsLink}" target="_blank"> google maps</a> | <a href="${osMapsLink}" target="_blank">OS maps</a>
+      </div>
+    `;
 
     // store on the class so other functions can know if popup exists or not
-    this.popup = new mapboxgl.Popup({ closeOnClick: true })
+    this.mouseoverPopup = new mapboxgl.Popup({ closeOnClick: true })
       .setLngLat(e.lngLat)
       .setHTML(html)
       .addTo(this.tsMap);
 
-    document.getElementById('popup-menu').style.cursor = 'pointer';
+    // add event listener to simulate hover effect
+    Array.from(document.getElementsByClassName('menu-item')).forEach( item => {
+      item.addEventListener('mouseover', (a) => {
+        a.target['style'].backgroundColor = '#F5F5F5';
+        a.target['style'].cursor = 'pointer';
+      });
+      item.addEventListener('mouseout', (a) => {
+        a.target['style'].backgroundColor = 'white';
+      });
+    });
 
     document.getElementById('delete-point').addEventListener('click', async () => {
       pathCoords.splice(pointId, 1);
@@ -445,8 +456,8 @@ export class MapCreateService extends MapService {
       this.history.add( new Path (backendResult) );
       this.updateMap();
       this.tsMap.removeFeatureState( {source: '0000pts'} );
-      this.popup.remove();
-      this.popup = null;
+      this.mouseoverPopup.remove();
+      this.mouseoverPopup = null;
     };
   }
 

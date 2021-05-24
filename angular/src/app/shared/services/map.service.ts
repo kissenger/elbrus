@@ -37,7 +37,7 @@ export class MapService {
     wideScreen: {top: 50, left: 50, bottom: 50, right: 300},
     narrowScreen: {top: 10, left: 10, bottom: 10, right: 10}
   };
-  private mouseoverPopup: mapboxgl.Popup;
+  public mouseoverPopup: mapboxgl.Popup;
 
 
   constructor(
@@ -304,14 +304,13 @@ export class MapService {
   }
 
   private onMouseLeavePoint = (e: mapboxgl.MapLayerMouseEvent) => {
-    this.tsMap.getCanvas().style.cursor = 'grab';
-    // this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
+    this.tsMap.getCanvas().style.cursor = '';  // restores default behaviour
     this.tsMap.removeFeatureState( {source: this.pathLayers.topLayer.pathId + 'pts'});
     this.tsMap.on('contextmenu', this.onRightClick);
 
   }
 
-  private onRightClick = (e: mapboxgl.MapLayerMouseEvent | mapboxgl.MapLayerTouchEvent) => {
+  public onRightClick = (e: mapboxgl.MapLayerMouseEvent | mapboxgl.MapLayerTouchEvent) => {
 
     if (this.mouseoverPopup) {
       this.mouseoverPopup.remove();
@@ -361,11 +360,7 @@ export class MapService {
       .setHTML(html)
       .addTo(this.tsMap);
 
-    this.tsMap.getCanvas().style.cursor = 'pointer';
-    document.getElementById('popup-menu').style.cursor = 'pointer';
-
   }
-
 
   addStartEndMarkers(pathId: string, startPoint: TsPosition, endPoint: TsPosition) {
     this.markers.add(pathId + 'start', 'start', startPoint, this.tsMap);
