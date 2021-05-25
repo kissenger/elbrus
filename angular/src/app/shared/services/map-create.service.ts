@@ -33,7 +33,6 @@ export class MapCreateService extends MapService {
   private pathToEdit: TsFeatureCollection;
   private line: TsFeatureCollection;
   private points: TsFeatureCollection;
-  // private popup: mapboxgl.Popup;
   private pathId: string;
 
   constructor(
@@ -376,8 +375,6 @@ export class MapCreateService extends MapService {
       this.mouseoverPopup = null;
     }
 
-
-
     const pathCoords = JSON.parse(JSON.stringify(this.history.coords));
     const pointId = <number>e.features[0].id;
     const latLngString = `${pathCoords[pointId][1]},${pathCoords[pointId][0]}`;
@@ -390,6 +387,7 @@ export class MapCreateService extends MapService {
       ${pointId < pathCoords.length - 1 ? '<div class="menu-item" id="delete-points-after" style="padding-left:3px">Delete all points after</div>' : ''}
       ${pointId > 0 ?                     '<div class="menu-item" id="add-point-before" style="padding-left:3px">Add point before</div>' : ''}
       ${pointId < pathCoords.length - 1 ? '<div class="menu-item" id="add-point-after" style="padding-left:3px">Add point after</div>' : ''}
+      <div class="menu-item" id="add-checkpoint" style="padding-left:3px">Add Checkpoint</div>
       <div style="padding-left:3px">
         Show point in <a href="${googleMapsLink}" target="_blank"> google maps</a> | <a href="${osMapsLink}" target="_blank">OS maps</a>
       </div>
@@ -445,8 +443,14 @@ export class MapCreateService extends MapService {
 
     document.getElementById('add-checkpoint')?.addEventListener('click', async () => {
       console.log('add-checkpoint');
-      this.http.addRemoveCheckpoint(this.pathId, pathCoords.splice(pointId, 1), 'add').subscribe(
-        result => console.log(result),
+      this.http.addRemoveCheckpoint(this.pathId, pointId, 'add').subscribe(
+        result => {
+          console.log(result);
+          // console.log(pathCoords.slice(pointId, pointId+1))
+          this.addCheckpointMarker('0000', pathCoords.slice(pointId, pointId+1)[0]);
+          this.mouseoverPopup.remove();
+          this.mouseoverPopup = null;
+        },
         error => console.log(error)
       );
     });

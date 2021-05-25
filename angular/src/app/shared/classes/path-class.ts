@@ -12,6 +12,7 @@ export class Path {
   public lastPoint: TsPosition;
   private nFeatures: number;
   public pointData: Array<{cumDist: number, elev: number}>;
+  private checkpoints: Array<number>;
 
   constructor( geoJson: TsFeatureCollection ) {
 
@@ -23,13 +24,23 @@ export class Path {
     this.firstPoint = this.positionsList[0];
     this.lastPoint = this.positionsList[this.positionsList.length - 1];
     this.nFeatures = this._geoJson.features.length;
+    this.checkpoints = [];
 
   }
 
+  toggleCheckpoint(point: number) {
+    if (this.checkpoints.includes(point)) {
+      this.checkpoints.splice(this.checkpoints.indexOf(point), 1);
+    } else{
+      this.checkpoints.push(point);
+    }
+  }
 
   get geoJson() {
     return  this._geoJson;
   }
+
+
 
 
   get boundingBox() {

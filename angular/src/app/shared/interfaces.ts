@@ -22,6 +22,8 @@ export interface TsUnits {
 
 export type TsActivityType = 'running' | 'cycling' | 'bikepacking' | 'fastpacking' | 'skitouring' | 'canicross' | 'walking' | 'gravelbiking';
 
+export type TsMarkerType = 'start' | 'finish' | 'home' | 'cp'
+
 export type TsCallingPageType = 'list' | 'create' | 'edit' | 'review';
 export interface TsCallingPage {
   callingPage: TsCallingPageType;
@@ -215,6 +217,7 @@ export interface TsInfo {
     isElevations: boolean;
     activityType: TsActivityType;
     startPoint: TsPosition;
+    checkpoints: number[];
 }
 
 export interface TsParams {

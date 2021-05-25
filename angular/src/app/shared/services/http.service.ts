@@ -126,7 +126,7 @@ export class HttpService {
       .pipe( catchError(this.errorService.handleError) );
   }
 
-  addRemoveCheckpoint(pathId: string, position: TsPosition, action: string) {
+  addRemoveCheckpoint(pathId: string, position: number, action: string) {
     return this.http
       .get<any>(`${this.backendURL}/add-remove-checkpoint/${pathId}/${position}/${action}`)
       .pipe( catchError(this.errorService.handleError) );

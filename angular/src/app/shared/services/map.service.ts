@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { DataService } from './data.service';
 import * as mapboxgl from 'mapbox-gl';
 import * as globals from 'src/app/shared/globals';
-import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition, TsMapType } from 'src/app/shared/interfaces';
+import { TsCoordinate, TsPlotPathOptions, TsLineStyle, TsFeatureCollection, TsFeature, TsBoundingBox, TsPosition, TsMapType, TsMarkerType } from 'src/app/shared/interfaces';
 import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { ActivePathLayers } from '../classes/active-layers';
@@ -244,6 +244,7 @@ export class MapService {
 
       const path = new Path( pathAsGeoJSON );
       const pathId = pathAsGeoJSON.properties.pathId;
+      const nPoints = pathAsGeoJSON.properties.stats.nPoints;
       const bbox: TsBoundingBox = pathAsGeoJSON.bbox;
 
       // map listener will fire only once when the data has finished loading
@@ -263,7 +264,12 @@ export class MapService {
       // for main route (not overlay)
       if (plotOptions.plotType !== 'overlay') {
 
-        this.addStartEndMarkers(pathId, path.firstPoint, path.lastPoint);
+        // this.addStartEndMarkers(pathId, path.firstPoint, path.lastPoint);
+
+        const pointIDs = [1, nPoints - 1, ...pathAsGeoJSON.properties.info.checkpoints];
+        const pointCoords = pointIDs.map( id => path.positionsList[id]);
+        this.addMarkers(pathId, pointCoords);
+
         this.addPointsLayer(pathId + 'pts', {
           'circle-radius': 4,
           'circle-stroke-opacity':
@@ -362,12 +368,29 @@ export class MapService {
 
   }
 
-  addStartEndMarkers(pathId: string, startPoint: TsPosition, endPoint: TsPosition) {
-    this.markers.add(pathId + 'start', 'start', startPoint, this.tsMap);
-    this.markers.add(pathId + 'finish', 'finish', endPoint, this.tsMap);
+  // expects an array of point coordinates
+  // first point will be start marker, second point will be end marker, all other points will be checkpoints
+  addMarkers(pathId, points: Array<TsPosition>) {
+    points.forEach( (point, index) => {
+      const type = index === 0 ? 'start' : index === 1 ? 'finish' : 'cp';
+      this.addMarker(pathId, type, point);
+    })
   }
 
-  clearStartEndMarkers(pathId: string) {
+  addMarker(pathId: string, type: TsMarkerType, point: TsPosition) {
+    this.markers.add(pathId + type, type, point, this.tsMap);
+  }
+
+  // addCheckpointMarker(pathId: string, point: TsPosition) {
+  //   this.markers.add(pathId + 'cp', 'cp', point, this.tsMap);
+  // }
+
+  // addStartEndMarkers(pathId: string, startPoint: TsPosition, endPoint: TsPosition) {
+  //   this.markers.add(pathId + 'start', 'start', startPoint, this.tsMap);
+  //   this.markers.add(pathId + 'finish', 'finish', endPoint, this.tsMap);
+  // }
+
+  clearPathMarkers(pathId: string) {
     this.markers.delete(pathId + 'start');
     this.markers.delete(pathId + 'finish');
   }
@@ -500,7 +523,7 @@ export class MapService {
     if ( this.pathLayers ) {
       this.pathLayers.get.forEach( layer => {
         this.remove(layer.pathId);
-        this.clearStartEndMarkers(layer.pathId);
+        this.clearPathMarkers(layer.pathId);
       });
     }
 

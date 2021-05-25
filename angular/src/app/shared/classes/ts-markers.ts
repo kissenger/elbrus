@@ -10,7 +10,7 @@ export class TsMarkers {
   ) { }
 
 
-  public add(id: string, type: 'start' | 'finish' | 'home', position: TsCoordinate | TsPosition, mapContext: mapboxgl.Map) {
+  public add(id: string, type: 'start' | 'finish' | 'home' | 'cp', position: mapboxgl.LngLatLike, mapContext: mapboxgl.Map) {
 
     const htmlElement = document.createElement('div');
     htmlElement.className = 'marker';
@@ -21,7 +21,7 @@ export class TsMarkers {
     htmlElement.style.backgroundSize = 'cover';
     htmlElement.style.pointerEvents = 'none';
 
-
+    console.log(id, position, htmlElement);
 
     this.markers.push({
       id,
