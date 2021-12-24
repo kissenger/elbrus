@@ -146,8 +146,8 @@ function gpxWrite(writeObject){
 
   return new Promise( (resolve, reject) => {
 
-    const creator = 'Trailscape https://kissenger.github.io/trailscape/';
-    const xmlns = 'http://www.topografix.com/GPX/1/0';
+    const creator = 'trailscape.cc';
+    const xmlns = 'http://www.topografix.com/GPX/1/1';
 
     // TODO: Unique filename needed otherwise cannot do export twice on the same filename, but of a hack, better way?
     const filePath = './downloads/'
