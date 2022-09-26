@@ -58,7 +58,7 @@ To Edit Renewal Schedule
 The scheduling is done by crontab, edit using:
 $ crontab -e
 
-Note - DO NOT use sudo, it sets upa  different scheduler.
+Note - DO NOT use sudo, it sets up a different scheduler.
 
 crontab currently calls the following script: ~/scripts/certbot-renew.sh
 and logs the result to ~/cron.log
