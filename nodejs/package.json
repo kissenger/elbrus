@@ -14,7 +14,7 @@
   "devDependencies": {
     "chai": "*",
     "chai-as-promised": "*",
-    "mocha": "^8.2.1"
+    "mocha": "^10.0.0"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
