@@ -12,7 +12,9 @@ cp /home/ivyterrace/trailscape/env/.env /home/ivyterrace/trailscape/nodejs
 echo "deploy-script.sh --> build angular"
 cd /home/ivyterrace/trailscape/angular
 # ng build --prod --base-href /trailscape/
-ng build --prod
+# ng build --prod
+# fix memory issue per: https://upmostly.com/angular/fixing-angular-build-memory-issues
+npm run build-prod
 cd /home/ivyterrace/trailscape
 echo "deploy-script.sh --> complete"
 echo "==========================================="
