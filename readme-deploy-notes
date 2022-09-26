@@ -1,3 +1,65 @@
+================================
+DEPLOYMENT NOTES FOR JOHN-KELLY:
+================================
+
+Backend is deployed on Port 8002
+
+Deployment
+==========
+git fetch --all
+git reset --hard origin/master
+cp -r env/environments angular/src
+cp env/.env nodejs
+sudo docker-compose down
+sudo docker system prune -a -f
+sudo docker-compose up --build --detach
+
+or run: 
+scripts/deploy-update.sh
+
+
+
+
+VM STORAGE 
+==========
+
+If machine gets restarted for any reason, mounted drives will be lost and need remounting.
+
+Mounting a persistent disk to VM
+--------------------------------
+follow instructions here: https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting
+** important: the disk should be attached as read/write in the google console  - check this in case of **
+** error "cant mount read only disk" **
+to list available disks: sudo lsblk
+to mount the disk: sudo mount -o discard,defaults /dev/sdb ./data
+
+
+
+Elevation Data ASTGTM_v003
+===========================
+
+Downloading source data
+-----------------------
+download data from: https://search.earthdata.nasa.gov/search
+login: ki..
+passwrd: E..1
+Use chrome extension "simple mass downloader" to download zips to directory
+(copy list of urls from download page and use "paste from urls" option in extension)
+Use command: "C:\Program Files\7-Zip\7z.exe" e *.zip -oc:\unzip
+... to unzip all into a directory, losing the directory structure
+Delete all *_num.tif files
+Upload to cloud storage bucket (just upload files or folder): https://console.cloud.google.com/storage/browser?project=trailscape&prefix=
+
+Copying ASTGTM files from Google Cloud Storage to VM Storage
+-----------------------------------------------------------
+go to destination and type (from https://cloud.google.com/storage/docs/gsutil/commands/cp):
+sudo gsutil cp -r gs://trailscape-geotiffs-europe/_ASTGTM .
+
+
+=====================
+ARCHIVE DOCKER NOTES:
+=====================
+
 Correct "Error starting userland proxy" Error
 ---------------------------------------------
 If you get the following error when trying to bring up docker-compose:
@@ -78,43 +140,6 @@ or run:
 scripts/deploy-update.sh
 
 
-
-***********
-VM STORAGE 
-***********
-
-If machine gets restarted for any reason, mounted drives will be lost and need remounting.
-
-Mounting a persistent disk to VM
---------------------------------
-follow instructions here: https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting
-** important: the disk should be attached as read/write in the google console  - check this in case of **
-** error "cant mount read only disk" **
-to list available disks: sudo lsblk
-to mount the disk: sudo mount -o discard,defaults /dev/sdb ./data
-
-
-
-************************************
-Elevation Data ASTGTM_v003 data
-************************************
-
-Downloading source data
------------------------
-download data from: https://search.earthdata.nasa.gov/search
-login: ki..
-passwrd: E..1
-Use chrome extension "simple mass downloader" to download zips to directory
-(copy list of urls from download page and use "paste from urls" option in extension)
-Use command: "C:\Program Files\7-Zip\7z.exe" e *.zip -oc:\unzip
-... to unzip all into a directory, losing the directory structure
-Delete all *_num.tif files
-Upload to cloud storage bucket (just upload files or folder): https://console.cloud.google.com/storage/browser?project=trailscape&prefix=
-
-Copying ASTGTM files from Google Cloud Storage to VM Storage
------------------------------------------------------------
-go to destination and type (from https://cloud.google.com/storage/docs/gsutil/commands/cp):
-sudo gsutil cp -r gs://trailscape-geotiffs-europe/_ASTGTM .
 
 
 ***********************************
