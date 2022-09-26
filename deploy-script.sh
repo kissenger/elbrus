@@ -15,7 +15,7 @@ echo "${YELLOW_BOLD}deploy-script.sh --> copy environment files${NC}"
 cp -r /home/ivyterrace/trailscape/env/environments /home/ivyterrace/trailscape/src
 cp /home/ivyterrace/trailscape/env/.env /home/ivyterrace/trailscape/nodejs
 echo "${YELLOW_BOLD}deploy-script.sh --> build angular${NC}"
-cd /home/ivyterrace/trailscape/angular
+cd /home/ivyterrace/trailscape
 # ng build --prod --base-href /trailscape/
 # ng build --prod
 # fix memory issue per: https://upmostly.com/angular/fixing-angular-build-memory-issues
